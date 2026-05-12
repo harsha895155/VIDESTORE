@@ -12,6 +12,9 @@ connectDB();
 
 const app = express();
 
+// Trust proxy - required for Render/Heroku to handle https correctly
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(passport.initialize());
 app.use(helmet());
@@ -24,7 +27,8 @@ app.use(cors({
       "http://localhost:5173",
       "http://localhost:5174",
       "https://videstore-black.vercel.app",
-      "https://videstore.onrender.com"
+      "https://videstore.onrender.com",
+      "https://videstore-6ky79nt74-harsha895155s-projects.vercel.app"
     ];
     if (!origin || allowed.includes(origin)) {
       callback(null, true);

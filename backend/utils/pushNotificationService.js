@@ -111,4 +111,4 @@ module.exports = {
     body: `Hey ${user.name?.split(' ')[0]}! Use code WELCOME10 for 10% OFF your first order.`,
     data: { url: '/shop', type: 'welcome' },
   }),
-};
+};
