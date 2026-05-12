@@ -1,8 +1,8 @@
-# 🛍️ TRENDORA – Premium Fashion E-Commerce
+# 🛍️ VIDESTORE – Premium Fashion E-Commerce
 
 > A full-stack production-ready fashion e-commerce platform built with React, Node.js, MongoDB, and Razorpay — inspired by Zara, Nike, and H&M.
 
-![Trendora](https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200&q=80)
+![VideStore](https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200&q=80)
 
 ---
 
@@ -23,7 +23,7 @@
 ## 📁 Folder Structure
 
 ```
-trendora/
+videstore/
 ├── frontend/
 │   └── src/
 │       ├── components/
@@ -63,7 +63,7 @@ trendora/
 
 ```bash
 # Install all dependencies
-cd trendora
+cd videstore
 npm run install:all
 ```
 
@@ -86,7 +86,7 @@ PORT=5000
 NODE_ENV=development
 
 # MongoDB Atlas connection string
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/trendora?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/videstore?retryWrites=true&w=majority
 
 # JWT (use a long random string)
 JWT_SECRET=your_super_secret_jwt_key_minimum_32_characters
@@ -151,8 +151,8 @@ node seed.js
 ```
 
 This creates:
-- 👑 **Admin**: `admin@trendora.in` / `Admin@123`
-- 👤 **User**: `user@trendora.in` / `User@123`
+- 👑 **Admin**: `admin@videstore.in` / `Admin@123`
+- 👤 **User**: `user@videstore.in` / `User@123`
 - 🛍️ 8 sample products across all categories
 
 ---
@@ -327,8 +327,8 @@ npm run build
 ## 🧪 Test Credentials
 
 ```
-Admin: admin@trendora.in / Admin@123
-User:  user@trendora.in / User@123
+Admin: admin@videstore.in / Admin@123
+User:  user@videstore.in / User@123
 
 Razorpay Test Card:
   Number: 4111 1111 1111 1111
@@ -341,4 +341,5 @@ Razorpay Test Card:
 
 ## 📝 License
 
-MIT © 2026 Trendora Fashion Pvt. Ltd.
+MIT © 2026 VideStore Fashion Pvt. Ltd.
+"# VIDESTORE" 
