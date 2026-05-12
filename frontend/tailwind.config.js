@@ -4,17 +4,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        gold: {
-          DEFAULT: '#C9A84C',
-          light: '#E2C97E',
-          dark: '#A07830',
+        veb: {
+          bg: "#040404",
+          panel: "#070707",
+          surface: "#0D0D0F",
+          surface2: "#121214",
+          gold: "#C8A646",
+          goldSoft: "#B88D2D",
+          goldDark: "#8C6A1F",
+          goldLine: "#5E4716",
+          text: "#F5F3EE",
+          muted: "#B8B1A1",
+          label: "#7F7765",
+          divider: "#232323",
         },
-        charcoal: '#1a1a1a',
-        offwhite: '#F5F5F0',
+        gold: {
+          DEFAULT: '#C8A646',
+          light: '#E2C97E',
+          dark: '#B88D2D',
+        },
+        charcoal: '#040404',
+        offwhite: '#F5F3EE',
       },
       fontFamily: {
         display: ['"Cormorant Garamond"', 'serif'],
-        body: ['"Jost"', 'sans-serif'],
+        body: ['"Inter"', 'sans-serif'],
         accent: ['"Cinzel"', 'serif'],
       },
       animation: {

@@ -1,31 +1,29 @@
 import { Link, useLocation } from 'react-router-dom';
 import { FiMail, FiPhone, FiMapPin, FiClock, FiMessageCircle } from 'react-icons/fi';
 
-const GOLD = '#C9A84C';
-const BG = '#111111';
-const BG2 = '#0a0a0a';
-const CARD = '#1a1a1a';
-const BORDER = 'rgba(255,255,255,0.08)';
-const TEXT = 'rgba(255,255,255,0.6)';
+const GOLD = 'var(--p)';
+const BG = 'var(--bg)';
+const BG2 = 'var(--bg-alt)';
+const CARD = 'var(--card)';
+const BORDER = 'var(--b)';
+const TEXT = 'var(--tl)';
 
 const helpLinks = [
   { label: 'Size Guide', to: '/size-guide' },
-  { label: 'Shipping & Returns', to: '/shipping-policy' },
-  { label: 'Track My Order', to: '/track-order' },
   { label: 'FAQ', to: '/faq' },
   { label: 'Contact Us', to: '/contact' },
-  { label: 'Cancellation Policy', to: '/refund-policy' },
+  { label: 'Cancellation Policy', to: '/privacy-policy' },
 ];
 
 function HelpLayout({ title, children }) {
   const location = useLocation();
   return (
   <div className="min-h-screen" style={{ backgroundColor: BG }}>
-    <div className="py-12 px-6 text-center" style={{ backgroundColor: BG2, borderBottom: `1px solid ${BORDER}` }}>
+    <div className="py-2 px-6 text-center" style={{ backgroundColor: BG2, borderBottom: `1px solid ${BORDER}` }}>
       <p className="font-body text-xs tracking-[0.25em] uppercase mb-2" style={{ color: GOLD }}>Help Center</p>
       <h1 className="font-display text-3xl md:text-4xl font-light text-white">{title}</h1>
     </div>
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-2">
       <div className="flex flex-col lg:flex-row gap-10">
         <aside className="lg:w-52 flex-shrink-0">
           <div className="sticky top-28" style={{ backgroundColor: CARD, border: `1px solid ${BORDER}` }}>
@@ -113,7 +111,7 @@ export function SizeGuide() {
           'When between sizes, size up for a relaxed fit or size down for a fitted look',
           'Stretch fabrics tend to run true to size',
           'Oversized styles are designed to fit larger — check product description for fit notes',
-          'Still unsure? Email us at trendorashoppingsai@gmail.com with your measurements',
+          'Still unsure? Email us at videstoreshoppingsai@gmail.com with your measurements',
         ].map((tip, i) => (
           <div key={i} className="flex items-start gap-2 font-body text-sm" style={{ color: TEXT }}>
             <span style={{ color: GOLD }}>•</span> {tip}
@@ -128,14 +126,14 @@ export function SizeGuide() {
 export function FAQ() {
   const faqs = [
     { q: 'How do I place an order?', a: 'Browse our collections, select your size and colour, click "Add to Cart", and proceed to checkout. You can pay via UPI, card, net banking, or Cash on Delivery.' },
-    { q: 'Can I change or cancel my order?', a: 'Orders can be cancelled within 24 hours of placement by emailing trendorashoppingsai@gmail.com. After 24 hours, cancellation is not possible but you can return the item after delivery.' },
+    { q: 'Can I change or cancel my order?', a: 'Orders can be cancelled within 24 hours of placement by emailing videstoreshoppingsai@gmail.com. After 24 hours, cancellation is not possible but you can return the item after delivery.' },
     { q: 'How long does delivery take?', a: 'Metro cities: 2–4 business days. Tier-2 cities: 4–6 business days. Tier-3/rural: 6–10 business days. Express delivery (1–2 days) is available at checkout for select pincodes.' },
     { q: 'Is Cash on Delivery available?', a: 'Yes! COD is available for most pincodes across India. An additional ₹50 COD handling fee applies. COD orders above ₹5,000 require a prepaid confirmation.' },
-    { q: 'How do I return an item?', a: 'Email trendorashoppingsai@gmail.com with your order number and reason for return within 30 days of delivery. We will arrange a free pickup for defective items.' },
+    { q: 'How do I return an item?', a: 'Email videstoreshoppingsai@gmail.com with your order number and reason for return within 30 days of delivery. We will arrange a free pickup for defective items.' },
     { q: 'When will I get my refund?', a: 'Refunds are processed within 7–10 business days after we receive and inspect your return. You will receive an email confirmation when the refund is initiated.' },
     { q: 'How do I track my order?', a: 'Once shipped, you will receive an email and SMS with your tracking number. You can also track your order in the My Orders section of your account.' },
-    { q: 'Are your products authentic?', a: 'Yes, 100%. All products on Trendorra are authentic and sourced directly from our manufacturing partners. We do not sell counterfeit or replica products.' },
-    { q: 'Do you offer discounts for bulk orders?', a: 'Yes! For bulk orders (10+ pieces), email us at trendorashoppingsai@gmail.com with your requirements for a custom quote.' },
+    { q: 'Are your products authentic?', a: 'Yes, 100%. All products on VideStore are authentic and sourced directly from our manufacturing partners. We do not sell counterfeit or replica products.' },
+    { q: 'Do you offer discounts for bulk orders?', a: 'Yes! For bulk orders (10+ pieces), email us at videstoreshoppingsai@gmail.com with your requirements for a custom quote.' },
     { q: 'Is my payment information secure?', a: 'Absolutely. All payments are processed by Razorpay, which is PCI-DSS Level 1 compliant. We never store your card or banking details on our servers.' },
   ];
 
@@ -174,7 +172,7 @@ export function ContactUs() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
         {[
-          { icon: FiMail, label: 'Email', value: 'trendorashoppingsai@gmail.com', sub: 'Response within 24 hours', href: 'mailto:trendorashoppingsai@gmail.com' },
+          { icon: FiMail, label: 'Email', value: 'videstoreshoppingsai@gmail.com', sub: 'Response within 24 hours', href: 'mailto:videstoreshoppingsai@gmail.com' },
           { icon: FiPhone, label: 'Phone', value: '+91 6304000624', sub: 'Mon–Sat, 9am–6pm IST', href: 'tel:+916304000624' },
           { icon: FiClock, label: 'Working Hours', value: 'Mon–Sat', sub: '9:00 AM – 6:00 PM IST', href: null },
         ].map(({ icon: Icon, label, value, sub, href }) => (
@@ -225,7 +223,7 @@ export function ContactUs() {
       <div className="flex items-start gap-3 p-4" style={{ backgroundColor: BG2, border: `1px solid ${BORDER}` }}>
         <FiMapPin size={18} style={{ color: GOLD, flexShrink: 0, marginTop: 2 }} />
         <div className="font-body text-sm" style={{ color: TEXT }}>
-          <p className="font-medium text-white mb-1">Trendorra Fashion Pvt. Ltd.</p>
+          <p className="font-medium text-white mb-1">VideStore Fashion Pvt. Ltd.</p>
           <p>Nellore – 524004, Andhra Pradesh, India</p>
           <p className="mt-1">GSTIN: 29XXXXX1234X1ZX</p>
         </div>
@@ -258,7 +256,7 @@ export function TrackOrder() {
           { status: 'Confirmed', color: '#60a5fa', desc: 'Your order is confirmed and will be handed over to our courier partner shortly.' },
           { status: 'Shipped', color: '#a78bfa', desc: 'Your order has been picked up by the courier. You will receive a tracking number.' },
           { status: 'Out for Delivery', color: '#fb923c', desc: 'Your order is with the delivery agent and will be delivered today.' },
-          { status: 'Delivered', color: '#4ade80', desc: 'Your order has been delivered. Enjoy your new Trendorra pieces!' },
+          { status: 'Delivered', color: '#4ade80', desc: 'Your order has been delivered. Enjoy your new VideStore pieces!' },
         ].map(s => (
           <div key={s.status} className="flex items-start gap-4 p-4" style={{ backgroundColor: BG2, border: `1px solid ${BORDER}` }}>
             <span className="px-2 py-1 text-xs font-body font-medium whitespace-nowrap" style={{ backgroundColor: `${s.color}15`, color: s.color }}>{s.status}</span>
@@ -267,7 +265,7 @@ export function TrackOrder() {
         ))}
       </div>
       <div className="mt-6 p-4 text-center" style={{ backgroundColor: BG2, border: `1px solid ${BORDER}` }}>
-        <p className="font-body text-sm" style={{ color: TEXT }}>Can't find your order? <a href="mailto:trendorashoppingsai@gmail.com" className="hover:underline" style={{ color: GOLD }}>Contact Support</a></p>
+        <p className="font-body text-sm" style={{ color: TEXT }}>Can't find your order? <a href="mailto:videstoreshoppingsai@gmail.com" className="hover:underline" style={{ color: GOLD }}>Contact Support</a></p>
       </div>
     </HelpLayout>
   );

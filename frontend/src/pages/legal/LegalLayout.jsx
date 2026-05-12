@@ -19,21 +19,21 @@ const legalLinks = [
 export default function LegalLayout({ title, lastUpdated = 'March 2026', children }) {
   const location = useLocation();
   return (
-    <div className="min-h-screen" style={{ backgroundColor: BG }}>
+    <div className="min-h-screen" style={{ background: 'transparent' }}>
       {/* Header */}
-      <div className="py-12 px-6 text-center" style={{ backgroundColor: BG2, borderBottom: `1px solid ${BORDER}` }}>
-        <p className="font-body text-xs tracking-[0.25em] uppercase mb-2" style={{ color: GOLD }}>Legal</p>
-        <h1 className="font-display text-3xl md:text-4xl font-light text-white mb-3">{title}</h1>
-        <p className="font-body text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>Last updated: {lastUpdated}</p>
+      <div className="py-6 px-6 text-center glass" style={{ borderBottom: `1px solid var(--b)` }}>
+        <p className="font-body text-xs tracking-[0.25em] uppercase mb-2" style={{ color: 'var(--p)' }}>Legal</p>
+        <h1 className="serif text-3xl md:text-4xl font-bold mb-3" style={{ color: 'var(--t)' }}>{title}</h1>
+        <p className="font-body text-sm opacity-50" style={{ color: 'var(--t)' }}>Last updated: {lastUpdated}</p>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        <div className="flex flex-col lg:flex-row gap-10">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-4">
+        <div className="flex flex-col lg:flex-row gap-6">
 
           {/* Sidebar navigation */}
           <aside className="lg:w-56 flex-shrink-0">
-            <div className="sticky top-28" style={{ backgroundColor: CARD, border: `1px solid ${BORDER}` }}>
-              <p className="font-body text-[10px] tracking-[0.2em] uppercase px-5 py-4" style={{ color: GOLD, borderBottom: `1px solid ${BORDER}` }}>
+            <div className="sticky top-28 rounded-3xl border shadow-premium overflow-hidden glass" style={{ borderColor: 'var(--b)' }}>
+              <p className="font-body text-[10px] tracking-[0.2em] uppercase px-5 py-4 border-b opacity-40" style={{ color: 'var(--t)', borderColor: 'var(--b)' }}>
                 Legal Pages
               </p>
               {legalLinks.map(link => {
@@ -42,21 +42,21 @@ export default function LegalLayout({ title, lastUpdated = 'March 2026', childre
                   <Link key={link.to} to={link.to}
                     className="flex items-center justify-between px-5 py-3.5 text-sm font-body transition-all"
                     style={{
-                      color: isActive ? GOLD : 'rgba(255,255,255,0.55)',
-                      backgroundColor: isActive ? 'rgba(201,168,76,0.08)' : 'transparent',
-                      borderBottom: `1px solid ${BORDER}`,
-                      borderLeft: isActive ? `2px solid ${GOLD}` : '2px solid transparent',
+                      color: isActive ? 'var(--p)' : 'var(--t)',
+                      backgroundColor: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
+                      borderBottom: `1px solid var(--b)`,
+                      borderLeft: isActive ? `2px solid var(--p)` : '2px solid transparent',
                     }}>
                     {link.label}
-                    {isActive && <FiChevronRight size={13} style={{ color: GOLD }} />}
+                    {isActive && <FiChevronRight size={13} style={{ color: 'var(--p)' }} />}
                   </Link>
                 );
               })}
               <div className="px-5 py-4">
-                <p className="font-body text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <p className="font-body text-xs leading-relaxed opacity-30" style={{ color: 'var(--t)' }}>
                   Questions? Contact us at<br />
-                  <a href="mailto:trendorashoppingsai@gmail.com" className="hover:text-gold transition-colors" style={{ color: GOLD }}>
-                    trendorashoppingsai@gmail.com
+                  <a href="mailto:videstoreshoppingsai@gmail.com" className="hover:opacity-100 transition-opacity" style={{ color: 'var(--p)' }}>
+                    videstoreshoppingsai@gmail.com
                   </a>
                 </p>
               </div>
@@ -65,7 +65,7 @@ export default function LegalLayout({ title, lastUpdated = 'March 2026', childre
 
           {/* Content */}
           <main className="flex-1 min-w-0">
-            <div className="p-6 sm:p-8" style={{ backgroundColor: CARD, border: `1px solid ${BORDER}` }}>
+            <div className="p-6 sm:p-8 rounded-[2.5rem] border shadow-premium glass" style={{ borderColor: 'var(--b)' }}>
               {children}
             </div>
           </main>
@@ -76,8 +76,8 @@ export default function LegalLayout({ title, lastUpdated = 'March 2026', childre
 }
 
 export const H2 = ({ children }) => (
-  <h2 className="font-display text-xl font-light text-white mt-8 mb-3 pb-2"
-    style={{ borderBottom: `1px solid rgba(201,168,76,0.3)`, color: '#C9A84C' }}>
+  <h2 className="serif text-xl font-bold mt-4 mb-2 pb-1 border-b"
+    style={{ borderColor: 'rgba(255,255,255,0.1)', color: 'var(--p)' }}>
     {children}
   </h2>
 );

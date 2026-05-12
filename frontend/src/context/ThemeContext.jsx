@@ -4,14 +4,12 @@ const ThemeContext = createContext(null);
 
 export const ThemeProvider = ({ children }) => {
   const [isDark, setIsDark] = useState(() => {
-    return localStorage.getItem('trendora_theme') !== 'light';
+    return localStorage.getItem('videstore_theme') !== 'light';
   });
 
   useEffect(() => {
-    localStorage.setItem('trendora_theme', isDark ? 'dark' : 'light');
+    localStorage.setItem('videstore_theme', isDark ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    document.body.style.backgroundColor = isDark ? '#111111' : '#ffffff';
-    document.body.style.color = isDark ? '#f0f0f0' : '#111111';
   }, [isDark]);
 
   const toggleTheme = () => setIsDark(prev => !prev);

@@ -5,60 +5,53 @@ import {
   FiUsers, FiShoppingBag, FiDollarSign, FiPackage,
   FiTrendingUp, FiArrowRight, FiArrowLeft, FiBell, FiTag, FiSliders,
   FiTrash2, FiAlertTriangle, FiRefreshCw, FiGrid,
-  FiShield, FiUser,
+  FiShield, FiUser, FiActivity, FiArrowUpRight, FiLayers, FiSettings, FiRotateCcw
 } from 'react-icons/fi';
 
-const BG = '#080808';
-const CARD = '#111111';
-const C2 = '#181818';
-const BORDER = 'rgba(255,255,255,0.07)';
-const GOLD = '#C9A84C';
-
 const statusStyle = (s) => ({
-  Processing: { color: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.12)', borderRadius: '6px', padding: '3px 10px', fontSize: '11px' },
-  Confirmed: { color: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.12)', borderRadius: '6px', padding: '3px 10px', fontSize: '11px' },
-  Shipped: { color: '#a78bfa', backgroundColor: 'rgba(167,139,250,0.12)', borderRadius: '6px', padding: '3px 10px', fontSize: '11px' },
-  'Out for Delivery': { color: '#fb923c', backgroundColor: 'rgba(251,146,60,0.12)', borderRadius: '6px', padding: '3px 10px', fontSize: '11px' },
-  Delivered: { color: '#4ade80', backgroundColor: 'rgba(74,222,128,0.12)', borderRadius: '6px', padding: '3px 10px', fontSize: '11px' },
-  Cancelled: { color: '#f87171', backgroundColor: 'rgba(248,113,113,0.12)', borderRadius: '6px', padding: '3px 10px', fontSize: '11px' },
-}[s] || { color: 'rgba(255,255,255,0.4)', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '3px 10px', fontSize: '11px' });
+  Processing: { color: 'var(--w)', backgroundColor: 'var(--w-light)', borderRadius: '8px', padding: '4px 10px', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', border: '1px solid var(--w-border)' },
+  Confirmed: { color: 'var(--p)', backgroundColor: 'var(--p-light)', borderRadius: '8px', padding: '4px 10px', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', border: '1px solid var(--p-border)' },
+  Shipped: { color: '#8b5cf6', backgroundColor: 'rgba(124, 58, 237, 0.05)', borderRadius: '8px', padding: '4px 10px', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', border: '1px solid rgba(124, 58, 237, 0.1)' },
+  'Out for Delivery': { color: '#c2410c', backgroundColor: 'rgba(249, 115, 22, 0.05)', borderRadius: '8px', padding: '4px 10px', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', border: '1px solid rgba(249, 115, 22, 0.1)' },
+  Delivered: { color: 'var(--s)', backgroundColor: 'var(--s-light)', borderRadius: '8px', padding: '4px 10px', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', border: '1px solid var(--s-border)' },
+  Cancelled: { color: 'var(--d)', backgroundColor: 'var(--d-light)', borderRadius: '8px', padding: '4px 10px', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', border: '1px solid var(--d-border)' },
+}[s] || { color: 'var(--tm)', backgroundColor: 'var(--bg-alt)', borderRadius: '8px', padding: '4px 10px', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase' });
 
 // ── Danger Modal ──────────────────────────────────────────────────
-function DangerModal({ open, onClose, onConfirm, loading, title, subtitle, lines, accentColor = '#f87171' }) {
+function DangerModal({ open, onClose, onConfirm, loading, title, subtitle, lines }) {
   const [typed, setTyped] = useState('');
   useEffect(() => { if (!open) setTyped(''); }, [open]);
   if (!open) return null;
   const ready = typed === 'DELETE' && !loading;
   return (
     <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-      style={{ position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-      <div style={{ backgroundColor: '#141414', border: `1px solid ${accentColor}44`, borderRadius: '16px', padding: '32px', maxWidth: '460px', width: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '22px' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: `${accentColor}15`, border: `1px solid ${accentColor}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <FiAlertTriangle size={22} style={{ color: accentColor }} />
+      className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
+      <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl p-10 max-w-[480px] w-full shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="flex items-center gap-5 mb-8">
+          <div className="w-14 h-14 rounded-xl bg-red-500/5 flex items-center justify-center text-red-500 border border-red-500/10">
+            <FiAlertTriangle size={24} />
           </div>
           <div>
-            <p style={{ color: accentColor, fontFamily: 'Cinzel, serif', fontSize: '15px', letterSpacing: '0.1em', marginBottom: '3px' }}>{title}</p>
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px' }}>{subtitle}</p>
+            <h3 className="text-xl font-bold text-[var(--t)] m-0 tracking-tight uppercase">{title}</h3>
+            <p className="text-[10px] font-bold text-[var(--tl)] m-0 uppercase tracking-widest mt-1 opacity-50">{subtitle}</p>
           </div>
         </div>
-        <div style={{ backgroundColor: `${accentColor}0d`, border: `1px solid ${accentColor}25`, borderRadius: '8px', padding: '16px', marginBottom: '22px' }}>
-          {lines.map((l, i) => <p key={i} style={{ color: i === 0 ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.45)', fontSize: i === 0 ? '13px' : '12px', lineHeight: '1.75', marginTop: i > 0 ? '8px' : 0 }}>{l}</p>)}
-          <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${accentColor}20`, display: 'flex', gap: '8px' }}>
-            <span style={{ fontSize: '14px' }}>🚫</span>
-            <p style={{ color: accentColor, fontSize: '12px', fontWeight: '600' }}>Once deleted, this data can NEVER be recovered.</p>
-          </div>
+        <div className="bg-[var(--bg-alt)] border border-[var(--b)] rounded-2xl p-8 mb-8">
+          {lines.map((l, i) => (
+            <p key={i} className={`m-0 leading-relaxed ${i === 0 ? 'text-red-500 font-bold text-sm uppercase tracking-wide' : 'text-[var(--tm)] text-[11px] mt-4 font-medium opacity-60 uppercase tracking-wider'}`}>{l}</p>
+          ))}
         </div>
-        <div style={{ marginBottom: '20px' }}>
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '11px', marginBottom: '8px' }}>Type <strong style={{ color: accentColor }}>DELETE</strong> to confirm</p>
-          <input autoFocus type="text" value={typed} onChange={e => setTyped(e.target.value)} placeholder="Type DELETE here…"
-            style={{ width: '100%', backgroundColor: '#0a0a0a', border: `1px solid ${typed === 'DELETE' ? accentColor : 'rgba(255,255,255,0.1)'}`, borderRadius: '8px', padding: '10px 14px', color: '#fff', fontSize: '13px', outline: 'none', fontFamily: 'monospace', boxSizing: 'border-box' }} />
+        <div className="mb-8">
+          <label className="block text-[10px] font-bold text-[var(--tl)] uppercase tracking-widest mb-3 px-1 opacity-60">Authorize Deletion: Type <span className="text-red-500">DELETE</span></label>
+          <input autoFocus type="text" value={typed} onChange={e => setTyped(e.target.value)} placeholder="Authorization code..."
+            className="w-full bg-[var(--bg-alt)] border-2 border-[var(--b)] rounded-xl px-6 py-4 text-sm font-bold text-[var(--t)] focus:border-red-500 outline-none transition-all" />
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={onClose} style={{ flex: 1, padding: '11px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'rgba(255,255,255,0.45)', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+        <div className="flex gap-4">
+          <button onClick={onClose} className="flex-1 py-4 px-6 bg-[var(--bg-alt)] border border-[var(--b)] text-[var(--tl)] font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-[var(--card-alt)] transition-all">Abort</button>
           <button onClick={() => ready && onConfirm()} disabled={!ready}
-            style={{ flex: 1, padding: '11px', backgroundColor: ready ? accentColor : `${accentColor}15`, border: `1px solid ${ready ? accentColor : `${accentColor}25`}`, borderRadius: '8px', color: ready ? '#fff' : `${accentColor}44`, fontSize: '13px', fontWeight: '700', cursor: ready ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px' }}>
-            {loading ? <><FiRefreshCw size={13} style={{ animation: 'spin 1s linear infinite' }} /> Deleting…</> : <><FiTrash2 size={13} /> Delete Forever</>}
+            className={`flex-1 py-4 px-6 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${ready ? 'bg-red-600 text-white shadow-xl shadow-red-900/20' : 'bg-red-500/5 text-red-500/20 cursor-not-allowed border border-red-500/10'}`}>
+            {loading ? <FiRefreshCw className="animate-spin" /> : <FiTrash2 />}
+            {loading ? 'Purging...' : 'Confirm Purge'}
           </button>
         </div>
       </div>
@@ -91,311 +84,240 @@ export default function AdminDashboard() {
   const adminRevenue = Math.max(0, totalRevenue - sellerRevenue);
 
   const statCards = stats ? [
-    { label: 'Total Users', value: (stats.totalUsers || 0).toLocaleString(), icon: FiUsers, color: GOLD, sub: `${stats.totalSellers || 0} sellers` },
-    { label: 'Total Orders', value: (stats.totalOrders || 0).toLocaleString(), icon: FiShoppingBag, color: '#60a5fa', sub: `${stats.cancelledCount || 0} cancelled` },
-    { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString()}`, icon: FiDollarSign, color: '#4ade80', sub: 'Excl. cancelled' },
-    { label: 'Avg Order Value', value: stats.totalOrders ? `₹${Math.round(totalRevenue / stats.totalOrders).toLocaleString()}` : '₹0', icon: FiTrendingUp, color: '#a78bfa', sub: 'Per order' },
+    { label: 'Users', value: (stats.totalUsers || 0).toLocaleString(), icon: FiUsers, color: 'var(--p)', sub: `${stats.totalSellers || 0} sellers` },
+    { label: 'Orders', value: (stats.totalOrders || 0).toLocaleString(), icon: FiShoppingBag, color: 'var(--p)', sub: `${stats.cancelledCount || 0} cancelled` },
+    { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString()}`, icon: FiDollarSign, color: 'var(--p)', sub: 'Gross earnings' },
+    { label: 'Avg Order Value', value: stats.totalOrders ? `₹${Math.round(totalRevenue / stats.totalOrders).toLocaleString()}` : '₹0', icon: FiActivity, color: 'var(--p)', sub: 'Per sale' },
   ] : [];
 
   const adminLinks = [
-    { to: '/admin/products', label: 'Products', icon: FiPackage, desc: 'Add, edit, delete products', color: GOLD },
-    { to: '/admin/orders', label: 'Orders', icon: FiShoppingBag, desc: 'View and update all orders', color: '#60a5fa' },
-    { to: '/admin/users', label: 'Users', icon: FiUsers, desc: 'Manage customers & roles', color: '#4ade80' },
-    { to: '/admin/analytics', label: 'Analytics', icon: FiTrendingUp, desc: 'Revenue charts & insights', color: '#a78bfa' },
-    { to: '/admin/notifications', label: 'Notifications', icon: FiBell, desc: 'Send SMS & promotional offers', color: '#fb923c' },
-    { to: '/admin/coupons', label: 'Coupons', icon: FiTag, desc: 'Create & manage discount codes', color: '#f472b6' },
-    { to: '/admin/sellers', label: 'Sellers', icon: FiUser, desc: 'Seller accounts & payouts', color: '#34d399' },
-    { to: '/admin/settings', label: 'Settings', icon: FiSliders, desc: 'Commission & platform fees', color: '#38bdf8' },
+    { to: '/admin/analytics', label: 'Analytics', icon: FiTrendingUp, desc: 'Sales & growth stats', color: 'var(--p)' },
+    { to: '/admin/orders', label: 'Orders', icon: FiShoppingBag, desc: 'Manage store orders', color: 'var(--p)' },
+    { to: '/admin/products', label: 'Products', icon: FiLayers, desc: 'Manage inventory', color: 'var(--p)' },
+    { to: '/admin/returns', label: 'Returns', icon: FiRotateCcw, desc: 'Manage product returns', color: 'var(--p)' },
+    { to: '/admin/users', label: 'Users', icon: FiUsers, desc: 'Manage customer accounts', color: 'var(--p)' },
+    { to: '/admin/coupons', label: 'Coupons', icon: FiTag, desc: 'Manage promo codes', color: 'var(--p)' },
+    { to: '/admin/sellers', label: 'Sellers', icon: FiUser, desc: 'Manage third-party sellers', color: 'var(--p)' },
+    { to: '/admin/settings', label: 'Settings', icon: FiSettings, desc: 'Global store settings', color: 'var(--p)' },
   ];
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: BG }}>
-      <style>{`
-        @media (max-width: 768px) {
-          .admin-stats { grid-template-columns: 1fr 1fr !important; }
-          .admin-revenue { grid-template-columns: 1fr !important; }
-          .admin-nav { grid-template-columns: repeat(2, 1fr) !important; }
-          .admin-header { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
-          .admin-recent-order { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
-          .admin-recent-order > div { width: 100% !important; justify-content: space-between !important; }
-        }
-      `}</style>
-
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
       <DangerModal open={showRevenueModal} onClose={() => setShowRevenueModal(false)}
         onConfirm={handleResetRevenue} loading={revenueDeleting}
-        title="Reset All Revenue Data" subtitle="Dashboard · All Time" accentColor="#f87171"
-        lines={['⚠️ You are about to permanently reset ALL revenue and analytics data.', 'This includes total revenue, order value, and all related analytics.']} />
+        title="Clear All Data" subtitle="Delete Everything"
+        lines={['⚠️ This will delete all sales and order data.', 'This action will reset your dashboard stats. This cannot be undone.']} />
 
       {/* ── Header ── */}
-      <div className="admin-header" style={{ backgroundColor: '#050505', borderBottom: `1px solid ${BORDER}`, padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: `${GOLD}18`, border: `1px solid ${GOLD}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <FiGrid size={16} style={{ color: GOLD }} />
+      <div className="px-8 py-6 flex items-center justify-between sticky top-0 z-10" 
+        style={{ backgroundColor: 'var(--glass)', borderBottom: `1px solid var(--b)`, backdropFilter: 'blur(32px)' }}>
+        <div className="flex items-center gap-6">
+          <div className="w-14 h-14 rounded-xl bg-[var(--p)] flex items-center justify-center text-[#040404] shadow-xl shadow-gold/20">
+            <FiGrid size={28} />
           </div>
           <div>
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 2px' }}>Admin Panel</p>
-            <h1 style={{ color: GOLD, fontFamily: 'Cinzel, serif', fontSize: '17px', letterSpacing: '0.15em', margin: 0 }}>TRENDORRA Dashboard</h1>
+            <div className="flex items-center gap-2 mb-1.5">
+              <FiShield size={12} className="text-[var(--p)]" />
+              <p className="font-bold text-[10px] tracking-[0.2em] uppercase opacity-60" style={{ color: 'var(--tm)' }}>Admin</p>
+            </div>
+            <h1 className="font-body text-2xl font-bold tracking-tight uppercase" style={{ color: 'var(--t)' }}>Dashboard</h1>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <button onClick={fetchStats} style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.35)', fontSize: '12px' }}>
-            <FiRefreshCw size={12} /> Refresh
+        <div className="flex items-center gap-3">
+          <button onClick={fetchStats} className="font-bold text-[11px] uppercase tracking-wider px-5 py-3 bg-[var(--bg-alt)] border border-[var(--b)] rounded-xl text-[var(--tm)] hover:bg-[var(--card-alt)] transition-all flex items-center gap-2 shadow-sm">
+            <FiRefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Refresh
           </button>
-          <button onClick={() => setShowRevenueModal(true)}
-            style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#f87171', background: 'none', border: '1px solid rgba(248,113,113,0.25)', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontSize: '12px' }}
-            onMouseOver={e => e.currentTarget.style.borderColor = 'rgba(248,113,113,0.6)'}
-            onMouseOut={e => e.currentTarget.style.borderColor = 'rgba(248,113,113,0.25)'}>
-            <FiTrash2 size={12} /> Reset Revenue
+          <button onClick={() => setShowRevenueModal(true)} className="font-bold text-[11px] uppercase tracking-wider px-5 py-3 bg-red-500/5 border border-red-500/10 rounded-xl text-red-500 hover:bg-red-500/10 transition-all flex items-center gap-2 shadow-sm">
+            <FiTrash2 size={14} /> Clear Data
           </button>
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'rgba(255,255,255,0.35)', textDecoration: 'none', fontSize: '12px' }}>
-            <FiArrowLeft size={13} /> Back to Store
+          <Link to="/" className="font-bold text-[11px] uppercase tracking-wider px-6 py-3 bg-[var(--p)] text-[#040404] rounded-xl shadow-lg shadow-gold/20 hover:-translate-y-0.5 transition-all flex items-center gap-2" style={{ textDecoration: 'none' }}>
+            <FiArrowLeft size={16} /> Storefront
           </Link>
         </div>
       </div>
 
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
+      <div className="max-w-[1536px] mx-auto px-8 py-4">
 
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '16px', marginBottom: '28px' }}>
-            {[...Array(4)].map((_, i) => <div key={i} style={{ height: '110px', backgroundColor: CARD, borderRadius: '14px', opacity: 0.4 }} />)}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+            {[...Array(4)].map((_, i) => <div key={i} className="skeleton h-64 rounded-3xl" />)}
           </div>
         ) : (
           <>
             {/* ── Stat Cards ── */}
-            <div className="admin-stats md:grid-cols-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginBottom: '24px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-6">
               {statCards.map(({ label, value, icon: Icon, color, sub }) => (
-                <div key={label} style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '14px', padding: '22px', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: `${color}18`, border: `1px solid ${color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Icon size={18} style={{ color }} />
+                <div key={label} className="bg-[var(--card)] border border-[var(--b)] rounded-2xl p-6 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-300">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center border transition-all duration-500 shadow-inner"
+                      style={{ backgroundColor: `${color}05`, borderColor: `${color}10`, color }}>
+                      <Icon size={22} />
                     </div>
-                    <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{label}</span>
+                    <div className="flex flex-col items-end opacity-40 group-hover:opacity-100 transition-all">
+                       <span className="text-[9px] font-bold text-[var(--tl)] uppercase tracking-wider">{label}</span>
+                       <FiArrowUpRight size={14} className="text-[var(--tl)] mt-1" />
+                    </div>
                   </div>
-                  <p style={{ color: '#fff', fontSize: '26px', fontWeight: '700', margin: '0 0 4px', letterSpacing: '-0.5px' }}>{value}</p>
-                  <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '11px', margin: 0 }}>{sub}</p>
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', backgroundColor: color, opacity: 0.5 }} />
-                  {/* subtle corner glow */}
-                  <div style={{ position: 'absolute', top: 0, right: 0, width: '60px', height: '60px', background: `radial-gradient(circle at top right, ${color}10, transparent)`, pointerEvents: 'none' }} />
+                  <h3 className="text-3xl font-bold text-[var(--t)] mb-1 m-0 tracking-tight">{value}</h3>
+                  <p className="text-[11px] font-medium text-[var(--tl)] m-0 opacity-40 uppercase tracking-wide">{sub}</p>
+                  <div className="absolute bottom-0 left-0 right-0 h-1.5 opacity-20" style={{ backgroundColor: color }} />
                 </div>
               ))}
             </div>
 
-            {/* ── Revenue Breakdown ── */}
-            <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '3px', height: '20px', backgroundColor: GOLD, borderRadius: '2px' }} />
-                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Revenue Breakdown</p>
-                </div>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {['overview', 'sellers'].map(t => (
-                    <button key={t} onClick={() => setTab(t)}
-                      style={{ padding: '5px 14px', fontSize: '11px', textTransform: 'capitalize', letterSpacing: '0.05em', backgroundColor: tab === t ? GOLD : 'transparent', color: tab === t ? '#000' : 'rgba(255,255,255,0.4)', border: `1px solid ${tab === t ? GOLD : BORDER}`, borderRadius: '6px', cursor: 'pointer', fontWeight: tab === t ? '700' : '400' }}>
-                      {t}
-                    </button>
-                  ))}
-                </div>
+            {/* ── Strategic Navigation ── */}
+            <div className="mb-20">
+              <div className="flex items-center gap-4 mb-12">
+                <div className="w-2 h-8 bg-[var(--p)] rounded-full" />
+                <h3 className="text-2xl font-bold text-[var(--t)] m-0 tracking-tight uppercase">Quick Links</h3>
+                <div className="flex-1 h-px bg-[var(--b)] ml-6 opacity-40" />
               </div>
-
-              {tab === 'overview' && (
-                <div className="admin-revenue" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '14px' }}>
-                  {[
-                    { label: 'Total Platform Revenue', value: `₹${totalRevenue.toLocaleString()}`, color: GOLD, sub: `${stats?.totalOrders || 0} orders total`, bg: `${GOLD}08`, border: `${GOLD}22` },
-                    { label: 'Admin Products Revenue', value: `₹${adminRevenue.toLocaleString()}`, color: '#60a5fa', sub: 'Your own product sales', bg: 'rgba(96,165,250,0.06)', border: 'rgba(96,165,250,0.18)' },
-                    { label: 'Seller Products Revenue', value: `₹${sellerRevenue.toLocaleString()}`, color: '#4ade80', sub: `${stats?.sellerStats?.length || 0} active sellers`, bg: 'rgba(74,222,128,0.06)', border: 'rgba(74,222,128,0.18)' },
-                  ].map(({ label, value, color, sub, bg, border }) => {
-                    const num = parseFloat(value.replace(/[₹,]/g, '')) || 0;
-                    const pct = totalRevenue > 0 ? Math.round((num / totalRevenue) * 100) : 0;
-                    return (
-                      <div key={label} style={{ backgroundColor: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '18px 20px' }}>
-                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', margin: '0 0 10px', letterSpacing: '0.05em' }}>{label}</p>
-                        <p style={{ color, fontSize: '24px', fontWeight: '700', margin: '0 0 4px', letterSpacing: '-0.5px' }}>{value}</p>
-                        <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '11px', margin: '0 0 12px' }}>{sub}</p>
-                        <div style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '2px' }}>
-                          <div style={{ height: '100%', width: `${pct}%`, backgroundColor: color, borderRadius: '2px', opacity: 0.8, transition: 'width 1s ease' }} />
-                        </div>
-                        <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '10px', margin: '5px 0 0' }}>{pct}% of total</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {tab === 'sellers' && (
-                <>
-                  {!stats?.sellerStats?.length ? (
-                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px', textAlign: 'center', padding: '32px 0' }}>No seller revenue data yet</p>
-                  ) : (
-                    <div style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
-                        <thead>
-                          <tr>
-                            {['Seller', 'Business', 'Orders', 'Items', 'Revenue', 'Paid Out', 'Pending'].map(h => (
-                              <th key={h} style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '10px 12px', textAlign: 'left', borderBottom: `1px solid ${BORDER}`, backgroundColor: '#0a0a0a' }}>{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {stats.sellerStats.map((s, i) => {
-                            const pending = Math.max(0, (s.revenue || 0) - (s.paidOut || 0));
-                            return (
-                              <tr key={i} style={{ borderBottom: `1px solid ${BORDER}` }}
-                                onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'}
-                                onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
-                                <td style={{ padding: '12px' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <div style={{ width: '26px', height: '26px', borderRadius: '50%', backgroundColor: `${GOLD}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                      <span style={{ color: GOLD, fontSize: '11px', fontWeight: '700' }}>{s.sellerName?.charAt(0)?.toUpperCase()}</span>
-                                    </div>
-                                    <div>
-                                      <p style={{ color: '#fff', fontSize: '12px', fontWeight: '500', margin: 0 }}>{s.sellerName || '—'}</p>
-                                      <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', margin: 0 }}>{s.sellerEmail}</p>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td style={{ padding: '12px', color: 'rgba(255,255,255,0.6)', fontSize: '12px' }}>{s.businessName || '—'}</td>
-                                <td style={{ padding: '12px', color: '#fff', fontSize: '12px' }}>{s.orderCount}</td>
-                                <td style={{ padding: '12px', color: 'rgba(255,255,255,0.6)', fontSize: '12px' }}>{s.itemsSold}</td>
-                                <td style={{ padding: '12px', color: GOLD, fontSize: '12px', fontWeight: '600' }}>₹{(s.revenue || 0).toLocaleString()}</td>
-                                <td style={{ padding: '12px', color: '#4ade80', fontSize: '12px' }}>₹{(s.paidOut || 0).toLocaleString()}</td>
-                                <td style={{ padding: '12px' }}>
-                                  <span style={{ color: pending > 0 ? '#fbbf24' : 'rgba(255,255,255,0.2)', fontSize: '12px', fontWeight: pending > 0 ? '600' : '400' }}>
-                                    {pending > 0 ? `₹${pending.toLocaleString()}` : '—'}
-                                  </span>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* ── Orders by Status ── */}
-            {stats?.ordersByStatus?.length > 0 && (
-              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '16px', padding: '20px 24px', marginBottom: '24px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                  <div style={{ width: '3px', height: '18px', backgroundColor: '#60a5fa', borderRadius: '2px' }} />
-                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Orders by Status</p>
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                  {stats.ordersByStatus.map(({ _id, count }) => {
-                    const s = statusStyle(_id);
-                    return (
-                      <Link key={_id} to={`/admin/orders?status=${_id}`}
-                        style={{ ...s, display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', border: `1px solid ${s.color}25`, transition: 'opacity 0.2s' }}
-                        onMouseOver={e => e.currentTarget.style.opacity = '0.7'}
-                        onMouseOut={e => e.currentTarget.style.opacity = '1'}>
-                        <span style={{ fontSize: '11px' }}>{_id}</span>
-                        <span style={{ backgroundColor: s.color, color: '#000', fontSize: '10px', fontWeight: '700', borderRadius: '20px', padding: '1px 7px', minWidth: '20px', textAlign: 'center' }}>{count}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* ── Quick Navigation ── */}
-            <div style={{ backgroundColor: CARD, border: `1px solid rgba(201,168,76,0.25)`, borderRadius: '18px', padding: '24px', marginBottom: '24px', outline: '3px solid rgba(201,168,76,0.05)', outlineOffset: '0' }}>
-              {/* Header */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                <div style={{ width: '3px', height: '20px', backgroundColor: GOLD, borderRadius: '2px' }} />
-                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', margin: 0 }}>Quick Navigation</p>
-                <div style={{ flex: 1, height: '1px', backgroundColor: `${GOLD}15` }} />
-              </div>
-
-              {/* 7 cards grid */}
-              <div className="admin-nav" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px' }}>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                 {adminLinks.map(({ to, label, icon: Icon, desc, color }) => (
                   <Link key={to} to={to}
-                    style={{
-                      backgroundColor: '#0d0d0d',
-                      border: `1px solid rgba(255,255,255,0.07)`,
-                      borderRadius: '14px', padding: '18px 14px',
-                      textDecoration: 'none', display: 'flex',
-                      flexDirection: 'column', alignItems: 'center',
-                      textAlign: 'center', gap: '12px',
-                      transition: 'all 0.2s ease',
-                      position: 'relative', overflow: 'hidden',
-                    }}
-                    onMouseOver={e => {
-                      e.currentTarget.style.borderColor = color;
-                      e.currentTarget.style.backgroundColor = `${color}0d`;
-                      e.currentTarget.style.transform = 'translateY(-4px)';
-                    }}
-                    onMouseOut={e => {
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
-                      e.currentTarget.style.backgroundColor = '#0d0d0d';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}>
-                    {/* Icon circle */}
-                    <div style={{
-                      width: '46px', height: '46px', borderRadius: '12px',
-                      backgroundColor: `${color}18`,
-                      border: `1px solid ${color}30`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0,
-                    }}>
-                      <Icon size={20} style={{ color }} />
+                    className="bg-[var(--card)] border border-[var(--b)] rounded-2xl p-6 text-decoration-none group hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center border mb-6 group-hover:scale-110 transition-all duration-500 shadow-inner"
+                      style={{ backgroundColor: `${color}05`, borderColor: `${color}10`, color }}>
+                      <Icon size={22} />
                     </div>
-                    {/* Label */}
-                    <div>
-                      <p style={{ color: '#fff', fontSize: '12px', fontWeight: '600', margin: '0 0 3px', letterSpacing: '0.02em' }}>{label}</p>
-                      <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '10px', lineHeight: '1.4', margin: 0 }}>{desc}</p>
-                    </div>
-                    {/* Bottom color line */}
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', backgroundColor: color, opacity: 0.45 }} />
+                    <h4 className="text-lg font-bold text-[var(--t)] mb-1.5 m-0 tracking-tight uppercase">{label}</h4>
+                    <p className="text-[11px] font-medium text-[var(--tl)] m-0 leading-relaxed opacity-40 uppercase">{desc}</p>
                   </Link>
                 ))}
               </div>
             </div>
 
-            {/* ── Recent Orders ── */}
-            {stats?.recentOrders?.length > 0 && (
-              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '16px', overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderBottom: `1px solid ${BORDER}`, backgroundColor: '#0a0a0a' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '3px', height: '18px', backgroundColor: GOLD, borderRadius: '2px' }} />
-                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Recent Orders</p>
+            {/* ── Analytics & Activity ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-20">
+              {/* Revenue Matrix */}
+              <div className="lg:col-span-2 bg-[var(--card)] border border-[var(--b)] rounded-2xl p-8 shadow-sm">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-10">
+                  <div className="flex items-center gap-6">
+                    <div className="w-12 h-12 rounded-xl bg-[var(--p)]/5 flex items-center justify-center text-[var(--p)] border border-[var(--p)]/10 shadow-inner">
+                       <FiTrendingUp size={22} />
+                    </div>
                   </div>
-                  <Link to="/admin/orders" style={{ color: GOLD, fontSize: '12px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    View All <FiArrowRight size={12} />
+                  <div className="flex p-1.5 bg-[var(--bg-alt)] rounded-2xl border border-[var(--b)] shadow-inner">
+                    {['overview', 'sellers'].map(t => (
+                      <button key={t} onClick={() => setTab(t)}
+                        className={`px-8 py-3 text-[10px] font-bold uppercase tracking-wider transition-all rounded-xl ${tab === t ? 'bg-[var(--card)] text-[var(--p)] shadow-xl' : 'text-[var(--tl)] opacity-60'}`}>
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {tab === 'overview' ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[
+                      { label: 'Total Sales', value: `₹${totalRevenue.toLocaleString()}`, color: 'var(--p)', pct: 100 },
+                      { label: 'Profit', value: `₹${adminRevenue.toLocaleString()}`, color: 'var(--p)', pct: totalRevenue > 0 ? (adminRevenue/totalRevenue)*100 : 0 },
+                      { label: 'Seller Sales', value: `₹${sellerRevenue.toLocaleString()}`, color: 'var(--p)', pct: totalRevenue > 0 ? (sellerRevenue/totalRevenue)*100 : 0 },
+                    ].map((item, i) => (
+                      <div key={i} className="p-8 rounded-2xl bg-[var(--bg-alt)] border border-[var(--b)] group hover:border-[var(--p)]/30 transition-all shadow-inner">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--tl)] mb-4 opacity-40">{item.label}</p>
+                        <p className="text-2xl font-bold text-[var(--t)] mb-6 m-0 tracking-tight">{item.value}</p>
+                        <div className="h-1.5 bg-[var(--bg)] rounded-full overflow-hidden border border-[var(--b)] shadow-inner">
+                          <div className="h-full rounded-full transition-all duration-1000 group-hover:opacity-80 shadow-lg shadow-gold/20" style={{ width: `${item.pct}%`, backgroundColor: item.color }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse min-w-[500px]">
+                      <thead>
+                        <tr className="bg-[var(--bg-alt)]/30 border-b border-[var(--b)]">
+                          {['Seller', 'Orders', 'Revenue', 'Status'].map(h => (
+                            <th key={h} className="text-[9px] font-bold text-[var(--tl)] uppercase tracking-widest px-8 py-6 text-left opacity-40">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[var(--b)]">
+                        {stats?.sellerStats?.slice(0, 5).map((s, i) => (
+                          <tr key={i} className="hover:bg-[var(--bg-alt)] transition-colors">
+                            <td className="px-8 py-6">
+                              <p className="text-sm font-bold text-[var(--t)] m-0 tracking-tight uppercase">{s.sellerName}</p>
+                              <p className="text-[10px] font-bold text-[var(--tl)] m-0 uppercase mt-1 tracking-tighter opacity-40">{s.businessName}</p>
+                            </td>
+                            <td className="px-8 py-6 text-sm font-bold text-[var(--t)]">{s.orderCount}</td>
+                            <td className="px-8 py-6 text-sm font-bold text-[var(--p)]">₹{(s.revenue || 0).toLocaleString()}</td>
+                            <td className="px-8 py-6">
+                              <span className="text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 bg-emerald-500/5 text-emerald-500 rounded-lg border border-emerald-500/10">Paid</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Status Breakdown */}
+              <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl p-8 shadow-sm">
+                <div className="flex items-center gap-6 mb-10">
+                  <div className="w-12 h-12 rounded-2xl bg-[var(--p)]/5 flex items-center justify-center text-[var(--p)] border border-[var(--p)]/10 shadow-inner">
+                     <FiActivity size={22} />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[var(--t)] m-0 tracking-tight uppercase">Order Status</h3>
+                </div>
+                <div className="space-y-8">
+                  {stats?.ordersByStatus?.map(({ _id, count }) => (
+                    <div key={_id} className="group">
+                      <div className="flex justify-between items-end mb-3 px-1">
+                        <span className="text-[10px] font-bold text-[var(--tl)] uppercase tracking-wider opacity-40">{_id}</span>
+                        <span className="text-base font-bold text-[var(--t)]">{count}</span>
+                      </div>
+                      <div className="h-2 bg-[var(--bg-alt)] rounded-full overflow-hidden border border-[var(--b)] shadow-inner">
+                        <div className="h-full rounded-full bg-[var(--p)] transition-all duration-1000 group-hover:opacity-80 shadow-lg shadow-gold/20" style={{ width: `${(count/(stats.totalOrders||1))*100}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ── Activity Stream ── */}
+            {stats?.recentOrders?.length > 0 && (
+              <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-10 py-8 border-b border-[var(--b)] bg-[var(--bg-alt)]/30">
+                  <div className="flex items-center gap-6">
+                    <div className="w-12 h-12 rounded-2xl bg-[var(--p)]/5 flex items-center justify-center text-[var(--p)] border border-[var(--p)]/10 shadow-inner">
+                       <FiBell size={22} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-[var(--t)] m-0 tracking-tight uppercase">Recent Orders</h3>
+                  </div>
+                  <Link to="/admin/orders" className="text-[10px] font-bold uppercase tracking-widest text-[var(--p)] hover:translate-x-2 transition-all flex items-center gap-4">
+                    View Orders <FiArrowUpRight size={18} />
                   </Link>
                 </div>
-                {stats.recentOrders.slice(0, 8).map(order => {
-                  const hasSeller = order.orderItems?.some(i => i.seller);
-                  return (
-                    <Link key={order._id} className="admin-recent-order" to="/admin/orders" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px', borderBottom: `1px solid ${BORDER}`, textDecoration: 'none', transition: 'background 0.15s' }}
-                      onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'}
-                      onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                        {/* Order source badge */}
-                        <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: hasSeller ? 'rgba(96,165,250,0.12)' : `${GOLD}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          {hasSeller ? <FiUser size={13} style={{ color: '#60a5fa' }} /> : <FiShield size={13} style={{ color: GOLD }} />}
+                <div className="divide-y divide-[var(--b)]">
+                  {stats.recentOrders.slice(0, 10).map(order => {
+                    const hasSeller = order.orderItems?.some(i => i.seller);
+                    return (
+                      <div key={order._id} className="flex flex-col md:flex-row md:items-center justify-between px-10 py-6 hover:bg-[var(--bg-alt)] transition-colors group">
+                        <div className="flex items-center gap-6 mb-4 md:mb-0">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all group-hover:scale-110 shadow-inner ${hasSeller ? 'bg-indigo-500/5 border-indigo-500/10 text-indigo-500' : 'bg-[var(--p)]/5 border-[var(--p)]/10 text-[var(--p)]'}`}>
+                            {hasSeller ? <FiUser size={20} /> : <FiShield size={20} />}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-4 mb-1">
+                               <p className="text-base font-bold text-[var(--t)] m-0 tracking-tight uppercase">#{order._id.slice(-8).toUpperCase()}</p>
+                               {hasSeller && <span className="px-2.5 py-1 bg-indigo-500/5 text-indigo-500 text-[8px] font-bold uppercase rounded-lg tracking-widest border border-indigo-500/10">Seller</span>}
+                            </div>
+                            <p className="text-[10px] font-bold text-[var(--tl)] m-0 uppercase tracking-tighter opacity-40">
+                              {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} · {order.user?.name}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p style={{ color: '#fff', fontSize: '13px', fontWeight: '500', margin: '0 0 2px' }}>
-                            #{order._id.slice(-8).toUpperCase()}
-                            <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', fontWeight: '400', marginLeft: '8px' }}>{order.user?.name}</span>
-                          </p>
-                          <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '11px', margin: 0 }}>
-                            {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            <span style={{ marginLeft: '8px', color: hasSeller ? '#60a5fa' : GOLD, fontSize: '10px' }}>
-                              {hasSeller ? '🏪 Seller' : '👑 Admin'}
-                            </span>
-                          </p>
+                        <div className="flex items-center justify-between md:justify-end gap-12">
+                          <span style={statusStyle(order.orderStatus)} className="shadow-sm">{order.orderStatus}</span>
+                          <span className="text-lg font-bold text-[var(--t)] min-w-[100px] text-right">₹{order.totalPrice?.toLocaleString()}</span>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                        <span style={{ ...statusStyle(order.orderStatus), fontFamily: 'Jost, sans-serif' }}>{order.orderStatus}</span>
-                        <span style={{ color: '#fff', fontSize: '14px', fontWeight: '600', minWidth: '70px', textAlign: 'right' }}>₹{order.totalPrice?.toLocaleString()}</span>
-                      </div>
-                    </Link>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             )}
           </>

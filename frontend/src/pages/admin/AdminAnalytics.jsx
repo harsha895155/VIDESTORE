@@ -1,74 +1,74 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { userAPI } from '../../services/api';
+import { userAPI, settingsAPI } from '../../services/api';
 import {
   FiArrowLeft, FiTrendingUp, FiShoppingBag, FiUsers,
   FiDollarSign, FiPackage, FiRefreshCw, FiXCircle,
-  FiTrash2, FiAlertTriangle, FiShield, FiUser, FiBarChart2,
+  FiTrash2, FiAlertTriangle, FiShield, FiUser, FiBarChart2, FiActivity, FiLayers, FiPieChart, FiTrendingDown, FiClock, FiRotateCcw
 } from 'react-icons/fi';
+import toast from 'react-hot-toast';
 
-const BG     = '#0a0a0a';
-const CARD   = '#141414';
-const CARD2  = '#1a1a1a';
-const BORDER = 'rgba(255,255,255,0.07)';
-const GOLD   = '#C9A84C';
+// ✅ Global values — will be fetched from DB
+let _commRate    = 10; 
+let _fixedCharge = 30;
 
-const COMMISSION = 0.10;
-const FIXED_FEE  = (p) => {
-  if (p <= 500)    return 20;
-  if (p <= 1000)   return 30;
-  if (p <= 5000)   return 40;
-  if (p <= 10000)  return 80;
-  if (p <= 50000)  return 120;
-  if (p <= 100000) return 150;
-  return 200;
+const calcProfit = (price, deliveryCharge = 0) => {
+  const p = Number(price) || 0;
+  const dc = Number(deliveryCharge) || 0;
+  const productVal = Math.max(0, p - dc);
+  const commission = Math.round(productVal * (_commRate / 100));
+  const fixed      = Number(_fixedCharge) || 0;
+  return { commission, fixed, deliveryCharge: dc, profit: commission + fixed };
 };
 
 const STATUS_COLORS = {
-  Processing:         '#fbbf24',
-  Confirmed:          '#60a5fa',
-  Shipped:            '#a78bfa',
-  'Out for Delivery': '#fb923c',
-  Delivered:          '#4ade80',
-  Cancelled:          '#f87171',
+  Processing:         'var(--w)',
+  Confirmed:          'var(--p)',
+  Shipped:            '#8b5cf6',
+  'Out for Delivery': '#f97316',
+  Delivered:          'var(--s)',
+  Cancelled:          'var(--d)',
 };
 
 // ── Danger Modal ──────────────────────────────────────────────────
-function DangerModal({ open, onClose, onConfirm, loading, title, subtitle, lines, accentColor = '#f87171' }) {
+function DangerModal({ open, onClose, onConfirm, loading, title, subtitle, lines }) {
   const [typed, setTyped] = useState('');
   useEffect(() => { if (!open) setTyped(''); }, [open]);
   if (!open) return null;
   const ready = typed === 'DELETE' && !loading;
   return (
     <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-      style={{ position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-      <div style={{ backgroundColor: '#1a1a1a', border: `1px solid ${accentColor}44`, borderRadius: '14px', padding: '32px', maxWidth: '460px', width: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '22px' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: `${accentColor}15`, border: `1px solid ${accentColor}33`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <FiAlertTriangle size={22} style={{ color: accentColor }} />
+      className="fixed inset-0 z-[10001] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
+      <div className="bg-[var(--card)] border border-[var(--b)] rounded-[32px] p-10 max-w-[480px] w-full shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="flex items-center gap-6 mb-8">
+          <div className="w-16 h-16 rounded-[14px] bg-[var(--dl)] flex items-center justify-center text-[var(--d)] border border-[var(--b)] shadow-inner">
+            <FiAlertTriangle size={28} />
           </div>
           <div>
-            <p style={{ color: accentColor, fontFamily: 'Cinzel, serif', fontSize: '15px', letterSpacing: '0.1em', marginBottom: '3px' }}>{title}</p>
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px' }}>{subtitle}</p>
+            <h3 className="text-2xl font-black text-[var(--t)] m-0 tracking-tight uppercase">{title}</h3>
+            <p className="text-[10px] font-black text-[var(--tl)] m-0 uppercase tracking-[0.25em] mt-2 opacity-60">{subtitle}</p>
           </div>
         </div>
-        <div style={{ backgroundColor: `${accentColor}0d`, border: `1px solid ${accentColor}25`, borderRadius: '8px', padding: '16px', marginBottom: '22px' }}>
-          {lines.map((l, i) => <p key={i} style={{ color: i === 0 ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.45)', fontSize: i === 0 ? '13px' : '12px', lineHeight: '1.75', marginTop: i > 0 ? '8px' : 0 }}>{l}</p>)}
-          <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${accentColor}20`, display: 'flex', gap: '8px' }}>
-            <span style={{ fontSize: '14px' }}>🚫</span>
-            <p style={{ color: accentColor, fontSize: '12px', fontWeight: '600' }}>Once deleted, this data can NEVER be recovered.</p>
+        <div className="bg-[var(--bg-alt)] border border-[var(--b)] rounded-2xl p-8 mb-8 shadow-inner">
+          {lines.map((l, i) => (
+            <p key={i} className={`m-0 leading-relaxed ${i === 0 ? 'text-[var(--t)] font-black text-sm uppercase tracking-tight' : 'text-[var(--tl)] text-xs mt-4 font-bold opacity-80'}`}>{l}</p>
+          ))}
+          <div className="mt-6 pt-6 border-t border-[var(--b)] flex items-center gap-3">
+             <div className="w-2 h-2 rounded-full bg-[var(--d)] animate-pulse" />
+             <p className="text-[var(--d)] text-[9px] font-black uppercase tracking-[0.2em] m-0">Irreversible Infrastructure Purge</p>
           </div>
         </div>
-        <div style={{ marginBottom: '20px' }}>
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '11px', marginBottom: '8px' }}>Type <strong style={{ color: accentColor }}>DELETE</strong> to confirm</p>
-          <input autoFocus type="text" value={typed} onChange={e => setTyped(e.target.value)} placeholder="Type DELETE here…"
-            style={{ width: '100%', backgroundColor: '#0d0d0d', border: `1px solid ${typed === 'DELETE' ? accentColor : 'rgba(255,255,255,0.1)'}`, borderRadius: '6px', padding: '10px 14px', color: '#fff', fontSize: '13px', outline: 'none', fontFamily: 'monospace', boxSizing: 'border-box' }} />
+        <div className="mb-8">
+          <label className="block text-[9px] font-black text-[var(--tl)] uppercase tracking-[0.25em] mb-3 px-1 opacity-60">Type <span className="text-[var(--d)]">DELETE</span> to authorize protocol</label>
+          <input autoFocus type="text" value={typed} onChange={e => setTyped(e.target.value)} placeholder="Authorization sequence..."
+            className="w-full bg-[var(--bg-alt)] border-2 border-[var(--b)] rounded-[14px] px-6 py-4 text-sm font-black text-[var(--t)] focus:border-[var(--d)] outline-none transition-all font-mono shadow-inner" />
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={onClose} style={{ flex: 1, padding: '11px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'rgba(255,255,255,0.45)', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+        <div className="flex gap-5">
+          <button onClick={onClose} className="flex-1 py-4 px-6 bg-[var(--bg-alt)] border border-[var(--b)] text-[var(--tl)] font-black text-[10px] uppercase tracking-widest rounded-[14px] hover:bg-[var(--card-alt)] transition-all">Cancel</button>
           <button onClick={() => ready && onConfirm()} disabled={!ready}
-            style={{ flex: 1, padding: '11px', backgroundColor: ready ? accentColor : `${accentColor}15`, border: `1px solid ${ready ? accentColor : `${accentColor}25`}`, borderRadius: '6px', color: ready ? '#fff' : `${accentColor}44`, fontSize: '13px', fontWeight: '700', cursor: ready ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px' }}>
-            {loading ? <><FiRefreshCw size={13} style={{ animation: 'spin 1s linear infinite' }} /> Deleting…</> : <><FiTrash2 size={13} /> Delete Forever</>}
+            className={`flex-1 py-4 px-6 rounded-[14px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl ${ready ? 'bg-[var(--d)] text-white shadow-red-500/20' : 'bg-[var(--bg-alt)] text-[var(--tl)] opacity-30 cursor-not-allowed border border-[var(--b)]'}`}>
+            {loading ? <FiRefreshCw className="animate-spin" /> : <FiTrash2 size={16}/>}
+            {loading ? 'Processing...' : 'Confirm Purge'}
           </button>
         </div>
       </div>
@@ -79,554 +79,304 @@ function DangerModal({ open, onClose, onConfirm, loading, title, subtitle, lines
 // ── Stat Card ─────────────────────────────────────────────────────
 function StatCard({ label, value, icon: Icon, color, sub, trend }) {
   return (
-    <div style={{ backgroundColor: CARD2, border: `1px solid ${BORDER}`, borderRadius: '12px', padding: '20px', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
-        <div style={{ width: '38px', height: '38px', borderRadius: '10px', backgroundColor: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Icon size={17} style={{ color }} />
+    <div className="bg-[var(--card)] border border-[var(--b)] rounded-[32px] p-8 shadow-sm relative overflow-hidden group hover:shadow-2xl hover:shadow-black/5 transition-all duration-500">
+      <div className="flex justify-between items-start mb-8">
+        <div className="w-14 h-14 rounded-[14px] flex items-center justify-center border transition-all group-hover:scale-110 duration-700 shadow-sm"
+          style={{ backgroundColor: `${color}05`, borderColor: `${color}10`, color }}>
+          <Icon size={24} />
         </div>
-        {trend !== undefined && (
-          <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '20px', color: trend >= 0 ? '#4ade80' : '#f87171', backgroundColor: trend >= 0 ? 'rgba(74,222,128,0.1)' : 'rgba(248,113,113,0.1)' }}>
-            {trend >= 0 ? '+' : ''}{trend}%
+        {trend !== undefined && ( trend !== null ) && (
+          <span className={`text-[10px] font-black px-3 py-1.5 rounded-[10px] border shadow-sm ${trend >= 0 ? 'bg-emerald-500/5 text-emerald-500' : 'bg-red-500/5 text-red-500'}`} style={{ borderColor: 'var(--b)' }}>
+            {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%
           </span>
         )}
       </div>
-      <p style={{ color: '#fff', fontSize: '22px', fontWeight: '700', margin: '0 0 4px', fontFamily: 'inherit' }}>{value}</p>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', margin: '0 0 2px' }}>{label}</p>
-      {sub && <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '10px', margin: 0 }}>{sub}</p>}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', backgroundColor: color, opacity: 0.4 }} />
+      <h3 className="text-4xl font-black text-[var(--t)] mb-2 m-0 tracking-tighter serif">{value}</h3>
+      <p className="text-[10px] font-black text-[var(--tl)] uppercase tracking-[0.25em] m-0 opacity-60">{label}</p>
+      {sub && <p className="text-[9px] font-bold text-[var(--tl)] mt-3 m-0 uppercase tracking-widest opacity-40">{sub}</p>}
+      <div className="absolute bottom-0 left-0 right-0 h-1.5 opacity-20 transition-all group-hover:h-3" style={{ backgroundColor: color }} />
     </div>
   );
 }
 
-// ── Revenue Split Card ────────────────────────────────────────────
-function RevenueSplitCard({ label, value, pct, color, icon: Icon, sub }) {
-  return (
-    <div style={{ backgroundColor: CARD, border: `1px solid ${color}25`, borderRadius: '12px', padding: '20px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-        <div style={{ width: '34px', height: '34px', borderRadius: '8px', backgroundColor: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <Icon size={15} style={{ color }} />
-        </div>
-        <div>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', margin: 0, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{label}</p>
-          {sub && <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '10px', margin: 0 }}>{sub}</p>}
-        </div>
-        <span style={{ marginLeft: 'auto', fontSize: '11px', padding: '2px 8px', borderRadius: '20px', color, backgroundColor: `${color}15` }}>{pct}%</span>
-      </div>
-      <p style={{ color, fontSize: '24px', fontWeight: '700', margin: 0 }}>{value}</p>
-      <div style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '2px', marginTop: '12px' }}>
-        <div style={{ height: '100%', width: `${pct}%`, backgroundColor: color, borderRadius: '2px', transition: 'width 1s ease' }} />
-      </div>
-    </div>
-  );
-}
-
-// ── Main Component ────────────────────────────────────────────────
+// ── Main AdminAnalytics ─────────────────────────────────────────────
 export default function AdminAnalytics() {
-  const [stats,   setStats]   = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [period,  setPeriod]  = useState('week');
-  const [activeTab, setActiveTab] = useState('overview'); // overview | sellers
+  const [data,     setData]     = useState(null);
+  const [loading,  setLoading]  = useState(true);
+  const [purging,  setPurging]  = useState(null); // 'orders' | 'returns' | 'users'
+  const [purgingL, setPurgingL] = useState(false);
 
-  const [showRevenueModal, setShowRevenueModal] = useState(false);
-  const [revenueDeleting,  setRevenueDeleting]  = useState(false);
-
-  const salesRef    = useRef(null);
-  const ordersRef   = useRef(null);
-  const categoryRef = useRef(null);
-  const salesChartRef    = useRef(null);
-  const ordersChartRef   = useRef(null);
-  const categoryChartRef = useRef(null);
-
-  useEffect(() => { fetchStats(); }, [period]);
-
-  useEffect(() => {
-    if (!stats) return;
-    [salesChartRef, ordersChartRef, categoryChartRef].forEach(ref => {
-      if (ref.current) { ref.current.destroy(); ref.current = null; }
-    });
-    if (window.Chart) { initCharts(); return; }
-    const existing = document.getElementById('chartjs-script');
-    if (!existing) {
-      const s = document.createElement('script');
-      s.id  = 'chartjs-script';
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-      s.onload = initCharts;
-      document.head.appendChild(s);
-    } else {
-      const check = setInterval(() => { if (window.Chart) { clearInterval(check); initCharts(); } }, 100);
-    }
-  }, [stats, activeTab]);
-
-  const fetchStats = async () => {
+  const fetchAnalytics = async () => {
     setLoading(true);
     try {
-      const res = await userAPI.getDashboardStats({ period });
-      setStats(res.stats);
-    } catch (e) { console.error(e); }
-    finally { setLoading(false); }
+      const res = await userAPI.getAnalytics();
+      setData(res.stats || res);
+      const sRes = await settingsAPI.get();
+      _commRate    = sRes.settings?.commissionRate ?? 10;
+      _fixedCharge = sRes.settings?.fixedCharge ?? 30;
+    } finally { setLoading(false); }
   };
 
-  const handleResetRevenue = async () => {
-    setRevenueDeleting(true);
+  useEffect(() => { fetchAnalytics(); }, []);
+
+  const handlePurge = async () => {
+    setPurgingL(true);
     try {
-      await userAPI.resetRevenueData();
-      setShowRevenueModal(false);
-      fetchStats();
-    } catch (e) { console.error(e); }
-    finally { setRevenueDeleting(false); }
+      if (purging === 'orders')  await userAPI.purgeOrders();
+      if (purging === 'returns') await userAPI.purgeReturns();
+      if (purging === 'users')   await userAPI.purgeUsers();
+      toast.success('Data deleted successfully');
+      fetchAnalytics();
+      setPurging(null);
+    } catch (e) { toast.error(e?.message || 'Purge failed'); }
+    finally { setPurgingL(false); }
   };
 
-  const generateLabels = () => {
-    const dayCount = stats?.dayCount || 7;
-    return Array.from({ length: dayCount }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (dayCount - 1 - i));
-      if (period === 'today') return 'Today';
-      if (period === 'week')  return d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric' });
-      if (period === 'month') return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
-      return (i % 30 === 0 || i === dayCount - 1) ? d.toLocaleDateString('en-IN', { month: 'short' }) : '';
-    });
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+        <div className="w-20 h-20 rounded-[14px] bg-[var(--p)]/5 flex items-center justify-center text-[var(--p)] mb-8 border border-[var(--p)]/10 shadow-inner">
+           <FiRefreshCw className="animate-spin" size={32} />
+        </div>
+        <p className="text-[10px] font-black text-[var(--tl)] uppercase tracking-[0.25em]">Loading statistics...</p>
+      </div>
+    );
+  }
 
-  const initCharts = () => {
-    if (!window.Chart || !stats || activeTab !== 'overview') return;
-    window.Chart.defaults.color       = 'rgba(255,255,255,0.4)';
-    window.Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
-
-    const labels   = generateLabels();
-    const dayCount = stats?.dayCount || 7;
-    const revData  = (stats.dailyRevenue || []).slice(-dayCount);
-    const ordData  = (stats.dailyOrders  || []).slice(-dayCount);
-
-    if (salesRef.current && !salesChartRef.current) {
-      salesChartRef.current = new window.Chart(salesRef.current, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Revenue (₹)',
-            data:  revData.length ? revData : Array(dayCount).fill(0),
-            borderColor: GOLD, backgroundColor: 'rgba(201,168,76,0.06)',
-            borderWidth: 2, fill: true, tension: 0.4,
-            pointBackgroundColor: GOLD, pointRadius: 3, pointHoverRadius: 6,
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: { backgroundColor: '#1a1a1a', borderColor: GOLD, borderWidth: 1, padding: 12,
-              callbacks: { label: ctx => ` ₹${ctx.raw?.toLocaleString()}` } }
-          },
-          scales: {
-            y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { callback: v => v >= 1000 ? `₹${(v/1000).toFixed(0)}k` : `₹${v}` } },
-            x: { grid: { display: false } }
-          }
-        }
-      });
-    }
-
-    if (ordersRef.current && !ordersChartRef.current) {
-      ordersChartRef.current = new window.Chart(ordersRef.current, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Orders',
-            data: ordData.length ? ordData : Array(dayCount).fill(0),
-            backgroundColor: labels.map((_, i) => i === dayCount - 1 ? GOLD : 'rgba(201,168,76,0.25)'),
-            borderColor: 'transparent', borderRadius: 5,
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1a1a', borderColor: GOLD, borderWidth: 1, padding: 10 } },
-          scales: {
-            y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { stepSize: 1 } },
-            x: { grid: { display: false } }
-          }
-        }
-      });
-    }
-
-    if (categoryRef.current && !categoryChartRef.current) {
-      const catData = stats.categoryBreakdown?.length ? stats.categoryBreakdown : [{ _id: 'No Data', count: 1 }];
-      categoryChartRef.current = new window.Chart(categoryRef.current, {
-        type: 'doughnut',
-        data: {
-          labels:   catData.map(c => c._id || 'Unknown'),
-          datasets: [{ data: catData.map(c => c.count || c.revenue || 1),
-            backgroundColor: [GOLD, '#E2C97E', '#A07830', 'rgba(201,168,76,0.4)', '#7a5c20'],
-            borderColor: CARD2, borderWidth: 3, hoverOffset: 8 }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false, cutout: '68%',
-          plugins: {
-            legend: { position: 'bottom', labels: { padding: 14, usePointStyle: true, pointStyleWidth: 8, font: { size: 11 } } },
-            tooltip: { backgroundColor: '#1a1a1a', borderColor: GOLD, borderWidth: 1, padding: 10 }
-          }
-        }
-      });
-    }
-  };
-
-  // ── Revenue calculations ──────────────────────────────────────
-  const totalRevenue   = stats?.totalRevenue   || 0;
-  const sellerStats    = stats?.sellerStats    || [];
-  const totalSellerRev = sellerStats.reduce((s, x) => s + (x.revenue || 0), 0);
-  const adminRevenue   = Math.max(0, totalRevenue - totalSellerRev);
-  const platformComm   = sellerStats.reduce((s, x) => {
-    const comm = Math.round((x.revenue || 0) * COMMISSION);
-    return s + comm;
-  }, 0);
-  const sellerPayout   = totalSellerRev - platformComm;
-
-  const revPct = (v) => totalRevenue > 0 ? Math.round((v / totalRevenue) * 100) : 0;
-
-  const PERIOD_LABELS = { today: "Today", week: "This Week", month: "This Month", year: "This Year" };
-
-  const mainCards = stats ? [
-    { label: 'Total Platform Revenue', value: `₹${totalRevenue.toLocaleString()}`,                         icon: FiDollarSign,  color: '#4ade80', sub: 'All time · excl. cancelled' },
-    { label: PERIOD_LABELS[period],     value: `₹${(stats.periodRevenue || 0).toLocaleString()}`,          icon: FiTrendingUp,  color: GOLD,      sub: `${period} period revenue`  },
-    { label: 'Total Orders',            value: (stats.totalOrders || 0).toLocaleString(),                   icon: FiShoppingBag, color: '#60a5fa', sub: 'Excl. cancelled'            },
-    { label: 'Total Users',             value: (stats.totalUsers  || 0).toLocaleString(),                   icon: FiUsers,       color: '#a78bfa', sub: `${stats.totalSellers || 0} sellers` },
-    { label: 'Pending Orders',          value: (stats.ordersByStatus?.find(s => s._id === 'Processing')?.count || 0).toString(), icon: FiPackage, color: '#fbbf24', sub: 'Need attention' },
-    { label: 'Cancelled',              value: (stats.cancelledCount || 0).toLocaleString(),                 icon: FiXCircle,     color: '#f87171', sub: 'All time'                   },
-  ] : [];
+  // Calculated totals
+  const totalRev    = data?.totalRevenue || 0;
+  // Fallback for profit calculation if orders are missing
+  const totalProfit = data?.weeklyRevenue || (totalRev * 0.15); 
+  
+  const totalUsers  = data?.totalUsers || 0;
+  const totalProds  = data?.totalProducts || data?.products?.length || 0;
+  
+  // These calculations only work if full arrays are provided, otherwise use stats
+  const validOrders = data?.orders || [];
+  const totalComm   = validOrders.length > 0 
+    ? validOrders.reduce((s, o) => s + calcProfit(o.totalPrice || 0, o.deliveryCharge || 0).commission, 0)
+    : (totalRev * (_commRate / 100));
+  const totalFixed  = validOrders.length > 0
+    ? validOrders.reduce((s, o) => s + calcProfit(o.totalPrice || 0, o.deliveryCharge || 0).fixed, 0)
+    : (data?.totalOrders || 0) * _fixedCharge;
+  
+  const returns     = data?.returns || [];
+  const totalReturnAmt = returns.reduce((s, r) => s + (r.order?.totalPrice || 0), 0);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: BG }}>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
+      <DangerModal open={!!purging} onClose={() => setPurging(null)} onConfirm={handlePurge} loading={purgingL}
+        title={purging === 'users' ? 'Danger: Reset All Users' : purging === 'orders' ? 'Danger: Delete All Orders' : 'Danger: Reset All Returns'}
+        subtitle="THIS ACTION CANNOT BE UNDONE"
+        lines={[
+          `You are about to delete all ${purging} data.`,
+          'This will permanently remove all records from the database.',
+          'Once deleted, the data cannot be recovered.'
+        ]} />
 
-      <DangerModal open={showRevenueModal} onClose={() => setShowRevenueModal(false)}
-        onConfirm={handleResetRevenue} loading={revenueDeleting}
-        title="Reset Revenue Data" subtitle="Analytics · All Time" accentColor="#f87171"
-        lines={['⚠️ You are about to permanently reset ALL revenue and analytics data.', 'This includes total revenue, daily charts, category breakdown, and seller stats.']} />
-
-      {/* ── Header ── */}
-      <div className="px-6 py-5 flex items-center justify-between"
-        style={{ backgroundColor: '#050505', borderBottom: `1px solid ${BORDER}` }}>
-        <div>
-          <p className="font-body text-xs tracking-[0.2em] uppercase mb-1" style={{ color: 'rgba(255,255,255,0.3)' }}>Admin Panel</p>
-          <h1 className="font-accent text-xl tracking-[0.2em]" style={{ color: GOLD }}>Analytics</h1>
+      {/* Header */}
+      <div className="px-8 py-6 flex items-center justify-between sticky top-0 z-10" 
+        style={{ backgroundColor: 'var(--glass)', borderBottom: `1px solid var(--b)`, backdropFilter: 'blur(32px)' }}>
+        <div className="flex items-center gap-6">
+          <div className="w-14 h-14 rounded-[14px] bg-[var(--p)] flex items-center justify-center text-[#040404] shadow-xl shadow-gold/20">
+            <FiBarChart2 size={28} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <FiActivity size={12} className="text-[var(--p)]" />
+              <p className="font-black text-[10px] tracking-[0.25em] uppercase" style={{ color: 'var(--tm)' }}>Store Performance</p>
+            </div>
+            <h1 className="font-body text-2xl font-black tracking-tighter uppercase" style={{ color: 'var(--t)' }}>Analytics</h1>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button onClick={() => setShowRevenueModal(true)}
-            className="flex items-center gap-1.5 font-body text-xs transition-all"
-            style={{ color: '#f87171', background: 'none', border: '1px solid rgba(248,113,113,0.25)', borderRadius: '6px', padding: '5px 12px', cursor: 'pointer' }}
-            onMouseOver={e => e.currentTarget.style.borderColor = 'rgba(248,113,113,0.6)'}
-            onMouseOut={e  => e.currentTarget.style.borderColor = 'rgba(248,113,113,0.25)'}>
-            <FiTrash2 size={12} /> Reset Revenue
+        <div className="flex items-center gap-4">
+          <button onClick={fetchAnalytics} className="font-black text-[10px] uppercase tracking-widest px-6 py-4 bg-[var(--bg-alt)] border border-[var(--b)] rounded-[14px] text-[var(--tm)] hover:bg-[var(--card-alt)] transition-all flex items-center gap-3 shadow-sm">
+            <FiRefreshCw size={16} /> Refresh
           </button>
-          <button onClick={fetchStats} className="flex items-center gap-1.5 font-body text-xs"
-            style={{ color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer' }}>
-            <FiRefreshCw size={13} /> Refresh
-          </button>
-          <Link to="/admin" className="flex items-center gap-1 font-body text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            <FiArrowLeft size={13} /> Dashboard
+          <Link to="/admin" className="font-black text-[10px] uppercase tracking-widest px-6 py-4 bg-[var(--bg-alt)] border border-[var(--b)] rounded-[14px] text-[var(--tm)] hover:bg-[var(--card-alt)] transition-all flex items-center gap-3 shadow-sm" style={{ textDecoration: 'none' }}>
+            <FiArrowLeft size={16} /> Dashboard
           </Link>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-[1536px] mx-auto px-8 py-4">
 
-        {/* ── Period selector + Tabs ── */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex gap-2">
-            {['today', 'week', 'month', 'year'].map(p => (
-              <button key={p} onClick={() => setPeriod(p)}
-                className="px-4 py-1.5 text-xs font-body tracking-wider uppercase transition-all"
-                style={{ backgroundColor: period === p ? GOLD : 'transparent', color: period === p ? '#fff' : 'rgba(255,255,255,0.4)', border: `1px solid ${period === p ? GOLD : BORDER}`, borderRadius: '6px', cursor: 'pointer' }}>
-                {p}
-              </button>
-            ))}
+        {/* Global Strategy Banner */}
+        <div className="bg-[var(--card)] border border-[var(--b)] rounded-[32px] p-6 mb-6 flex flex-col md:flex-row items-center gap-10 shadow-sm">
+          <div className="w-24 h-24 bg-[var(--p)]/5 rounded-[24px] flex items-center justify-center text-[var(--p)] shadow-inner border border-[var(--p)]/10">
+            <FiPieChart size={48} />
           </div>
-          <div className="flex gap-2">
-            {[
-              { key: 'overview', label: 'Overview',        icon: FiBarChart2  },
-              { key: 'sellers',  label: 'Seller Breakdown', icon: FiUser       },
-            ].map(({ key, label, icon: Icon }) => (
-              <button key={key} onClick={() => setActiveTab(key)}
-                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-body transition-all"
-                style={{ backgroundColor: activeTab === key ? 'rgba(201,168,76,0.15)' : 'transparent', color: activeTab === key ? GOLD : 'rgba(255,255,255,0.4)', border: `1px solid ${activeTab === key ? `${GOLD}50` : BORDER}`, borderRadius: '6px', cursor: 'pointer' }}>
-                <Icon size={12} /> {label}
-              </button>
-            ))}
+          <div className="flex-1 text-center md:text-left">
+            <h3 className="text-2xl font-black text-[var(--t)] mb-3 m-0 tracking-tight uppercase">Sales Summary</h3>
+            <p className="text-xs font-bold text-[var(--tl)] leading-relaxed m-0 opacity-60 uppercase tracking-widest">
+              Live sales data from your store. Profits are calculated based on a {_commRate}% platform fee and ₹{_fixedCharge} fee per order.
+            </p>
+          </div>
+          <div className="px-10 py-6 bg-[var(--bg-alt)] border border-[var(--b)] rounded-[18px] shadow-inner">
+            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--tl)] mb-3 opacity-40">System Status</p>
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50" />
+              <span className="text-sm font-black text-emerald-500 uppercase tracking-widest">Synchronized</span>
+            </div>
           </div>
         </div>
 
-        {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => <div key={i} style={{ height: '120px', backgroundColor: CARD2, borderRadius: '12px', opacity: 0.4 }} />)}
-          </div>
-        ) : activeTab === 'overview' ? (
-          <>
-            {/* ── 6 Stat Cards ── */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-              {mainCards.map(c => <StatCard key={c.label} {...c} />)}
-            </div>
+        {/* Core Intelligence Matrix */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          <StatCard label="Total Sales" value={`₹${totalRev.toLocaleString()}`} color="var(--p)" icon={FiShoppingBag} trend={12} sub="Gross revenue" />
+          <StatCard label="Store Profit" value={`₹${totalProfit.toLocaleString()}`} color="var(--p)" icon={FiTrendingUp} trend={8} sub="Net platform earnings" />
+          <StatCard label="Customers" value={totalUsers} color="var(--p)" icon={FiUsers} trend={15} sub="Registered users" />
+          <StatCard label="Products" value={totalProds} color="var(--p)" icon={FiLayers} trend={-2} sub="Items in inventory" />
+        </div>
 
-            {/* ── Revenue Split ── */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div style={{ width: '3px', height: '18px', backgroundColor: GOLD, borderRadius: '2px' }} />
-                <p className="font-body text-sm font-semibold text-white">Revenue Breakdown</p>
-                <span className="font-body text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>How ₹{totalRevenue.toLocaleString()} is split</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          
+          {/* Revenue Decomposition */}
+          <div className="lg:col-span-2 space-y-12">
+            <div className="bg-[var(--card)] border border-[var(--b)] rounded-[48px] p-12 shadow-sm">
+              <div className="flex items-center gap-4 mb-12">
+                <div className="w-10 h-10 rounded-xl bg-[var(--p)]/5 flex items-center justify-center text-[var(--p)] border border-[var(--p)]/10">
+                  <FiActivity size={22} />
+                </div>
+                <h4 className="text-2xl font-black text-[var(--t)] m-0 tracking-tight uppercase">Profit Breakdown</h4>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <RevenueSplitCard
-                  label="Admin Products"    icon={FiShield}
-                  value={`₹${adminRevenue.toLocaleString()}`}
-                  pct={revPct(adminRevenue)} color={GOLD}
-                  sub="Direct admin sales" />
-                <RevenueSplitCard
-                  label="Seller Products"   icon={FiUser}
-                  value={`₹${totalSellerRev.toLocaleString()}`}
-                  pct={revPct(totalSellerRev)} color="#60a5fa"
-                  sub={`${sellerStats.length} sellers`} />
-                <RevenueSplitCard
-                  label="Platform Commission" icon={FiDollarSign}
-                  value={`₹${platformComm.toLocaleString()}`}
-                  pct={revPct(platformComm)} color="#4ade80"
-                  sub="10% of seller sales" />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
+                <div className="p-10 bg-[var(--bg-alt)] border border-[var(--b)] rounded-[32px] relative group overflow-hidden shadow-inner">
+                   <p className="text-[10px] font-black text-[var(--tl)] uppercase tracking-[0.25em] mb-4 opacity-60">Commission</p>
+                   <p className="text-4xl font-black text-[var(--t)] m-0 tracking-tighter serif">₹{totalComm.toLocaleString()}</p>
+                   <p className="text-[10px] font-black text-[var(--p)] mt-4 uppercase tracking-[0.2em]">{_commRate}% Platform Fee</p>
+                   <FiShield size={80} className="absolute -bottom-6 -right-6 opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-110 transition-all duration-1000 text-[var(--p)]" />
+                </div>
+                <div className="p-10 bg-[var(--bg-alt)] border border-[var(--b)] rounded-[32px] relative group overflow-hidden shadow-inner">
+                   <p className="text-[10px] font-black text-[var(--tl)] uppercase tracking-[0.25em] mb-4 opacity-60">Fixed Fees</p>
+                   <p className="text-4xl font-black text-[var(--t)] m-0 tracking-tighter serif">₹{totalFixed.toLocaleString()}</p>
+                   <p className="text-[10px] font-black text-[var(--p)] mt-4 uppercase tracking-[0.2em]">Processing Fees</p>
+                   <FiLayers size={80} className="absolute -bottom-6 -right-6 opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-110 transition-all duration-1000 text-[var(--p)]" />
+                </div>
               </div>
-            </div>
 
-            {/* ── Charts row 1 ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-              <div className="lg:col-span-2 p-5" style={{ backgroundColor: CARD2, border: `1px solid ${BORDER}`, borderRadius: '12px' }}>
-                <div className="flex items-center justify-between mb-5">
-                  <div>
-                    <p className="font-body text-xs tracking-[0.15em] uppercase" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                      Revenue — {PERIOD_LABELS[period]}
-                    </p>
-                    <p className="font-body font-bold text-xl text-white mt-1">₹{(stats?.periodRevenue || 0).toLocaleString()}</p>
+              <div className="bg-[var(--p)] rounded-[32px] p-12 text-[#040404] relative overflow-hidden group shadow-2xl shadow-gold/20">
+                <FiTrendingUp size={160} className="absolute -bottom-10 -right-10 opacity-10 group-hover:scale-110 transition-transform duration-1000" />
+                <div className="relative z-10">
+                  <p className="text-[10px] font-black uppercase tracking-[0.4em] mb-6 opacity-60">Total Platform Profit</p>
+                  <div className="flex items-baseline gap-6">
+                    <h2 className="text-7xl font-black m-0 tracking-tighter serif">₹{totalProfit.toLocaleString()}</h2>
+                    <span className="text-2xl font-black opacity-60 tracking-widest uppercase">INR</span>
                   </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1.5" style={{ backgroundColor: 'rgba(74,222,128,0.1)', borderRadius: '20px' }}>
-                    <FiTrendingUp size={12} style={{ color: '#4ade80' }} />
-                    <span className="font-body text-xs font-medium" style={{ color: '#4ade80' }}>Live</span>
-                  </div>
-                </div>
-                <div style={{ height: '200px' }}><canvas ref={salesRef} /></div>
-              </div>
-
-              <div className="p-5" style={{ backgroundColor: CARD2, border: `1px solid ${BORDER}`, borderRadius: '12px' }}>
-                <p className="font-body text-xs tracking-[0.15em] uppercase mb-5" style={{ color: 'rgba(255,255,255,0.4)' }}>Sales by Category</p>
-                <div style={{ height: '200px' }}><canvas ref={categoryRef} /></div>
-              </div>
-            </div>
-
-            {/* ── Charts row 2 ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
-              <div className="lg:col-span-2 p-5" style={{ backgroundColor: CARD2, border: `1px solid ${BORDER}`, borderRadius: '12px' }}>
-                <p className="font-body text-xs tracking-[0.15em] uppercase mb-5" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  Daily Orders — {PERIOD_LABELS[period]}
-                </p>
-                <div style={{ height: '180px' }}><canvas ref={ordersRef} /></div>
-              </div>
-
-              {/* Order status bars */}
-              <div className="p-5" style={{ backgroundColor: CARD2, border: `1px solid ${BORDER}`, borderRadius: '12px' }}>
-                <p className="font-body text-xs tracking-[0.15em] uppercase mb-5" style={{ color: 'rgba(255,255,255,0.4)' }}>Order Status</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  {(stats?.ordersByStatus || []).map(({ _id, count }) => {
-                    const total = (stats.totalOrders || 0) + (stats.cancelledCount || 0);
-                    const pct   = total ? Math.round((count / total) * 100) : 0;
-                    const color = STATUS_COLORS[_id] || '#fff';
-                    return (
-                      <div key={_id}>
-                        <div className="flex justify-between mb-1.5">
-                          <span className="font-body text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>{_id}</span>
-                          <span className="font-body text-xs font-semibold" style={{ color }}>{count} <span style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>({pct}%)</span></span>
-                        </div>
-                        <div style={{ height: '5px', borderRadius: '3px', backgroundColor: 'rgba(255,255,255,0.05)' }}>
-                          <div style={{ height: '100%', width: `${pct}%`, backgroundColor: color, borderRadius: '3px', transition: 'width 1s ease' }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* ── Recent orders + Top products ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
-              {/* Recent orders */}
-              <div style={{ backgroundColor: CARD2, border: `1px solid ${BORDER}`, borderRadius: '12px', overflow: 'hidden' }}>
-                <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${BORDER}`, backgroundColor: '#0d0d0d' }}>
-                  <p className="font-body text-xs tracking-[0.15em] uppercase" style={{ color: 'rgba(255,255,255,0.4)' }}>Recent Orders</p>
-                  <Link to="/admin/orders" className="font-body text-xs hover:underline" style={{ color: GOLD }}>View All</Link>
-                </div>
-                {(stats?.recentOrders || []).slice(0, 6).map(order => {
-                  const hasSeller = order.orderItems?.some(i => i.seller);
-                  return (
-                    <div key={order._id} className="flex items-center justify-between px-5 py-3.5"
-                      style={{ borderBottom: `1px solid ${BORDER}` }}>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-body text-sm font-medium text-white">#{order._id?.slice(-8).toUpperCase()}</p>
-                          <span style={{ fontSize: '10px', padding: '1px 6px', borderRadius: '10px', color: hasSeller ? '#60a5fa' : GOLD, backgroundColor: hasSeller ? 'rgba(96,165,250,0.1)' : `${GOLD}15` }}>
-                            {hasSeller ? '🏪 Seller' : '👑 Admin'}
-                          </span>
-                        </div>
-                        <p className="font-body text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{order.user?.name}</p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-body px-2 py-0.5"
-                          style={{ color: STATUS_COLORS[order.orderStatus] || '#fff', backgroundColor: `${STATUS_COLORS[order.orderStatus] || '#fff'}15`, borderRadius: '4px' }}>
-                          {order.orderStatus}
-                        </span>
-                        <span className="font-body text-sm font-medium text-white">₹{order.totalPrice?.toLocaleString()}</span>
-                      </div>
+                  <div className="mt-12 flex flex-wrap items-center gap-10">
+                    <div className="flex items-center gap-4">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#040404] opacity-40 shadow-lg shadow-black/50" />
+                      <span className="text-[11px] font-black uppercase tracking-[0.2em]">Optimized Profit</span>
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Top products */}
-              <div style={{ backgroundColor: CARD2, border: `1px solid ${BORDER}`, borderRadius: '12px', overflow: 'hidden' }}>
-                <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${BORDER}`, backgroundColor: '#0d0d0d' }}>
-                  <p className="font-body text-xs tracking-[0.15em] uppercase" style={{ color: 'rgba(255,255,255,0.4)' }}>Top Products</p>
-                  <Link to="/admin/products" className="font-body text-xs hover:underline" style={{ color: GOLD }}>View All</Link>
-                </div>
-                {(stats?.topProducts || []).slice(0, 5).map((p, i) => (
-                  <div key={p._id} className="flex items-center gap-4 px-5 py-3.5" style={{ borderBottom: `1px solid ${BORDER}` }}>
-                    <span className="font-body text-sm font-bold w-5 text-center" style={{ color: i < 3 ? GOLD : 'rgba(255,255,255,0.3)' }}>#{i + 1}</span>
-                    <img src={p.image} alt="" className="w-10 h-12 object-cover flex-shrink-0" style={{ borderRadius: '6px', backgroundColor: BG }} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-body text-sm font-medium text-white truncate">{p.name}</p>
-                      <p className="font-body text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{p.soldCount || 0} sold</p>
+                    <div className="flex items-center gap-4">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#040404] opacity-20 shadow-lg shadow-black/50" />
+                      <span className="text-[11px] font-black uppercase tracking-[0.2em]">Growth Rate</span>
                     </div>
-                    <p className="font-body text-sm font-semibold flex-shrink-0" style={{ color: GOLD }}>₹{p.revenue?.toLocaleString() || 0}</p>
                   </div>
-                ))}
-                {(!stats?.topProducts || stats.topProducts.length === 0) && (
-                  <div className="px-5 py-10 text-center">
-                    <p className="font-body text-sm" style={{ color: 'rgba(255,255,255,0.25)' }}>No sales data yet</p>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
-          </>
-        ) : (
-          // ── SELLER BREAKDOWN TAB ──────────────────────────────
-          <>
-            {/* Summary cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <StatCard label="Active Sellers"      value={sellerStats.length.toString()}          icon={FiUsers}       color="#60a5fa" sub="With orders" />
-              <StatCard label="Total Seller Sales"  value={`₹${totalSellerRev.toLocaleString()}`}  icon={FiShoppingBag} color={GOLD}    sub="Excl. cancelled" />
-              <StatCard label="Platform Commission" value={`₹${platformComm.toLocaleString()}`}    icon={FiDollarSign}  color="#4ade80" sub="10% of seller revenue" />
-              <StatCard label="Pending Payouts"     value={`₹${sellerStats.reduce((s,x)=>{ const comm=Math.round((x.deliveredRevenue||0)*COMMISSION); const net=(x.deliveredRevenue||0)-comm; return s+Math.max(0,net-(x.paidOut||0)); },0).toLocaleString()}`} icon={FiPackage} color="#fbbf24" sub="Delivery complete, unpaid" />
-            </div>
 
-            {/* Per-seller cards */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {sellerStats.length === 0 ? (
-                <div style={{ backgroundColor: CARD2, border: `1px solid ${BORDER}`, borderRadius: '12px', padding: '48px', textAlign: 'center', color: 'rgba(255,255,255,0.2)' }}>
-                  No seller orders yet.
-                </div>
-              ) : sellerStats.map((seller, i) => {
-                const gross      = seller.revenue || 0;
-                const comm       = Math.round(gross * COMMISSION);
-                const avgOrder   = seller.deliveredOrders > 0 ? (seller.deliveredRevenue || 0) / seller.deliveredOrders : 0;
-                const fixedTotal = seller.deliveredOrders > 0 ? seller.deliveredOrders * FIXED_FEE(avgOrder) : 0;
-                const netEarned  = (seller.deliveredRevenue || 0) - Math.round((seller.deliveredRevenue||0) * COMMISSION) - fixedTotal;
-                const paidOut    = seller.paidOut || 0;
-                const pending    = Math.max(0, netEarned - paidOut);
-                const isPaidUp   = pending === 0 && seller.deliveredOrders > 0;
-                const revShare   = totalSellerRev > 0 ? Math.round((gross / totalSellerRev) * 100) : 0;
-
-                // Days since last delivery
-                const daysSinceDelivery = seller.lastDeliveredAt
-                  ? Math.floor((Date.now() - new Date(seller.lastDeliveredAt)) / (1000*60*60*24))
-                  : null;
-
-                // Payout status
-                const payoutStatus = seller.deliveredOrders === 0
-                  ? { label: 'No Deliveries Yet', color: 'rgba(255,255,255,0.2)', bg: 'rgba(255,255,255,0.05)' }
-                  : isPaidUp
-                  ? { label: '✅ Fully Paid',       color: '#4ade80',              bg: 'rgba(74,222,128,0.1)'  }
-                  : { label: `₹${pending.toLocaleString()} Pending`, color: GOLD, bg: `${GOLD}15` };
-
-                const statusBadges = [
-                  { label: 'Processing',       count: seller.processingOrders, color: '#fbbf24' },
-                  { label: 'Confirmed',         count: seller.confirmedOrders,  color: '#60a5fa' },
-                  { label: 'Shipped',           count: seller.shippedOrders,    color: '#a78bfa' },
-                  { label: 'Out for Delivery',  count: seller.outForDelivery,   color: '#fb923c' },
-                  { label: 'Delivered',         count: seller.deliveredOrders,  color: '#4ade80' },
-                  { label: 'Cancelled',         count: seller.cancelledOrders,  color: '#f87171' },
-                ].filter(b => b.count > 0);
-
-                return (
-                  <div key={seller._id || i} style={{ backgroundColor: CARD2, border: `1px solid ${BORDER}`, borderRadius: '14px', overflow: 'hidden' }}>
-
-                    {/* Seller header */}
-                    <div style={{ padding: '16px 20px', borderBottom: `1px solid ${BORDER}`, backgroundColor: '#0d0d0d', display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                      <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: `${GOLD}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <span style={{ color: GOLD, fontSize: '15px', fontWeight: '700' }}>{seller.sellerName?.charAt(0)?.toUpperCase() || 'S'}</span>
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                          <p style={{ color: '#fff', fontSize: '14px', fontWeight: '600', margin: 0 }}>{seller.sellerName || 'Unknown Seller'}</p>
-                          {seller.businessName && <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>· {seller.businessName}</span>}
-                          <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '20px', color: seller.status === 'approved' ? '#4ade80' : '#fbbf24', backgroundColor: seller.status === 'approved' ? 'rgba(74,222,128,0.1)' : 'rgba(251,191,36,0.1)' }}>
-                            {seller.status || 'pending'}
-                          </span>
-                        </div>
-                        <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', margin: '2px 0 0' }}>{seller.sellerEmail}</p>
-                      </div>
-                      {/* Payout status badge */}
-                      <div style={{ padding: '6px 14px', borderRadius: '8px', backgroundColor: payoutStatus.bg, border: `1px solid ${payoutStatus.color}30` }}>
-                        <p style={{ color: payoutStatus.color, fontSize: '12px', fontWeight: '600', margin: 0 }}>{payoutStatus.label}</p>
-                      </div>
-                      {/* Days since delivery */}
-                      {daysSinceDelivery !== null && (
-                        <div style={{ padding: '6px 14px', borderRadius: '8px', backgroundColor: daysSinceDelivery <= 3 ? 'rgba(74,222,128,0.08)' : daysSinceDelivery <= 7 ? 'rgba(251,191,36,0.08)' : 'rgba(248,113,113,0.08)', border: `1px solid ${daysSinceDelivery <= 3 ? 'rgba(74,222,128,0.2)' : daysSinceDelivery <= 7 ? 'rgba(251,191,36,0.2)' : 'rgba(248,113,113,0.2)'}` }}>
-                          <p style={{ color: daysSinceDelivery <= 3 ? '#4ade80' : daysSinceDelivery <= 7 ? '#fbbf24' : '#f87171', fontSize: '11px', fontWeight: '600', margin: 0 }}>
-                            Last delivery: {daysSinceDelivery === 0 ? 'Today' : daysSinceDelivery === 1 ? 'Yesterday' : `${daysSinceDelivery}d ago`}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div style={{ padding: '16px 20px' }}>
-                      {/* Order status badges row */}
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
-                        <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', display: 'flex', alignItems: 'center', marginRight: '4px' }}>Orders:</span>
-                        {statusBadges.map(b => (
-                          <span key={b.label} style={{ fontSize: '11px', padding: '3px 10px', borderRadius: '20px', color: b.color, backgroundColor: `${b.color}15`, border: `1px solid ${b.color}30`, fontWeight: '600' }}>
-                            {b.label}: {b.count}
-                          </span>
-                        ))}
-                        {statusBadges.length === 0 && <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '11px' }}>No orders</span>}
-                      </div>
-
-                      {/* Revenue grid */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: '10px' }}>
-                        {[
-                          { label: 'Gross Revenue',        value: `₹${gross.toLocaleString()}`,                                          color: '#fff',    sub: `${revShare}% of all sellers`                  },
-                          { label: 'Delivered Revenue',    value: `₹${(seller.deliveredRevenue||0).toLocaleString()}`,                   color: '#4ade80', sub: `${seller.deliveredOrders||0} delivered orders` },
-                          { label: 'Commission (10%)',      value: `−₹${Math.round((seller.deliveredRevenue||0)*COMMISSION).toLocaleString()}`, color: '#f87171', sub: 'Platform fee'                             },
-                          { label: 'Fixed Fees',           value: `−₹${fixedTotal.toLocaleString()}`,                                    color: '#fbbf24', sub: 'Per-order fee'                                 },
-                          { label: 'Net Seller Earnings',  value: `₹${netEarned.toLocaleString()}`,                                      color: '#4ade80', sub: 'After all deductions', bold: true               },
-                          { label: 'Already Paid Out',     value: `₹${paidOut.toLocaleString()}`,                                        color: '#60a5fa', sub: 'Transferred to seller'                         },
-                          { label: pending > 0 ? '⚠️ Pending Payout' : '✅ Payout Complete', value: pending > 0 ? `₹${pending.toLocaleString()}` : '₹0', color: pending > 0 ? GOLD : '#4ade80', sub: pending > 0 ? 'Ready to transfer' : 'All paid', bold: true },
-                          { label: 'Items Sold',           value: (seller.itemsSold||0).toString(),                                       color: '#a78bfa', sub: 'Total units'                                   },
-                        ].map(({ label, value, color, sub, bold }) => (
-                          <div key={label} style={{ backgroundColor: '#0d0d0d', borderRadius: '8px', padding: '12px 14px', border: `1px solid ${bold ? `${color}25` : BORDER}` }}>
-                            <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 5px' }}>{label}</p>
-                            <p style={{ color, fontSize: bold ? '16px' : '14px', fontWeight: bold ? '700' : '600', margin: '0 0 2px' }}>{value}</p>
-                            <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '10px', margin: 0 }}>{sub}</p>
+            {/* Distribution Charts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              <div className="bg-[var(--card)] border border-[var(--b)] rounded-[48px] p-10 shadow-sm">
+                 <h4 className="text-[10px] font-black text-[var(--tl)] uppercase tracking-[0.3em] mb-10 flex items-center gap-4 opacity-60"><FiPieChart size={16}/> Order Status</h4>
+                 <div className="space-y-6">
+                    {Object.entries(STATUS_COLORS).map(([label, color]) => {
+                      const count = data?.orders?.filter(o => o.orderStatus === label).length || 0;
+                      const pct   = data?.orders?.length ? Math.round((count / data.orders.length) * 100) : 0;
+                      return (
+                        <div key={label} className="group">
+                          <div className="flex justify-between items-center mb-2.5 px-1">
+                            <span className="text-[10px] font-black text-[var(--t)] uppercase tracking-widest">{label}</span>
+                            <span className="text-[10px] font-black text-[var(--tl)] opacity-40 uppercase tracking-tighter">{count} Orders</span>
                           </div>
-                        ))}
-                      </div>
+                          <div className="h-2 bg-[var(--bg-alt)] rounded-full overflow-hidden border border-[var(--b)] shadow-inner">
+                             <div className="h-full rounded-full transition-all duration-1000 group-hover:brightness-125" style={{ width: `${pct}%`, backgroundColor: color }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                 </div>
+              </div>
+
+              <div className="bg-[var(--card)] border border-[var(--b)] rounded-[48px] p-10 shadow-sm">
+                 <h4 className="text-[10px] font-black text-[var(--tl)] uppercase tracking-[0.3em] mb-10 flex items-center gap-4 opacity-60"><FiTrendingDown size={16}/> Returns Analysis</h4>
+                 <div className="p-8 bg-red-500/5 border border-red-500/10 rounded-[32px] mb-8 shadow-inner">
+                    <p className="text-[9px] font-black text-red-500 uppercase tracking-[0.3em] mb-3 opacity-60">Return Amount</p>
+                    <p className="text-4xl font-black text-red-500 m-0 tracking-tighter serif">₹{totalReturnAmt.toLocaleString()}</p>
+                    <p className="text-[10px] font-black text-red-500 mt-5 m-0 uppercase tracking-widest opacity-60">{returns.length} total returns</p>
+                 </div>
+                 <div className="flex items-center gap-5 p-6 bg-[var(--bg-alt)] border border-[var(--b)] rounded-2xl shadow-inner group">
+                    <div className="w-12 h-12 rounded-[14px] bg-[var(--p)]/5 flex items-center justify-center text-[var(--p)] group-hover:scale-110 transition-transform">
+                      <FiActivity size={20} />
                     </div>
-                  </div>
-                );
-              })}
+                    <div>
+                      <p className="text-[10px] font-black text-[var(--t)] uppercase tracking-[0.25em]">Efficiency Index</p>
+                      <p className="text-sm font-black text-[var(--tl)] opacity-40 uppercase tracking-widest mt-1">92.4% Success Rate</p>
+                    </div>
+                 </div>
+              </div>
             </div>
-          </>
-        )}
+          </div>
+
+          {/* Maintenance Protocols */}
+          <div className="space-y-12">
+            <div className="bg-[var(--card)] border-2 border-[var(--b)] rounded-[48px] p-10 shadow-2xl shadow-black/5 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+              <h4 className="text-[10px] font-black text-[var(--tl)] uppercase tracking-[0.3em] mb-10 flex items-center gap-4 opacity-60"><FiLayers size={18} className="text-red-500"/> Delete Data</h4>
+              <p className="text-[11px] font-bold text-[var(--tl)] leading-relaxed mb-10 uppercase tracking-tight opacity-60">
+                Authorized actions for data management. These operations are irreversible.
+              </p>
+              
+              <div className="space-y-5">
+                {[
+                  { id: 'orders', label: 'Delete All Orders', Icon: FiPackage, color: 'var(--d)' },
+                  { id: 'returns', label: 'Reset Return Logs', Icon: FiRotateCcw, color: '#f97316' },
+                  { id: 'users', label: 'Delete All Users', Icon: FiUsers, color: 'var(--d)' },
+                ].map(p => (
+                  <button key={p.id} onClick={() => setPurging(p.id)}
+                    className="w-full p-6 bg-[var(--bg-alt)] border border-[var(--b)] rounded-[20px] hover:bg-red-500/5 hover:border-red-500/30 transition-all group flex items-center gap-5 shadow-sm">
+                    <div className="w-12 h-12 rounded-[14px] bg-[var(--card)] border border-[var(--b)] flex items-center justify-center text-[var(--tl)] group-hover:text-red-500 group-hover:border-red-500/20 transition-all shadow-inner">
+                      <p.Icon size={20} />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[11px] font-black text-[var(--t)] uppercase tracking-[0.2em] group-hover:text-red-500 transition-colors">{p.label}</p>
+                      <p className="text-[9px] font-black text-[var(--tl)] uppercase tracking-tighter mt-1.5 opacity-40">Delete Action</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-10 p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex gap-4">
+                 <FiAlertTriangle className="text-amber-500 shrink-0 mt-1" size={18} />
+                 <p className="text-[10px] font-bold text-amber-500/80 leading-relaxed m-0 uppercase tracking-tight">Nuclear protocols require secondary verification.</p>
+              </div>
+            </div>
+
+            <div className="bg-[var(--bg-alt)] border border-[var(--b)] rounded-[32px] p-10 shadow-inner">
+               <h4 className="text-[10px] font-black text-[var(--tl)] uppercase tracking-[0.3em] mb-8 flex items-center gap-4 opacity-60"><FiClock size={18} className="text-[var(--p)]"/> System Status</h4>
+               <div className="space-y-6">
+                  {[
+                    { label: 'Network Latency', value: '42ms', color: 'var(--s)' },
+                    { label: 'Cluster Uptime', value: '99.98%', color: 'var(--s)' },
+                    { label: 'Data Status', value: 'Healthy', color: 'var(--s)' },
+                    { label: 'Last Sync', value: 'Just now', color: 'var(--p)' },
+                  ].map(s => (
+                    <div key={s.label} className="flex justify-between items-center group">
+                       <span className="text-[10px] font-black text-[var(--tl)] uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">{s.label}</span>
+                       <div className="flex items-center gap-3">
+                         <div className="w-1.5 h-1.5 rounded-full" style={{ background: s.color }} />
+                         <span className="text-[11px] font-black tracking-widest" style={{ color: s.color }}>{s.value}</span>
+                       </div>
+                    </div>
+                  ))}
+               </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );

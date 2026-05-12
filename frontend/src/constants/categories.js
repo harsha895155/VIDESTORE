@@ -1,4 +1,4 @@
-// ─── Trendorra · Shared Category & Subcategory Data ──────────────────────────
+// ─── VideStore · Shared Category & Subcategory Data ──────────────────────────
 // Single source of truth — import this in:
 //   • Navbar.jsx          (desktop mega-menu + mobile drawer)
 //   • ShopPage.jsx        (filter pills)

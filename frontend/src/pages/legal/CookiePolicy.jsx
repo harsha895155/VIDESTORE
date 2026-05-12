@@ -66,7 +66,7 @@ export default function CookiePolicy() {
       <P>We may update this Cookie Policy as we add new features or services. We will notify you of significant changes via email or a website banner.</P>
 
       <H2>7. Contact</H2>
-      <P>For questions about our use of cookies: hello@Trendorra.in</P>
+      <P>For questions about our use of cookies: vibestore2027@gmail.com</P>
     </LegalLayout>
   );
 }

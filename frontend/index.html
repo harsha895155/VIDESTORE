@@ -6,9 +6,21 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
-    content="Trendorra – Premium Fashion E-commerce. Discover the latest trends in Men, Women, Streetwear & Accessories." />
-  <meta name="keywords" content="fashion, clothing, trendorra, premium, streetwear, accessories" />
-  <title>Trendorra – Premium Fashion Store</title>
+    content="VideStore – Premium Fashion E-commerce. Discover the latest trends in Men, Women, Streetwear & Accessories." />
+  <meta name="keywords" content="fashion, clothing, videstore, premium, streetwear, accessories" />
+  <title>VideStore – Premium Fashion Store</title>
+  <script>
+    (function() {
+      try {
+        const theme = localStorage.getItem('videstore_theme');
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const defaultTheme = theme ? theme : (supportDarkMode ? 'dark' : 'dark'); // Default to dark for luxury feel
+        document.documentElement.setAttribute('data-theme', defaultTheme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link

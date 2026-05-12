@@ -4,14 +4,8 @@ import { settingsAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 import {
   FiArrowLeft, FiSave, FiRefreshCw, FiPercent,
-  FiDollarSign, FiInfo, FiShield, FiTrendingUp, FiLayers,
+  FiDollarSign, FiInfo, FiShield, FiTrendingUp, FiLayers, FiSettings, FiCheckCircle, FiMinus, FiPlus, FiActivity, FiChevronDown
 } from 'react-icons/fi';
-
-const BG     = '#080808';
-const CARD   = '#111111';
-const CARD2  = '#161616';
-const BORDER = 'rgba(255,255,255,0.07)';
-const GOLD   = '#C9A84C';
 
 const DEFAULT_SLABS = [
   { upTo: 500,    label: 'Up to ₹500',        fee: 0 },
@@ -22,7 +16,6 @@ const DEFAULT_SLABS = [
   { upTo: null,   label: 'Above ₹20,000',      fee: 0 },
 ];
 
-// Pick fee for a given price from the sorted slab list
 const getFeeForPrice = (price, slabs) => {
   if (!slabs || slabs.length === 0) return 0;
   const sorted = [...slabs].sort((a, b) => {
@@ -36,27 +29,24 @@ const getFeeForPrice = (price, slabs) => {
   return 0;
 };
 
-// ── Live earnings preview ─────────────────────────────────────────
 function EarningsPreview({ rate, slabs }) {
   const examples = [300, 800, 2000, 7000, 15000, 25000];
   return (
-    <div style={{ backgroundColor: CARD2, border: `1px solid ${BORDER}`, borderRadius: '12px', overflow: 'hidden' }}>
-      <div style={{ padding: '14px 18px', borderBottom: `1px solid ${BORDER}`, backgroundColor: '#0a0a0a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <FiTrendingUp size={13} style={{ color: GOLD }} />
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', margin: 0 }}>
-          Live Earnings Preview — ₹60 delivery example
-        </p>
+    <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl overflow-hidden shadow-sm">
+      <div className="bg-[var(--bg-alt)]/50 px-10 py-6 border-b border-[var(--b)] flex items-center gap-4">
+        <FiTrendingUp className="text-[var(--p)]" size={18} />
+        <h4 className="text-[10px] font-bold text-[var(--tl)] uppercase tracking-widest m-0 opacity-40">Revenue Projection</h4>
       </div>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse min-w-[700px]">
           <thead>
-            <tr>
-              {['Sale Price', '−Delivery', 'Product Val', `−Commission ${rate}%`, '−Fixed Fee (Slab)', 'Seller Earns'].map(h => (
-                <th key={h} style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '10px 14px', textAlign: 'left', borderBottom: `1px solid ${BORDER}`, backgroundColor: '#0a0a0a', whiteSpace: 'nowrap' }}>{h}</th>
+            <tr className="bg-[var(--bg-alt)]/30">
+              {['Sale Price', 'Logistics', 'Asset Value', `Comm. ${rate}%`, 'Fixed Slab', 'Net Payout'].map(h => (
+                <th key={h} className="text-[9px] font-bold text-[var(--tl)] uppercase tracking-widest px-10 py-6 text-left opacity-40">{h}</th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-[var(--b)]">
             {examples.map(price => {
               const dc         = 60;
               const productVal = price - dc;
@@ -65,37 +55,35 @@ function EarningsPreview({ rate, slabs }) {
               const earn       = Math.max(0, productVal - comm - fixed);
               const slab       = [...(slabs || [])].sort((a, b) => a.upTo === null ? 1 : b.upTo === null ? -1 : a.upTo - b.upTo).find(s => s.upTo === null || price <= s.upTo);
               return (
-                <tr key={price}
-                  onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'}
-                  onMouseOut={e  => e.currentTarget.style.backgroundColor = 'transparent'}>
-                  <td style={{ padding: '10px 14px', borderBottom: `1px solid ${BORDER}` }}>
-                    <span style={{ color: '#fff', fontSize: '13px', fontWeight: '600' }}>₹{price.toLocaleString()}</span>
+                <tr key={price} className="hover:bg-[var(--bg-alt)] transition-colors">
+                  <td className="px-10 py-6">
+                    <span className="text-sm font-bold text-[var(--t)] tracking-tight">₹{price.toLocaleString()}</span>
                   </td>
-                  <td style={{ padding: '10px 14px', borderBottom: `1px solid ${BORDER}` }}>
-                    <span style={{ color: '#60a5fa', fontSize: '12px' }}>−₹{dc}</span>
+                  <td className="px-10 py-6">
+                    <span className="text-[11px] font-black text-[var(--p)] opacity-80 tracking-tighter serif">−₹{dc}</span>
                   </td>
-                  <td style={{ padding: '10px 14px', borderBottom: `1px solid ${BORDER}` }}>
-                    <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>₹{productVal.toLocaleString()}</span>
+                  <td className="px-10 py-6">
+                    <span className="text-[11px] font-black text-[var(--tl)] opacity-40 serif">₹{productVal.toLocaleString()}</span>
                   </td>
-                  <td style={{ padding: '10px 14px', borderBottom: `1px solid ${BORDER}` }}>
-                    <span style={{ color: rate > 0 ? '#f87171' : 'rgba(255,255,255,0.25)', fontSize: '12px' }}>
+                  <td className="px-10 py-6">
+                    <span className={`text-[11px] font-black tracking-tighter serif ${rate > 0 ? 'text-[var(--d)]' : 'text-[var(--tl)] opacity-20'}`}>
                       {rate > 0 ? `−₹${comm}` : '₹0'}
                     </span>
                   </td>
-                  <td style={{ padding: '10px 14px', borderBottom: `1px solid ${BORDER}` }}>
-                    <div>
-                      <span style={{ color: fixed > 0 ? '#fbbf24' : 'rgba(255,255,255,0.25)', fontSize: '12px' }}>
+                  <td className="px-10 py-6">
+                    <div className="flex items-center gap-3">
+                       <span className={`text-[11px] font-black tracking-tighter serif ${fixed > 0 ? 'text-[var(--w)]' : 'text-[var(--tl)] opacity-20'}`}>
                         {fixed > 0 ? `−₹${fixed}` : '₹0'}
                       </span>
                       {slab && (
-                        <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '10px', marginLeft: '6px' }}>
+                        <span className="text-[9px] font-black text-[var(--tl)] uppercase tracking-tighter opacity-30">
                           ({slab.label})
                         </span>
                       )}
                     </div>
                   </td>
-                  <td style={{ padding: '10px 14px', borderBottom: `1px solid ${BORDER}` }}>
-                    <span style={{ color: '#4ade80', fontSize: '13px', fontWeight: '700' }}>₹{earn.toLocaleString()}</span>
+                  <td className="px-10 py-6">
+                    <span className="text-base font-bold text-emerald-500 tracking-tight">₹{earn.toLocaleString()}</span>
                   </td>
                 </tr>
               );
@@ -107,285 +95,215 @@ function EarningsPreview({ rate, slabs }) {
   );
 }
 
-// ── Slab Editor ───────────────────────────────────────────────────
 function SlabEditor({ slabs, onChange }) {
+  const sorted = [...(slabs || [])].sort((a, b) => {
+    if (a.upTo === null) return 1;
+    if (b.upTo === null) return -1;
+    return a.upTo - b.upTo;
+  });
+
+  const update = (idx, field, val) => {
+    const next = [...sorted];
+    next[idx][field] = val;
+    onChange(next);
+  };
+
   return (
-    <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '14px', overflow: 'hidden' }}>
-      <div style={{ padding: '16px 20px', borderBottom: `1px solid ${BORDER}`, backgroundColor: '#0a0a0a', display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <div style={{ width: '34px', height: '34px', borderRadius: '10px', backgroundColor: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <FiLayers size={15} style={{ color: '#fbbf24' }} />
-        </div>
-        <div>
-          <p style={{ color: '#fff', fontSize: '14px', fontWeight: '600', margin: '0 0 1px' }}>Fixed Fee Slabs</p>
-          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', margin: 0 }}>Set a different flat fee per price tier</p>
-        </div>
-      </div>
-
-      <div style={{ padding: '6px 0' }}>
-        {slabs.map((slab, i) => (
-          <div key={i} style={{
-            display: 'flex', alignItems: 'center', gap: '12px',
-            padding: '10px 20px',
-            backgroundColor: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.012)',
-            borderBottom: i < slabs.length - 1 ? `1px solid ${BORDER}` : 'none',
-          }}>
-            {/* Slab label */}
-            <div style={{ flex: 1 }}>
-              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>{slab.label}</span>
-              {slab.upTo === null && (
-                <span style={{ marginLeft: '8px', fontSize: '10px', padding: '1px 7px', borderRadius: '20px', backgroundColor: `${GOLD}15`, color: GOLD }}>No limit</span>
-              )}
-            </div>
-
-            {/* Fee input */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <button
-                onClick={() => { const v = Math.max(0, (Number(slab.fee) || 0) - 5); onChange(i, v); }}
-                style={{ width: '28px', height: '28px', borderRadius: '6px', backgroundColor: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.2)', color: '#fbbf24', fontSize: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
-              <div style={{ position: 'relative', width: '110px' }}>
-                <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#fbbf24', fontSize: '13px', fontWeight: '600', pointerEvents: 'none' }}>₹</span>
-                <input
-                  type="number" min="0" step="5"
-                  value={slab.fee}
-                  onChange={e => onChange(i, Math.max(0, Number(e.target.value) || 0))}
-                  onFocus={e => e.target.style.borderColor = '#fbbf24'}
-                  onBlur={e  => e.target.style.borderColor = BORDER}
-                  style={{ width: '100%', boxSizing: 'border-box', backgroundColor: '#0a0a0a', border: `1px solid ${BORDER}`, borderRadius: '6px', padding: '7px 10px 7px 26px', color: '#fff', fontSize: '14px', fontWeight: '600', outline: 'none' }}
-                />
-              </div>
-              <button
-                onClick={() => onChange(i, (Number(slab.fee) || 0) + 5)}
-                style={{ width: '28px', height: '28px', borderRadius: '6px', backgroundColor: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.2)', color: '#fbbf24', fontSize: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
-
-              {/* Zero pill */}
-              {Number(slab.fee) === 0 && (
-                <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '20px', backgroundColor: 'rgba(74,222,128,0.08)', color: '#4ade80', whiteSpace: 'nowrap' }}>Free</span>
-              )}
-            </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {sorted.map((s, i) => (
+        <div key={i} className="flex items-center gap-6 p-8 bg-[var(--bg-alt)] border border-[var(--b)] rounded-2xl transition-all hover:border-[var(--p)]/20 group shadow-inner">
+          <div className="flex-1">
+             <div className="flex justify-between mb-3 px-1">
+                <label className="text-[9px] font-bold text-[var(--tl)] uppercase tracking-widest opacity-40">{s.label}</label>
+                <span className="text-[9px] font-bold text-[var(--p)] uppercase tracking-widest opacity-40">{s.upTo === null ? 'Terminal' : `≤ ₹${s.upTo}`}</span>
+             </div>
+             <div className="relative">
+                <FiDollarSign className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--p)]" size={16} />
+                <input type="number" value={s.fee} onChange={e => update(i, 'fee', e.target.value)}
+                  className="w-full bg-[var(--card)] border-2 border-[var(--b)] rounded-xl pl-12 pr-6 py-4 text-sm font-bold text-[var(--t)] focus:border-[var(--p)] outline-none transition-all shadow-sm" />
+             </div>
           </div>
-        ))}
-      </div>
+          <div className="w-12 h-12 rounded-xl bg-[var(--card)] border border-[var(--b)] flex items-center justify-center text-[var(--tl)] group-hover:text-[var(--p)] group-hover:scale-110 transition-all shadow-sm">
+             <FiLayers size={20} />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
 
-// ── Main ──────────────────────────────────────────────────────────
 export default function AdminSettings() {
-  const [settings,  setSettings]  = useState(null);
-  const [loading,   setLoading]   = useState(true);
-  const [saving,    setSaving]    = useState(false);
+  const [settings, setSettings] = useState({ commissionRate: 0, fixedCharge: 0, slabs: [] });
+  const [loading,  setLoading]  = useState(true);
+  const [saving,   setSaving]   = useState(false);
 
-  const [commRate, setCommRate] = useState('0');
-  const [slabs,    setSlabs]    = useState(DEFAULT_SLABS);
-
-  // Saved-to-DB copies for hasChanges check
-  const [savedRate,  setSavedRate]  = useState(0);
-  const [savedSlabs, setSavedSlabs] = useState(DEFAULT_SLABS);
-
-  useEffect(() => { fetchSettings(); }, []);
-
-  const fetchSettings = async () => {
-    setLoading(true);
-    try {
-      const res = await settingsAPI.get();
-      const s   = res.settings;
-      setSettings(s);
-      const rate  = s.commissionRate ?? 0;
-      const slabsData = s.fixedSlabs?.length ? s.fixedSlabs : DEFAULT_SLABS;
-      setCommRate(String(rate));
-      setSlabs(slabsData);
-      setSavedRate(rate);
-      setSavedSlabs(slabsData);
-    } catch (e) { console.error(e); toast.error('Failed to load settings'); }
-    finally { setLoading(false); }
-  };
-
-  const handleSlabChange = (index, newFee) => {
-    setSlabs(prev => prev.map((s, i) => i === index ? { ...s, fee: newFee } : s));
-  };
+  useEffect(() => {
+    settingsAPI.get().then(res => {
+      setSettings({
+        commissionRate: res.settings?.commissionRate ?? 0,
+        fixedCharge:    res.settings?.fixedCharge    ?? 0,
+        slabs:          res.settings?.slabs?.length ? res.settings.slabs : DEFAULT_SLABS
+      });
+    }).finally(() => setLoading(false));
+  }, []);
 
   const handleSave = async () => {
-    const rate = parseFloat(commRate) || 0;
-    if (rate < 0 || rate > 100) { toast.error('Commission must be 0–100%'); return; }
     setSaving(true);
     try {
-      const res = await settingsAPI.update({
-        commissionRate: rate,
-        fixedSlabs: slabs.map(s => ({ ...s, fee: Number(s.fee) || 0 })),
-      });
-      setSettings(res.settings);
-      setSavedRate(rate);
-      setSavedSlabs(slabs);
-      toast.success('✅ Settings saved! New orders will use these rates.');
-    } catch (e) { toast.error(e?.message || 'Save failed'); }
-    finally { setSaving(false); }
+      await settingsAPI.update(settings);
+      toast.success('Strategy Matrix Synchronized');
+    } catch {
+      toast.error('Synchronization failed');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const hasChanges = parseFloat(commRate) !== savedRate ||
-    JSON.stringify(slabs) !== JSON.stringify(savedSlabs);
-
-  const allSlabsFree = slabs.every(s => Number(s.fee) === 0);
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+        <div className="w-20 h-20 rounded-2xl bg-[var(--p)]/5 flex items-center justify-center text-[var(--p)] mb-8 border border-[var(--p)]/10 shadow-inner">
+           <FiRefreshCw className="animate-spin" size={32} />
+        </div>
+        <p className="text-[10px] font-bold text-[var(--tl)] uppercase tracking-widest opacity-40">Synchronizing Protocol Matrix...</p>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: BG }}>
-
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
       {/* Header */}
-      <div style={{ backgroundColor: '#050505', borderBottom: `1px solid ${BORDER}`, padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 4px' }}>Admin Panel</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 style={{ color: GOLD, fontFamily: 'Cinzel, serif', fontSize: '18px', letterSpacing: '0.15em', margin: 0 }}>Platform Settings</h1>
-            {!loading && settings && (
-              <span style={{ fontSize: '11px', padding: '2px 10px', borderRadius: '20px',
-                color: (parseFloat(commRate) === 0 && allSlabsFree) ? '#4ade80' : GOLD,
-                backgroundColor: (parseFloat(commRate) === 0 && allSlabsFree) ? 'rgba(74,222,128,0.1)' : `${GOLD}15` }}>
-                {(parseFloat(commRate) === 0 && allSlabsFree) ? '🟢 Free for Sellers' : `${commRate}% commission + tiered fees`}
-              </span>
-            )}
+      <div className="px-8 py-6 flex items-center justify-between sticky top-0 z-10" 
+        style={{ backgroundColor: 'var(--glass)', borderBottom: `1px solid var(--b)`, backdropFilter: 'blur(16px)' }}>
+        <div className="flex items-center gap-6">
+          <div className="w-14 h-14 rounded-xl bg-[var(--p)] flex items-center justify-center text-[#040404] shadow-xl shadow-gold/20">
+            <FiSettings size={28} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <FiShield size={12} className="text-[var(--p)]" />
+              <p className="font-bold text-[10px] tracking-[0.2em] uppercase opacity-60" style={{ color: 'var(--tm)' }}>Infrastructure Control</p>
+            </div>
+            <h1 className="font-body text-2xl font-bold tracking-tight uppercase" style={{ color: 'var(--t)' }}>Economic Parameters</h1>
           </div>
         </div>
-        <Link to="/admin" style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'rgba(255,255,255,0.35)', fontSize: '12px', textDecoration: 'none' }}>
-          <FiArrowLeft size={13} /> Dashboard
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link to="/admin" className="font-bold text-[10px] uppercase tracking-widest px-6 py-4 bg-[var(--bg-alt)] border border-[var(--b)] rounded-xl text-[var(--tm)] hover:bg-[var(--card-alt)] transition-all flex items-center gap-3 shadow-sm" style={{ textDecoration: 'none' }}>
+            <FiArrowLeft size={16} /> Dashboard
+          </Link>
+          <button onClick={handleSave} disabled={saving}
+            className={`flex items-center gap-3 px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-[#040404] transition-all rounded-xl shadow-2xl ${saving ? 'bg-[var(--bg-alt)] text-[var(--tl)] opacity-40' : 'bg-[var(--p)] shadow-gold/30 hover:-translate-y-1'}`}>
+            {saving ? <FiRefreshCw size={18} className="animate-spin" /> : <FiSave size={18} />}
+            {saving ? 'Synchronizing...' : 'Commit Parameters'}
+          </button>
+        </div>
       </div>
 
-      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '32px 24px' }}>
+      <div className="max-w-[1536px] mx-auto px-8 py-4">
 
-        {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            {[...Array(2)].map((_, i) => <div key={i} style={{ height: '180px', backgroundColor: CARD, borderRadius: '14px', opacity: 0.4 }} />)}
+        {/* Global Strategy Banner */}
+        <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl p-6 mb-6 flex flex-col md:flex-row items-center gap-10 shadow-sm">
+          <div className="w-24 h-24 bg-[var(--p)]/5 rounded-2xl flex items-center justify-center text-[var(--p)] shadow-inner border border-[var(--p)]/10">
+            <FiShield size={48} />
           </div>
-        ) : (
-          <>
-            {/* Startup notice */}
-            <div style={{ backgroundColor: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: '12px', padding: '16px 20px', marginBottom: '24px', display: 'flex', gap: '14px' }}>
-              <FiShield size={18} style={{ color: '#4ade80', flexShrink: 0, marginTop: '1px' }} />
-              <div>
-                <p style={{ color: '#4ade80', fontSize: '13px', fontWeight: '600', margin: '0 0 4px' }}>Startup Mode — Zero Charges by Default</p>
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', lineHeight: '1.7', margin: 0 }}>
-                  Commission and all slab fees are <strong style={{ color: '#fff' }}>₹0</strong> by default.
-                  Set tiered fees per price slab below — changes apply to <strong style={{ color: '#fff' }}>new orders only</strong>.
-                </p>
-              </div>
-            </div>
+          <div className="flex-1 text-center md:text-left">
+            <h3 className="text-2xl font-bold text-[var(--t)] mb-3 m-0 tracking-tight uppercase">Governance Protocol</h3>
+            <p className="text-xs font-bold text-[var(--tl)] leading-relaxed m-0 opacity-40 uppercase tracking-widest">
+              Define the institutional logic for vendor yield calculations. Commission rates apply to product valuation post-logistics. Fixed overhead slabs ensure infrastructure cost recovery.
+            </p>
+          </div>
+          <div className="px-10 py-6 bg-[var(--bg-alt)] border border-[var(--b)] rounded-2xl shadow-inner">
+             <div className="flex items-center gap-4">
+               <FiCheckCircle size={24} className="text-emerald-500" />
+               <div>
+                  <p className="text-[9px] font-bold text-[var(--tl)] uppercase tracking-widest mb-1 opacity-40">Logic Status</p>
+                  <span className="text-[11px] font-bold text-emerald-500 uppercase tracking-widest">Live Protocol</span>
+               </div>
+             </div>
+          </div>
+        </div>
 
-            {/* Commission Rate */}
-            <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '14px', padding: '24px', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '10px', backgroundColor: 'rgba(248,113,113,0.12)', border: '1px solid rgba(248,113,113,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <FiPercent size={16} style={{ color: '#f87171' }} />
-                </div>
-                <div>
-                  <p style={{ color: '#fff', fontSize: '14px', fontWeight: '600', margin: '0 0 2px' }}>Commission Rate</p>
-                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', margin: 0 }}>% of product value per order (applied on top of slab fees)</p>
-                </div>
-              </div>
-              <div style={{ marginBottom: '16px' }}>
-                <input type="range" min="0" max="30" step="0.5"
-                  value={commRate}
-                  onChange={e => setCommRate(e.target.value)}
-                  style={{ width: '100%', accentColor: '#f87171', cursor: 'pointer', height: '4px' }} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
-                  <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '10px' }}>0%</span>
-                  <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '10px' }}>30%</span>
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <button onClick={() => setCommRate(String(Math.max(0, parseFloat(commRate) - 0.5)))}
-                  style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                <div style={{ flex: 1, position: 'relative' }}>
-                  <input type="number" min="0" max="100" step="0.5" value={commRate}
-                    onChange={e => setCommRate(e.target.value)}
-                    style={{ width: '100%', boxSizing: 'border-box', backgroundColor: '#0a0a0a', border: `1px solid ${BORDER}`, borderRadius: '8px', padding: '10px 40px 10px 14px', color: '#fff', fontSize: '20px', fontWeight: '700', outline: 'none', textAlign: 'center' }}
-                    onFocus={e => e.target.style.borderColor = '#f87171'}
-                    onBlur={e  => e.target.style.borderColor = BORDER} />
-                  <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#f87171', fontSize: '14px', fontWeight: '600' }}>%</span>
-                </div>
-                <button onClick={() => setCommRate(String(Math.min(100, parseFloat(commRate) + 0.5)))}
-                  style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
-              </div>
-              {parseFloat(commRate) === 0 && (
-                <div style={{ marginTop: '12px', padding: '8px 12px', backgroundColor: 'rgba(74,222,128,0.06)', borderRadius: '6px', border: '1px solid rgba(74,222,128,0.15)' }}>
-                  <p style={{ color: '#4ade80', fontSize: '11px', margin: 0 }}>✅ No commission — sellers keep 100% of product value (minus slab fee)</p>
-                </div>
-              )}
-            </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-12">
+          
+          {/* Main Parameters */}
+          <div className="xl:col-span-2 space-y-12">
+            
+            <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl p-6 shadow-sm">
+               <div className="flex items-center gap-4 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--p)]/5 flex items-center justify-center text-[var(--p)] border border-[var(--p)]/10">
+                    <FiPercent size={22} />
+                  </div>
+                  <h2 className="text-2xl font-bold text-[var(--t)] m-0 tracking-tight uppercase">Primary Catalyst Rate</h2>
+               </div>
+               
+               <div className="p-6 bg-[var(--bg-alt)] border border-[var(--b)] rounded-3xl flex flex-col md:flex-row items-center gap-12 group hover:border-[var(--p)]/20 transition-all shadow-inner">
+                  <div className="flex-1 w-full">
+                     <label className="block text-[9px] font-bold text-[var(--tl)] uppercase tracking-widest mb-5 px-1 opacity-40">Global Commission Catalyst (%)</label>
+                     <div className="relative">
+                        <FiPercent className="absolute left-6 top-1/2 -translate-y-1/2 text-[var(--p)]" size={24} />
+                        <input type="number" value={settings.commissionRate} onChange={e => setSettings(s => ({ ...s, commissionRate: e.target.value }))}
+                          className="w-full bg-[var(--card)] border-2 border-[var(--b)] rounded-2xl pl-16 pr-10 py-8 text-4xl font-bold text-[var(--t)] focus:border-[var(--p)] outline-none transition-all shadow-sm tracking-tight" />
+                     </div>
+                  </div>
+                  <div className="w-28 h-28 rounded-2xl bg-[var(--p)] text-[#040404] flex items-center justify-center shadow-2xl shadow-gold/30 group-hover:scale-110 transition-transform duration-700">
+                     <FiTrendingUp size={48} />
+                  </div>
+               </div>
 
-            {/* Slab Editor */}
-            <div style={{ marginBottom: '16px' }}>
-              <SlabEditor slabs={slabs} onChange={handleSlabChange} />
-            </div>
-
-            {/* Summary + Save */}
-            <div style={{ backgroundColor: CARD, border: `1px solid ${hasChanges ? `${GOLD}40` : BORDER}`, borderRadius: '14px', padding: '20px 24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <div>
-                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 3px' }}>Commission</p>
-                  <p style={{ color: parseFloat(commRate) > 0 ? '#f87171' : '#4ade80', fontSize: '22px', fontWeight: '700', margin: 0 }}>{commRate}%</p>
-                </div>
-                <div style={{ width: '1px', backgroundColor: BORDER, height: '36px' }} />
-                <div>
-                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 3px' }}>Fixed Slabs</p>
-                  <p style={{ color: allSlabsFree ? '#4ade80' : '#fbbf24', fontSize: '13px', fontWeight: '600', margin: 0 }}>
-                    {allSlabsFree ? 'All Free' : `₹${Math.min(...slabs.map(s => s.fee))} – ₹${Math.max(...slabs.map(s => s.fee))}`}
+               <div className="mt-12 p-8 bg-[var(--p)]/5 border border-[var(--p)]/10 rounded-2xl flex gap-5">
+                  <FiInfo className="text-[var(--p)] shrink-0 mt-1" size={22} />
+                  <p className="text-[11px] font-bold text-[var(--tl)] leading-relaxed m-0 opacity-60 uppercase tracking-tight">
+                    This catalyst rate is applied to the net product valuation (Sale Price − Logistics Charge). Adjust with institutional caution.
                   </p>
-                </div>
-                <div style={{ width: '1px', backgroundColor: BORDER, height: '36px' }} />
-                <div>
-                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 3px' }}>Status</p>
-                  <p style={{ color: hasChanges ? GOLD : 'rgba(255,255,255,0.3)', fontSize: '13px', fontWeight: '600', margin: 0 }}>
-                    {hasChanges ? '⚠️ Unsaved Changes' : '✅ Up to date'}
-                  </p>
-                </div>
-                {settings?.updatedAt && (
-                  <>
-                    <div style={{ width: '1px', backgroundColor: BORDER, height: '36px' }} />
-                    <div>
-                      <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 3px' }}>Last Updated</p>
-                      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', margin: 0 }}>
-                        {new Date(settings.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      </p>
-                    </div>
-                  </>
-                )}
-              </div>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button onClick={fetchSettings}
-                  style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '10px 16px', backgroundColor: 'transparent', border: `1px solid ${BORDER}`, borderRadius: '8px', color: 'rgba(255,255,255,0.35)', fontSize: '12px', cursor: 'pointer' }}>
-                  <FiRefreshCw size={12} /> Reset
-                </button>
-                <button onClick={handleSave} disabled={saving || !hasChanges}
-                  style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 22px', backgroundColor: hasChanges ? GOLD : `${GOLD}30`, border: 'none', borderRadius: '8px', color: hasChanges ? '#000' : `${GOLD}60`, fontSize: '13px', fontWeight: '700', cursor: hasChanges ? 'pointer' : 'not-allowed', transition: 'all 0.2s' }}>
-                  {saving ? <><FiRefreshCw size={13} style={{ animation: 'spin 1s linear infinite' }} /> Saving…</> : <><FiSave size={13} /> Save Settings</>}
-                </button>
-              </div>
+               </div>
             </div>
 
-            {/* Live preview */}
-            <EarningsPreview rate={parseFloat(commRate) || 0} slabs={slabs} />
+            <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl p-6 shadow-sm">
+               <div className="flex items-center gap-4 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--p)]/5 flex items-center justify-center text-[var(--p)] border border-[var(--p)]/10">
+                    <FiActivity size={22} />
+                  </div>
+                  <h2 className="text-2xl font-bold text-[var(--t)] m-0 tracking-tight uppercase">Fixed Slab Matrix</h2>
+               </div>
+               <SlabEditor slabs={settings.slabs} onChange={next => setSettings(s => ({ ...s, slabs: next }))} />
+            </div>
 
-            {/* Info */}
-            <div style={{ backgroundColor: 'rgba(96,165,250,0.04)', border: '1px solid rgba(96,165,250,0.14)', borderRadius: '12px', padding: '16px 20px', marginTop: '16px', display: 'flex', gap: '12px' }}>
-              <FiInfo size={15} style={{ color: '#60a5fa', flexShrink: 0, marginTop: '1px' }} />
-              <div>
-                <p style={{ color: '#60a5fa', fontSize: '12px', fontWeight: '600', margin: '0 0 6px' }}>How tiered fees work</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          </div>
+
+          {/* Verification Sidebar */}
+          <div className="space-y-12">
+            <EarningsPreview rate={settings.commissionRate} slabs={settings.slabs} />
+            
+            <div className="bg-[#070707] border border-[var(--b)] rounded-3xl p-12 text-white shadow-2xl relative overflow-hidden group">
+               <div className="absolute top-0 right-0 w-40 h-40 bg-[var(--p)]/5 rounded-full -mr-20 -mt-20 blur-3xl transition-all group-hover:scale-150 duration-1000" />
+               <FiShield size={140} className="absolute -bottom-10 -right-10 opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-transform duration-1000 text-[var(--p)]" />
+               <h4 className="text-[10px] font-bold uppercase tracking-widest mb-10 opacity-40">Compliance Protocol</h4>
+               <div className="space-y-6">
                   {[
-                    'Each price slab has its own fixed fee — higher value orders pay more.',
-                    'The slab is determined by the Sale Price (before delivery deduction).',
-                    'Formula: Seller Earns = (Sale Price − Delivery) − Commission% − Slab Fixed Fee',
-                    'If all slab fees are ₹0, sellers keep 100% of product value (minus commission).',
-                    'Changes apply to NEW orders only. Existing orders are unaffected.',
-                  ].map((t, i) => (
-                    <p key={i} style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', margin: 0 }}>
-                      <span style={{ color: '#60a5fa', marginRight: '6px' }}>•</span>{t}
-                    </p>
+                    'Automated Reconciliation',
+                    'Immutable Audit Trail',
+                    'Dynamic Payout Logic',
+                    'Institutional Custody'
+                  ].map((s, i) => (
+                    <div key={i} className="flex items-center gap-4">
+                       <div className="w-2 h-2 rounded-full bg-[var(--p)] shadow-lg shadow-gold/50" />
+                       <span className="text-[11px] font-bold uppercase tracking-widest opacity-60">{s}</span>
+                    </div>
                   ))}
-                </div>
-              </div>
+               </div>
+               <div className="mt-16 pt-10 border-t border-white/5">
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 mb-3">Institutional Core</p>
+                  <p className="text-2xl font-bold m-0 tracking-tight uppercase">Economic Node v4.2</p>
+               </div>
             </div>
-          </>
-        )}
+
+            <button onClick={() => setSettings(s => ({ ...s, slabs: DEFAULT_SLABS }))}
+              className="w-full py-6 border-2 border-dashed border-[var(--b)] rounded-2xl text-[var(--tl)] text-[10px] font-bold uppercase tracking-widest hover:border-[var(--p)]/50 hover:text-[var(--p)] hover:bg-[var(--p)]/5 transition-all flex items-center justify-center gap-4 opacity-40 hover:opacity-100">
+               <FiRefreshCw size={18} /> Restore Default Matrix
+            </button>
+          </div>
+
+        </div>
       </div>
     </div>
   );

@@ -5,28 +5,23 @@ import { orderAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 import {
     FiArrowLeft, FiRotateCcw, FiCheck, FiX, FiRefreshCw,
-    FiImage, FiUser, FiCalendar, FiPackage,
+    FiImage, FiUser, FiCalendar, FiPackage, FiInfo, FiActivity, FiShield
 } from 'react-icons/fi';
 
-const BG = '#0a0a0a';
-const CARD = '#1a1a1a';
-const BORDER = 'rgba(255,255,255,0.08)';
-const GOLD = '#C9A84C';
-
 const rStyle = (s) => ({
-    Pending: { color: '#fbbf24', bg: 'rgba(251,191,36,0.1)', border: 'rgba(251,191,36,0.3)' },
-    Approved: { color: '#4ade80', bg: 'rgba(74,222,128,0.1)', border: 'rgba(74,222,128,0.3)' },
-    Rejected: { color: '#f87171', bg: 'rgba(248,113,113,0.1)', border: 'rgba(248,113,113,0.3)' },
-}[s] || { color: 'rgba(255,255,255,0.4)', bg: 'rgba(255,255,255,0.05)', border: BORDER });
+    Pending: { color: 'var(--w)', bg: 'rgba(245, 158, 11, 0.05)', border: 'rgba(245, 158, 11, 0.1)' },
+    Approved: { color: 'var(--s)', bg: 'rgba(16, 185, 129, 0.05)', border: 'rgba(16, 185, 129, 0.1)' },
+    Rejected: { color: 'var(--d)', bg: 'rgba(239, 68, 68, 0.05)', border: 'rgba(239, 68, 68, 0.1)' },
+}[s] || { color: 'var(--tm)', bg: 'var(--bg-alt)', border: 'var(--b)' });
 
 // ── Image lightbox ────────────────────────────────────────────────
 function ImageModal({ src, onClose }) {
     if (!src) return null;
     return (
         <div onClick={onClose}
-            style={{ position: 'fixed', inset: 0, zIndex: 99999, backgroundColor: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-            <img src={src} alt="Return evidence" style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: '8px' }} />
-            <button onClick={onClose} style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%', width: '36px', height: '36px', color: '#fff', cursor: 'pointer', fontSize: '16px' }}>✕</button>
+            className="fixed inset-0 z-[99999] bg-black/95 backdrop-blur-xl flex items-center justify-center p-8 animate-in fade-in duration-300">
+            <img src={src} alt="Return evidence" className="max-w-full max-h-full object-contain rounded-3xl shadow-2xl animate-in zoom-in-95 duration-300 border border-white/10" />
+            <button onClick={onClose} className="absolute top-8 right-8 w-12 h-12 bg-white/5 hover:bg-white/10 text-white rounded-full flex items-center justify-center transition-all border border-white/10 cursor-pointer text-xl">✕</button>
         </div>
     );
 }
@@ -43,60 +38,51 @@ function ActionModal({ open, order, action, onClose, onConfirm, loading }) {
 
     return (
         <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-            style={{ position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-            <div style={{ backgroundColor: '#1a1a1a', border: `1px solid ${isApprove ? 'rgba(74,222,128,0.3)' : 'rgba(248,113,113,0.3)'}`, borderRadius: '14px', padding: '28px', maxWidth: '460px', width: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-                    <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: isApprove ? 'rgba(74,222,128,0.1)' : 'rgba(248,113,113,0.1)', border: `1px solid ${isApprove ? 'rgba(74,222,128,0.3)' : 'rgba(248,113,113,0.3)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        {isApprove ? <FiCheck size={20} style={{ color: '#4ade80' }} /> : <FiX size={20} style={{ color: '#f87171' }} />}
+            className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
+            <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl p-8 max-w-[480px] w-full shadow-2xl animate-in zoom-in-95 duration-300">
+                <div className="flex items-center gap-5 mb-8">
+                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center border shadow-inner ${isApprove ? 'bg-emerald-500/5 border-emerald-500/10 text-emerald-500' : 'bg-red-500/5 border-red-500/10 text-red-500'}`}>
+                        {isApprove ? <FiCheck size={24} /> : <FiX size={24} />}
                     </div>
                     <div>
-                        <h3 style={{ color: isApprove ? '#4ade80' : '#f87171', fontSize: '15px', fontFamily: 'Cinzel, serif', margin: '0 0 3px' }}>
-                            {isApprove ? 'Approve Return' : 'Reject Return'}
+                        <h3 className={`text-xl font-bold m-0 tracking-tight uppercase ${isApprove ? 'text-emerald-500' : 'text-red-500'}`}>
+                            {isApprove ? 'Authorize Refund' : 'Decline Request'}
                         </h3>
-                        <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', margin: 0 }}>Order #{orderId}</p>
+                        <p className="text-[10px] font-bold text-[var(--tl)] m-0 uppercase tracking-widest mt-1 opacity-40">Transaction #{orderId}</p>
                     </div>
                 </div>
 
                 {isApprove && (
-                    <div style={{ backgroundColor: 'rgba(74,222,128,0.06)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: '8px', padding: '14px', marginBottom: '16px' }}>
-                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 6px' }}>Refund to Customer</p>
-                        <p style={{ color: '#4ade80', fontSize: '24px', fontWeight: '700', margin: '0 0 4px' }}>₹{refund.toLocaleString('en-IN')}</p>
-                        <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', margin: 0 }}>Will be processed within 5–7 business days</p>
+                    <div className="bg-[var(--p)]/5 border border-[var(--p)]/10 rounded-2xl p-6 mb-8 shadow-inner">
+                        <p className="text-[9px] font-bold text-[var(--p)] uppercase tracking-widest mb-2 px-1 opacity-40">Refund Capital Transfer</p>
+                        <p className="text-3xl font-bold text-[var(--p)] m-0">₹{refund.toLocaleString('en-IN')}</p>
+                        <p className="text-[10px] font-medium text-[var(--tl)] m-0 mt-2 uppercase tracking-tight opacity-40">Cycle: 3–5 Business Days</p>
                     </div>
                 )}
 
-                <div style={{ marginBottom: '20px' }}>
-                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 8px' }}>
-                        {isApprove ? 'Message to Customer (Optional)' : 'Reason for Rejection (Required)'}
-                    </p>
+                <div className="mb-8">
+                    <label className="block text-[10px] font-bold text-[var(--tl)] uppercase tracking-widest mb-3 px-1 opacity-40">
+                        {isApprove ? 'Internal Disposition (Optional)' : 'Rejection Rationale (Required)'}
+                    </label>
                     <textarea
                         value={note}
                         onChange={e => setNote(e.target.value)}
-                        rows={3}
-                        placeholder={isApprove ? 'e.g. Return pickup will be arranged within 24 hours...' : 'e.g. Item shows signs of use and is not eligible for return...'}
-                        style={{ width: '100%', backgroundColor: '#0d0d0d', border: `1px solid ${BORDER}`, borderRadius: '6px', padding: '10px 14px', color: '#fff', fontSize: '13px', outline: 'none', resize: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
-                        onFocus={e => e.target.style.borderColor = GOLD}
-                        onBlur={e => e.target.style.borderColor = BORDER}
+                        rows={4}
+                        placeholder={isApprove ? 'Strategic note for the customer...' : 'Explicit reason for declining the asset return...'}
+                        className="w-full bg-[var(--bg-alt)] border-2 border-[var(--b)] rounded-xl p-4 text-sm font-bold text-[var(--t)] focus:border-[var(--p)] outline-none transition-all resize-none shadow-inner"
                     />
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={onClose} style={{ flex: 1, padding: '11px', backgroundColor: 'transparent', border: `1px solid ${BORDER}`, borderRadius: '6px', color: 'rgba(255,255,255,0.4)', fontSize: '13px', cursor: 'pointer' }}>
-                        Cancel
-                    </button>
+                <div className="flex gap-4">
+                    <button onClick={onClose} className="flex-1 py-4 px-6 bg-[var(--bg-alt)] border border-[var(--b)] text-[var(--tl)] font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-[var(--card-alt)] transition-all">Cancel</button>
                     <button
                         onClick={() => onConfirm(action, note)}
                         disabled={loading || (!isApprove && !note.trim())}
-                        style={{ flex: 2, padding: '11px', backgroundColor: loading ? 'rgba(201,168,76,0.3)' : GOLD, border: 'none', borderRadius: '6px', color: '#000', fontSize: '13px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px' }}>
-                        {loading
-                            ? <><FiRefreshCw size={13} style={{ animation: 'spin 1s linear infinite' }} /> Processing…</>
-                            : isApprove ? <><FiCheck size={13} /> Approve & Notify Customer</> : <><FiX size={13} /> Reject & Notify Customer</>
-                        }
+                        className={`flex-[2] py-4 px-6 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${loading || (!isApprove && !note.trim()) ? 'bg-[var(--bg-alt)] text-[var(--tl)] opacity-20 cursor-not-allowed' : isApprove ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-500/20' : 'bg-red-600 text-white shadow-xl shadow-red-500/20'}`}>
+                        {loading ? <FiRefreshCw className="animate-spin" /> : isApprove ? <FiCheck /> : <FiX />}
+                        {loading ? 'Processing...' : isApprove ? 'Authorize' : 'Confirm'}
                     </button>
                 </div>
-                {!isApprove && !note.trim() && (
-                    <p style={{ color: '#f87171', fontSize: '11px', margin: '8px 0 0', textAlign: 'center' }}>Please provide a reason for rejection</p>
-                )}
             </div>
         </div>
     );
@@ -117,7 +103,7 @@ export default function AdminReturns() {
             const res = await orderAPI.getReturns({ status: filter || undefined, limit: 100 });
             setOrders(res.orders || []);
         } catch (e) {
-            toast.error(e?.message || 'Failed to load returns');
+            toast.error(e?.message || 'Synchronization failed');
         } finally {
             setLoading(false);
         }
@@ -130,24 +116,21 @@ export default function AdminReturns() {
         setActLoad(true);
         try {
             const res = await orderAPI.handleReturn(actModal.order._id, action, note);
-            toast.success(res.message || (action === 'approve' ? 'Return approved!' : 'Return rejected'));
+            toast.success(res.message || (action === 'approve' ? 'Resolution authorized' : 'Request declined'));
             setActModal({ open: false, order: null, action: null });
             fetchReturns();
         } catch (e) {
-            toast.error(e?.message || 'Action failed');
+            toast.error(e?.message || 'Resolution failed');
         } finally {
             setActLoad(false);
         }
     };
 
-    const thS = { color: 'rgba(255,255,255,0.35)', fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '12px 16px', textAlign: 'left', borderBottom: `1px solid ${BORDER}`, backgroundColor: '#050505' };
-    const tdS = { padding: '14px 16px', borderBottom: `1px solid ${BORDER}`, verticalAlign: 'top' };
-
     const counts = { Pending: 0, Approved: 0, Rejected: 0 };
     orders.forEach(o => { if (o.returnRequest?.status) counts[o.returnRequest.status] = (counts[o.returnRequest.status] || 0) + 1; });
 
     return (
-        <div className="min-h-screen" style={{ backgroundColor: BG }}>
+        <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
             <ImageModal src={imgSrc} onClose={() => setImgSrc(null)} />
             <ActionModal
                 open={actModal.open}
@@ -158,72 +141,80 @@ export default function AdminReturns() {
                 loading={actLoad}
             />
 
-            <style>{`
-                @media (max-width: 768px) {
-                    .admin-returns-card { display: block !important; }
-                    .admin-returns-card thead { display: none !important; }
-                    .admin-returns-card tbody { display: block !important; }
-                    .admin-returns-card tr { display: block !important; border: 1px solid rgba(255,255,255,0.08) !important; border-radius: 12px !important; margin-bottom: 12px !important; padding: 12px !important; background: #0a0a0a !important; }
-                    .admin-returns-card td { display: block !important; border: none !important; padding: 4px 0 !important; }
-                    .admin-returns-card td:first-child p { font-size: 14px !important; }
-                    .admin-returns-wrap { overflow-x: auto !important; padding: 0 12px !important; }
-                    .admin-returns-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
-                }
-            `}</style>
-
             {/* Header */}
-            <div className="admin-returns-header" style={{ padding: '16px 24px', borderBottom: `1px solid ${BORDER}`, backgroundColor: '#050505', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 2px' }}>Admin Panel</p>
-                    <h1 style={{ color: GOLD, fontFamily: 'Cinzel, serif', fontSize: '18px', letterSpacing: '0.1em', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <FiRotateCcw size={16} /> Return Requests
-                    </h1>
+            <div className="px-8 py-6 flex items-center justify-between sticky top-0 z-10" 
+                style={{ backgroundColor: 'var(--glass)', borderBottom: `1px solid var(--b)`, backdropFilter: 'blur(32px)' }}>
+                <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 rounded-xl bg-[var(--p)] flex items-center justify-center text-[#040404] shadow-xl shadow-gold/20">
+                        <FiRotateCcw size={28} />
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-2 mb-1.5">
+                            <FiShield size={12} className="text-[var(--p)]" />
+                            <p className="font-bold text-[10px] tracking-[0.2em] uppercase opacity-60" style={{ color: 'var(--tm)' }}>Resolution Center</p>
+                        </div>
+                        <h1 className="font-body text-2xl font-bold tracking-tight uppercase" style={{ color: 'var(--t)' }}>Return Pipeline</h1>
+                    </div>
                 </div>
-                <Link to="/admin" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'rgba(255,255,255,0.4)', fontSize: '12px', textDecoration: 'none' }}>
-                    <FiArrowLeft size={13} /> Dashboard
-                </Link>
+                <div className="flex items-center gap-4">
+                    <button onClick={fetchReturns} className="font-bold text-[10px] uppercase tracking-widest px-6 py-4 bg-[var(--bg-alt)] border border-[var(--b)] rounded-xl text-[var(--tm)] hover:bg-[var(--card-alt)] transition-all flex items-center gap-3 shadow-sm">
+                        <FiRefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Sync Records
+                    </button>
+                    <Link to="/admin" className="font-bold text-[10px] uppercase tracking-widest px-6 py-4 bg-[var(--bg-alt)] border border-[var(--b)] rounded-xl text-[var(--tm)] hover:bg-[var(--card-alt)] transition-all flex items-center gap-3 shadow-sm" style={{ textDecoration: 'none' }}>
+                        <FiArrowLeft size={16} /> Dashboard
+                    </Link>
+                </div>
             </div>
 
-            <div className="admin-returns-wrap" style={{ maxWidth: '1100px', margin: '0 auto', padding: '24px' }}>
+            <div className="max-w-7xl mx-auto px-8 py-4">
 
                 {/* Filter tabs */}
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                <div className="flex flex-wrap items-center gap-3 mb-6">
                     {[
-                        { key: '', label: `All (${orders.length})`, color: GOLD },
-                        { key: 'Pending', label: `Pending (${counts.Pending || 0})`, color: '#fbbf24' },
-                        { key: 'Approved', label: `Approved (${counts.Approved || 0})`, color: '#4ade80' },
-                        { key: 'Rejected', label: `Rejected (${counts.Rejected || 0})`, color: '#f87171' },
+                        { key: '', label: `Aggregate Assets (${orders.length})`, color: 'var(--p)' },
+                        { key: 'Pending', label: `Pending Protocol (${counts.Pending || 0})`, color: 'var(--w)' },
+                        { key: 'Approved', label: `Authorized Returns (${counts.Approved || 0})`, color: 'var(--s)' },
+                        { key: 'Rejected', label: `Declined Requests (${counts.Rejected || 0})`, color: 'var(--d)' },
                     ].map(tab => (
                         <button key={tab.key} onClick={() => setFilter(tab.key)}
-                            style={{ padding: '8px 18px', borderRadius: '6px', fontSize: '12px', fontFamily: 'Jost, sans-serif', fontWeight: filter === tab.key ? '700' : '400', cursor: 'pointer', transition: 'all 0.15s', backgroundColor: filter === tab.key ? tab.color : 'transparent', color: filter === tab.key ? '#000' : 'rgba(255,255,255,0.45)', border: `1px solid ${filter === tab.key ? tab.color : BORDER}` }}>
+                            className={`px-6 py-3 text-[10px] font-bold uppercase tracking-widest transition-all rounded-xl border shadow-sm ${filter === tab.key ? 'text-[#040404] shadow-xl' : 'bg-[var(--card)] text-[var(--tl)] border-[var(--b)] hover:border-[var(--p)]/30'}`}
+                            style={{ 
+                                backgroundColor: filter === tab.key ? tab.color : '',
+                                borderColor: filter === tab.key ? tab.color : ''
+                            }}>
                             {tab.label}
                         </button>
                     ))}
-                    <button onClick={fetchReturns} style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', backgroundColor: 'transparent', border: `1px solid ${BORDER}`, borderRadius: '6px', color: 'rgba(255,255,255,0.4)', fontSize: '12px', cursor: 'pointer' }}>
-                        <FiRefreshCw size={12} /> Refresh
-                    </button>
                 </div>
 
-                {/* Table */}
-                <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '10px', overflow: 'hidden' }}>
+                {/* Content */}
+                <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl overflow-hidden shadow-sm">
                     {loading ? (
-                        <div style={{ padding: '48px', textAlign: 'center', color: 'rgba(255,255,255,0.2)' }}>Loading...</div>
+                        <div className="p-32 flex flex-col items-center justify-center">
+                            <div className="w-20 h-20 rounded-2xl bg-[var(--p)]/5 flex items-center justify-center text-[var(--p)] mb-8 border border-[var(--p)]/10 shadow-inner">
+                                <FiRefreshCw className="animate-spin" size={32} />
+                            </div>
+                            <p className="text-[10px] font-bold text-[var(--tl)] uppercase tracking-widest opacity-40">Synchronizing records...</p>
+                        </div>
                     ) : orders.length === 0 ? (
-                        <div style={{ padding: '64px', textAlign: 'center' }}>
-                            <FiRotateCcw size={40} style={{ color: 'rgba(255,255,255,0.08)', display: 'block', margin: '0 auto 14px' }} />
-                            <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '14px' }}>No return requests found.</p>
+                        <div className="p-40 text-center">
+                            <div className="w-24 h-24 bg-[var(--bg-alt)] rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-inner border border-[var(--b)]">
+                                <FiRotateCcw size={48} className="text-[var(--p)] opacity-20" />
+                            </div>
+                            <h3 className="text-3xl font-bold text-[var(--t)] mb-4 tracking-tight uppercase">Null Disposition</h3>
+                            <p className="text-sm font-bold text-[var(--tl)] opacity-40 uppercase tracking-widest">No return requests found within the current filter parameters.</p>
                         </div>
                     ) : (
-                        <div style={{ overflowX: 'auto' }}>
-                            <table className="admin-returns-card" style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
+                        <div className="overflow-x-auto">
+                            <table className="w-full border-collapse min-w-[1200px]">
                                 <thead>
-                                    <tr>
-                                        {['Order', 'Customer', 'Reason', 'Evidence', 'Requested', 'Status', 'Actions'].map(h => (
-                                            <th key={h} style={thS}>{h}</th>
+                                    <tr className="bg-[var(--bg-alt)]/30">
+                                        {['Transaction', 'Client Node', 'Strategic Reason', 'Evidence Assets', 'Timestamp', 'Current Status', 'Operations'].map(h => (
+                                            <th key={h} className="text-[9px] font-bold text-[var(--tl)] uppercase tracking-widest px-8 py-5 text-left border-b border-[var(--b)] opacity-40">{h}</th>
                                         ))}
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-[var(--b)]">
                                     {orders.map(order => {
                                         const rr = order.returnRequest;
                                         const rs = rStyle(rr?.status);
@@ -231,112 +222,105 @@ export default function AdminReturns() {
                                         const isPending = rr?.status === 'Pending';
 
                                         return (
-                                            <tr key={order._id}
-                                                onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'}
-                                                onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
-
+                                            <tr key={order._id} className="hover:bg-[var(--bg-alt)] transition-colors group">
                                                 {/* Order */}
-                                                <td style={tdS}>
-                                                    <Link to={`/admin/orders`} style={{ color: GOLD, fontSize: '13px', fontWeight: '600', textDecoration: 'underline', textDecorationStyle: 'dotted', textUnderlineOffset: '3px' }}>
+                                                <td className="px-8 py-6">
+                                                    <Link to={`/admin/orders`} className="text-sm font-bold text-[var(--p)] hover:opacity-80 transition-all block mb-1 uppercase tracking-tight">
                                                         #{orderId}
                                                     </Link>
-                                                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', margin: '3px 0 0' }}>
-                                                        ₹{order.totalPrice?.toLocaleString('en-IN')}
-                                                    </p>
+                                                    <p className="text-[11px] font-medium text-[var(--tl)] m-0 opacity-40">₹{order.totalPrice?.toLocaleString('en-IN')}</p>
                                                 </td>
 
                                                 {/* Customer */}
-                                                <td style={tdS}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: `${GOLD}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                            <FiUser size={12} style={{ color: GOLD }} />
+                                                <td className="px-8 py-6">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-xl bg-[var(--bg-alt)] border border-[var(--b)] flex items-center justify-center text-[var(--tl)] group-hover:text-[var(--p)] transition-all shadow-inner">
+                                                            <FiUser size={16} />
                                                         </div>
                                                         <div>
-                                                            <p style={{ color: '#fff', fontSize: '13px', fontWeight: '500', margin: '0 0 2px' }}>{order.user?.name}</p>
-                                                            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', margin: 0 }}>{order.user?.email}</p>
+                                                            <p className="text-sm font-bold text-[var(--t)] m-0 uppercase tracking-tight">{order.user?.name}</p>
+                                                            <p className="text-[10px] font-medium text-[var(--tl)] m-0 uppercase tracking-tight opacity-40">{order.user?.email}</p>
                                                         </div>
                                                     </div>
                                                 </td>
 
                                                 {/* Reason */}
-                                                <td style={tdS}>
-                                                    <p style={{ color: '#fff', fontSize: '12px', fontWeight: '500', margin: '0 0 4px' }}>{rr?.reasonLabel || rr?.reason || '—'}</p>
+                                                <td className="px-8 py-6">
+                                                    <p className="text-xs font-bold text-[var(--t)] m-0 leading-relaxed uppercase tracking-tight">{rr?.reasonLabel || rr?.reason || '—'}</p>
                                                     {rr?.note && (
-                                                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', margin: 0, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                        <p className="text-[10px] font-medium text-[var(--tl)] m-0 mt-1 truncate max-w-[200px] opacity-40">
                                                             {rr.note}
                                                         </p>
                                                     )}
                                                     {rr?.upiId && (
-                                                        <p style={{ color: GOLD, fontSize: '11px', margin: '4px 0 0', fontWeight: '500' }}>
-                                                            UPI: {rr.upiId}
-                                                        </p>
+                                                        <div className="flex items-center gap-1.5 mt-2 px-2 py-1 bg-[var(--p)]/5 text-[var(--p)] rounded-lg w-fit border border-[var(--p)]/10 shadow-inner">
+                                                            <FiActivity size={10} />
+                                                            <span className="text-[9px] font-bold uppercase tracking-widest">{rr.upiId}</span>
+                                                        </div>
                                                     )}
                                                 </td>
 
-                                                {/* Photos */}
-                                                <td style={tdS}>
+                                                {/* Evidence */}
+                                                <td className="px-8 py-6">
                                                     {rr?.images?.length > 0 ? (
-                                                        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                                                        <div className="flex -space-x-4 hover:space-x-1 transition-all duration-500">
                                                             {rr.images.map((img, i) => (
                                                                 <img key={i} src={img.url} alt="" onClick={() => setImgSrc(img.url)}
-                                                                    style={{ width: '36px', height: '44px', objectFit: 'cover', borderRadius: '4px', cursor: 'pointer', border: `1px solid ${BORDER}` }}
-                                                                    title="Click to enlarge"
+                                                                    className="w-12 h-16 object-cover rounded-lg border-2 border-[var(--card)] shadow-lg cursor-zoom-in hover:z-10 hover:-translate-y-2 transition-all duration-500"
                                                                 />
                                                             ))}
                                                         </div>
                                                     ) : (
-                                                        <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                            <FiImage size={11} /> None
-                                                        </span>
+                                                        <div className="flex items-center gap-2 text-[var(--tl)] opacity-20">
+                                                            <FiImage size={14} />
+                                                            <span className="text-[9px] font-bold uppercase tracking-widest">Null Assets</span>
+                                                        </div>
                                                     )}
                                                 </td>
 
                                                 {/* Date */}
-                                                <td style={tdS}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                                        <FiCalendar size={11} style={{ color: 'rgba(255,255,255,0.25)' }} />
-                                                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>
-                                                            {rr?.requestedAt ? new Date(rr.requestedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                                                <td className="px-8 py-6">
+                                                    <div className="flex items-center gap-2 text-[var(--tl)] opacity-30">
+                                                        <FiCalendar size={14} />
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest">
+                                                            {rr?.requestedAt ? new Date(rr.requestedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}
                                                         </span>
                                                     </div>
                                                 </td>
 
                                                 {/* Status */}
-                                                <td style={tdS}>
-                                                    <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', color: rs.color, backgroundColor: rs.bg, border: `1px solid ${rs.border}`, fontWeight: '600' }}>
+                                                <td className="px-8 py-6">
+                                                    <span className="text-[8px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border shadow-sm" 
+                                                        style={{ color: rs.color, backgroundColor: rs.bg, borderColor: rs.border }}>
                                                         {rr?.status || '—'}
                                                     </span>
                                                     {rr?.status === 'Approved' && rr?.refundAmount > 0 && (
-                                                        <p style={{ color: '#4ade80', fontSize: '11px', margin: '5px 0 0', fontWeight: '600' }}>
-                                                            Refund: ₹{rr.refundAmount.toLocaleString('en-IN')}
-                                                        </p>
-                                                    )}
-                                                    {rr?.resolutionNote && (
-                                                        <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', margin: '4px 0 0', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                            {rr.resolutionNote}
+                                                        <p className="text-[9px] font-bold text-emerald-500 m-0 mt-2 uppercase tracking-tight">
+                                                            ₹{rr.refundAmount.toLocaleString('en-IN')} Disbursed
                                                         </p>
                                                     )}
                                                 </td>
 
                                                 {/* Actions */}
-                                                <td style={tdS}>
+                                                <td className="px-8 py-6">
                                                     {isPending ? (
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                                        <div className="flex gap-2">
                                                             <button
                                                                 onClick={() => setActModal({ open: true, order, action: 'approve' })}
-                                                                style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '7px 14px', backgroundColor: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', borderRadius: '6px', color: '#4ade80', fontSize: '12px', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                                                                <FiCheck size={11} /> Approve
+                                                                className="w-9 h-9 rounded-xl bg-emerald-500/5 text-emerald-500 border border-emerald-500/10 hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center shadow-sm">
+                                                                <FiCheck size={16} />
                                                             </button>
                                                             <button
                                                                 onClick={() => setActModal({ open: true, order, action: 'reject' })}
-                                                                style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '7px 14px', backgroundColor: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.3)', borderRadius: '6px', color: '#f87171', fontSize: '12px', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                                                                <FiX size={11} /> Reject
+                                                                className="w-9 h-9 rounded-xl bg-red-500/5 text-red-500 border border-red-500/10 hover:bg-red-600 hover:text-white transition-all flex items-center justify-center shadow-sm">
+                                                                <FiX size={16} />
                                                             </button>
                                                         </div>
                                                     ) : (
-                                                        <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '12px' }}>
-                                                            {rr?.status === 'Approved' ? '✓ Resolved' : '✕ Closed'}
-                                                        </span>
+                                                        <div className="flex items-center gap-2 text-[var(--tl)] opacity-20">
+                                                            <FiInfo size={14} />
+                                                            <span className="text-[9px] font-bold uppercase tracking-widest">Resolved</span>
+                                                        </div>
                                                     )}
                                                 </td>
                                             </tr>
@@ -346,6 +330,17 @@ export default function AdminReturns() {
                             </table>
                         </div>
                     )}
+                </div>
+
+                {/* Disclaimer */}
+                <div className="mt-12 p-8 bg-[var(--bg-alt)] border border-[var(--b)] rounded-3xl flex gap-6 shadow-inner">
+                    <FiInfo className="text-[var(--p)] mt-1 flex-shrink-0" size={20} />
+                    <div>
+                        <h4 className="text-sm font-bold text-[var(--t)] mb-2 uppercase tracking-tight">Resolution Protocol</h4>
+                        <p className="text-xs font-bold text-[var(--tl)] leading-relaxed m-0 opacity-40 uppercase tracking-widest">
+                            Approved returns trigger a platform-wide financial reconciliation. Ensure all evidence assets are verified before authorization. Rejections require an explicit rationale for audit transparency. Resolution cycles Typically settle within 3–5 cycles.
+                        </p>
+                    </div>
                 </div>
 
             </div>

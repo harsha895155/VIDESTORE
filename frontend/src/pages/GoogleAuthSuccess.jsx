@@ -24,7 +24,7 @@ export default function GoogleAuthSuccess() {
 
   return (
     <div style={{
-      backgroundColor: '#111111',
+      backgroundColor: '#fff',
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
@@ -35,17 +35,18 @@ export default function GoogleAuthSuccess() {
       <div style={{
         width: 40,
         height: 40,
-        border: '3px solid rgba(201,168,76,0.2)',
-        borderTop: '3px solid #C9A84C',
+        border: '3px solid rgba(79, 70, 229, 0.1)',
+        borderTop: '3px solid #4F46E5',
         borderRadius: '50%',
         animation: 'spin 0.8s linear infinite'
       }} />
       <p style={{
-        color: '#C9A84C',
+        color: '#4F46E5',
         fontSize: '13px',
         letterSpacing: '0.2em',
         textTransform: 'uppercase',
-        fontFamily: 'Jost, sans-serif'
+        fontFamily: 'Inter, sans-serif',
+        fontWeight: 600
       }}>
         Signing you in...
       </p>

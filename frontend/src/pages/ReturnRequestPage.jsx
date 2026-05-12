@@ -3,12 +3,8 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { orderAPI } from '../services/api';
 import toast from 'react-hot-toast';
-import { FiArrowLeft, FiCheck, FiUpload, FiX, FiAlertCircle, FiRotateCcw } from 'react-icons/fi';
-
-const BG = '#111111';
-const BG2 = '#0a0a0a';
-const BORDER = 'rgba(255,255,255,0.08)';
-const GOLD = '#C9A84C';
+import { FiArrowLeft, FiCheck, FiUpload, FiX, FiAlertCircle, FiRotateCcw, FiShoppingBag, FiInfo } from 'react-icons/fi';
+import BackButton from '../components/common/BackButton';
 
 const RETURN_REASONS = [
     { id: 'wrong_size', label: "Wrong Size / Doesn't Fit", desc: 'Too big, too small, or sizing is off' },
@@ -57,6 +53,7 @@ export default function ReturnRequestPage() {
 
     const handleSubmit = async () => {
         if (!selectedReason) { toast.error('Please select a return reason'); return; }
+        if (!upiId.trim()) { toast.error('Please provide a UPI ID for refund'); return; }
         setSubmitting(true);
         try {
             const formData = new FormData();
@@ -75,253 +72,242 @@ export default function ReturnRequestPage() {
         }
     };
 
-    // Loading skeleton
     if (loading) return (
-        <div className="min-h-screen" style={{ backgroundColor: BG }}>
-            <div className="max-w-2xl mx-auto px-6 py-16 space-y-4">
-                <div className="skeleton h-6 w-32 rounded" />
-                <div className="skeleton h-16 rounded" />
-                <div className="skeleton h-96 rounded" />
+        <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
+            <div className="max-w-3xl mx-auto px-6 py-20 space-y-8">
+                <div className="h-6 w-32 bg-white/5 rounded-full animate-pulse" />
+                <div className="h-48 bg-[var(--card)] rounded-[2rem] border border-[var(--b)] animate-pulse" />
+                <div className="h-96 bg-[var(--card)] rounded-[2rem] border border-[var(--b)] animate-pulse" />
             </div>
         </div>
     );
 
-    // Order not found
     if (!order) return (
-        <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: BG }}>
-            <div className="text-center">
-                <FiAlertCircle size={52} className="mx-auto mb-5" style={{ color: '#f87171' }} />
-                <h2 className="font-display text-2xl font-light text-white mb-2">Order Not Found</h2>
-                <p className="font-body text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    We couldn't find this order in your account.
+        <div className="min-h-screen flex items-center justify-center px-6" style={{ backgroundColor: 'var(--bg)' }}>
+            <div className="bg-[var(--card)] rounded-[2rem] border border-[var(--b)] shadow-2xl p-12 text-center max-w-md w-full">
+                <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-8">
+                    <FiAlertCircle size={40} className="text-red-500" />
+                </div>
+                <h2 className="serif text-3xl font-black text-[var(--t)] mb-4">Order Not Found</h2>
+                <p className="text-[var(--tm)] font-medium leading-relaxed mb-10">
+                    We couldn't find this order in your account history.
                 </p>
-                <Link to="/orders" className="font-body text-sm px-6 py-2.5 inline-block"
-                    style={{ border: `1px solid ${GOLD}`, color: GOLD, borderRadius: '4px' }}>
+                <Link to="/orders" className="h-14 px-10 bg-[var(--p)] text-black rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all flex items-center justify-center">
                     Back to Orders
                 </Link>
             </div>
         </div>
     );
 
-    // Success screen
     if (submitted) return (
-        <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: BG }}>
-            <div className="text-center max-w-md w-full">
-                <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8"
-                    style={{ backgroundColor: 'rgba(74,222,128,0.08)', border: '2px solid rgba(74,222,128,0.25)' }}>
-                    <FiCheck size={36} style={{ color: '#4ade80' }} />
-                </div>
-                <p className="font-body text-xs tracking-[0.2em] uppercase mb-3" style={{ color: GOLD }}>Request Submitted</p>
-                <h2 className="font-display text-3xl font-light text-white mb-4">We Got Your Request</h2>
-                <p className="font-body text-sm mb-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    Your return request for order{' '}
-                    <span style={{ color: '#fff', fontWeight: 600 }}>#{order._id.slice(-8).toUpperCase()}</span>{' '}
-                    has been sent to the seller.
-                </p>
-                <p className="font-body text-sm mb-10" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                    You'll receive a response within 24–48 business hours via your registered email.
-                </p>
-                <div className="flex gap-3 justify-center flex-wrap">
-                    <Link to="/orders" className="font-body text-sm px-7 py-2.5"
-                        style={{ border: `1px solid ${GOLD}`, color: GOLD, borderRadius: '4px' }}>
-                        My Orders
-                    </Link>
-                    <Link to="/" className="font-body text-sm px-7 py-2.5 font-semibold"
-                        style={{ backgroundColor: GOLD, color: '#000', borderRadius: '4px' }}>
-                        Go Home
-                    </Link>
+        <div className="min-h-screen flex items-center justify-center px-6 py-20" style={{ backgroundColor: 'var(--bg)' }}>
+            <div className="bg-[var(--card)] rounded-[2rem] border border-[var(--b)] shadow-2xl p-12 text-center max-w-xl w-full relative overflow-hidden">
+                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-[var(--p)]/10 rounded-full blur-[60px]" />
+                
+                <div className="relative z-10">
+                    <div className="w-24 h-24 bg-[var(--p)]/10 rounded-2xl flex items-center justify-center mx-auto mb-8">
+                        <FiCheck size={44} className="text-[var(--p)]" />
+                    </div>
+                    <p className="text-[10px] font-black text-[var(--p)] uppercase tracking-[0.2em] mb-3">Request Submitted</p>
+                    <h2 className="serif text-4xl font-black text-[var(--t)] mb-6">We've Received It!</h2>
+                    <p className="text-[var(--tm)] font-medium leading-relaxed mb-4">
+                        Your return request for order <span className="text-[var(--t)] font-black">#{order._id.slice(-8).toUpperCase()}</span> has been sent for review.
+                    </p>
+                    <p className="text-[var(--tl)] font-bold text-[9px] uppercase tracking-widest mb-10">
+                        Check your email for updates within 24-48 hours.
+                    </p>
+                    <div className="flex flex-wrap gap-4 justify-center">
+                        <Link to="/orders" className="h-14 px-10 bg-[var(--p)] text-black rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-gold/20 flex items-center gap-2">
+                            My Orders
+                        </Link>
+                        <Link to="/" className="h-14 px-10 bg-[var(--bg-alt)] text-[var(--t)] rounded-xl font-black text-xs uppercase tracking-widest border border-[var(--b)] hover:bg-[var(--card)] transition-all flex items-center gap-2">
+                            Go Home
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
     );
 
-    // Main form
+    const inputClass = "w-full bg-[var(--bg-alt)] border-2 border-[var(--b)] rounded-2xl px-5 text-sm font-bold text-[var(--t)] focus:border-[var(--p)] transition-all outline-none placeholder:opacity-30";
+
     return (
-        <div className="min-h-screen py-12 px-4 sm:px-6" style={{ backgroundColor: BG }}>
-            <div className="max-w-2xl mx-auto">
+        <div className="min-h-screen py-0 px-4 sm:px-6" style={{ backgroundColor: 'var(--bg)' }}>
+            <div className="max-w-[1440px] mx-auto">
 
                 <Link to={`/orders/${id}`}
-                    className="font-body text-sm inline-flex items-center gap-2 mb-10 transition-opacity hover:opacity-60"
-                    style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    <FiArrowLeft size={14} /> Back to Order
+                    className="inline-flex items-center gap-2 text-[10px] font-black text-[var(--tl)] uppercase tracking-widest hover:text-[var(--p)] transition-colors mb-4">
+                    <FiArrowLeft size={16} /> Back to Order Details
                 </Link>
 
-                <div className="mb-8">
-                    <p className="font-body text-xs tracking-[0.2em] uppercase mb-2" style={{ color: GOLD }}>Return &amp; Refund</p>
-                    <h1 className="font-display text-3xl font-light text-white mb-1">Request a Return</h1>
-                    <p className="font-body text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                <div className="mb-4">
+                    <p className="text-[10px] font-black text-[var(--p)] uppercase tracking-[0.3em] mb-4">Support Center</p>
+                    <h1 className="serif text-5xl md:text-6xl font-black text-[var(--t)] mb-4">Request a Return</h1>
+                    <p className="text-[var(--tm)] font-bold uppercase tracking-tighter text-xs">
                         Order #{order._id.slice(-8).toUpperCase()} &nbsp;·&nbsp;
                         {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>
                 </div>
 
-                {/* Items preview */}
-                <div className="mb-8 p-5 rounded-xl" style={{ backgroundColor: BG2, border: `1px solid ${BORDER}` }}>
-                    <p className="font-body text-xs tracking-[0.15em] uppercase mb-4" style={{ color: 'rgba(255,255,255,0.3)' }}>Items in this Order</p>
-                    <div className="space-y-3">
-                        {order.orderItems?.map(item => (
-                            <div key={item._id} className="flex items-center gap-4">
-                                <img src={item.image} alt={item.name} className="w-12 h-14 object-cover flex-shrink-0" style={{ border: `1px solid ${BORDER}` }} />
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-body text-sm font-medium text-white truncate">{item.name}</p>
-                                    <p className="font-body text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                                        {item.size && `Size: ${item.size}`}{item.color && ` • Color: ${item.color}`}{` • Qty: ${item.quantity}`}
+                <div className="space-y-10">
+                    <div className="bg-[var(--card)] rounded-[2rem] border border-[var(--b)] p-8">
+                        <p className="text-[9px] font-black text-[var(--tl)] uppercase tracking-[0.25em] mb-8">Items to be Returned</p>
+                        <div className="space-y-6">
+                            {order.orderItems?.map(item => (
+                                <div key={item._id} className="flex items-center gap-8">
+                                    <img src={item.image} alt={item.name} className="w-16 h-20 object-cover rounded-xl border border-[var(--b)]" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-black text-[var(--t)] truncate">{item.name}</p>
+                                        <p className="text-[10px] font-black text-[var(--tl)] mt-1 uppercase tracking-widest">
+                                            {item.size && `Size: ${item.size}`}{item.color && ` • Color: ${item.color}`}{` • Qty: ${item.quantity}`}
+                                        </p>
+                                    </div>
+                                    <p className="text-sm font-black text-[var(--p)]">₹{(item.price * item.quantity).toLocaleString()}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="bg-[var(--card)] rounded-[3rem] border border-[var(--b)] shadow-2xl p-8 sm:p-14 space-y-16">
+                        
+                        {/* STEP 1 — Reason */}
+                        <div>
+                            <div className="flex items-center gap-5 mb-10">
+                                <div className="w-12 h-12 bg-[var(--p)] text-black rounded-2xl flex items-center justify-center font-black text-sm shadow-xl shadow-gold/10">1</div>
+                                <h2 className="serif text-3xl font-black text-[var(--t)]">Why are you returning?</h2>
+                            </div>
+
+                            <div className="grid sm:grid-cols-2 gap-5">
+                                {RETURN_REASONS.map((reason) => {
+                                    const active = selectedReason === reason.id;
+                                    return (
+                                        <button 
+                                            key={reason.id} 
+                                            onClick={() => setSelected(reason.id)}
+                                            className={`group text-left p-6 rounded-[2rem] transition-all border-2 ${
+                                                active ? 'bg-[var(--p)]/5 border-[var(--p)]' : 'bg-[var(--bg-alt)] border-[var(--b)] hover:border-[var(--tl)]'
+                                            }`}
+                                        >
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <p className={`text-sm font-black mb-1.5 transition-colors ${active ? 'text-[var(--p)]' : 'text-[var(--t)]'}`}>{reason.label}</p>
+                                                    <p className="text-[11px] font-bold text-[var(--tl)] leading-relaxed">{reason.desc}</p>
+                                                </div>
+                                                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all border-2 ${
+                                                    active ? 'bg-[var(--p)] border-[var(--p)]' : 'border-[var(--b-inner)] group-hover:border-[var(--tl)]'
+                                                }`}>
+                                                    {active && <FiCheck size={12} className="text-black" strokeWidth={4} />}
+                                                </div>
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* STEP 2 — Photos */}
+                        <div>
+                            <div className="flex items-center gap-5 mb-3">
+                                <div className="w-12 h-12 bg-[var(--p)] text-black rounded-2xl flex items-center justify-center font-black text-sm shadow-xl shadow-gold/10">2</div>
+                                <h2 className="serif text-3xl font-black text-[var(--t)]">Evidence Photos</h2>
+                            </div>
+                            <p className="text-[var(--tl)] font-bold text-xs ml-16 mb-10">Photos help us process your request faster (Max 4)</p>
+
+                            <div className="flex gap-5 flex-wrap ml-16">
+                                {images.map((img, idx) => (
+                                    <div key={idx} className="relative w-28 h-36 rounded-2xl overflow-hidden border border-[var(--b)] shadow-lg group">
+                                        <img src={img.preview} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                                        <button onClick={() => removeImage(idx)}
+                                            className="absolute top-2 right-2 w-8 h-8 bg-black/80 backdrop-blur rounded-full flex items-center justify-center text-red-500 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <FiX size={16} />
+                                        </button>
+                                    </div>
+                                ))}
+                                {images.length < 4 && (
+                                    <label className="w-28 h-36 bg-[var(--bg-alt)] border-2 border-dashed border-[var(--b)] rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-[var(--p)] hover:bg-[var(--p)]/5 transition-all text-[var(--tl)] group">
+                                        <FiUpload size={24} className="mb-3 group-hover:text-[var(--p)]" />
+                                        <span className="text-[9px] font-black uppercase tracking-widest">Add Photo</span>
+                                        <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageAdd} />
+                                    </label>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* STEP 3 — Note & Refund */}
+                        <div className="grid md:grid-cols-2 gap-12">
+                            <div>
+                                <div className="flex items-center gap-5 mb-10">
+                                    <div className="w-12 h-12 bg-[var(--p)] text-black rounded-2xl flex items-center justify-center font-black text-sm shadow-xl shadow-gold/10">3</div>
+                                    <h2 className="serif text-3xl font-black text-[var(--t)]">Any notes?</h2>
+                                </div>
+                                <textarea 
+                                    value={additionalNote} 
+                                    onChange={e => setNote(e.target.value)} 
+                                    maxLength={500} 
+                                    rows={4}
+                                    placeholder="Tell us more about the issue..."
+                                    className={`${inputClass} py-6 h-48 resize-none`}
+                                />
+                                <div className="flex justify-between mt-4 px-2">
+                                    <p className="text-[9px] font-black text-[var(--tl)] uppercase tracking-widest">Optional details</p>
+                                    <p className="text-[9px] font-black text-[var(--tl)] uppercase tracking-widest">{additionalNote.length}/500</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div className="flex items-center gap-5 mb-10">
+                                    <div className="w-12 h-12 bg-[var(--p)] text-black rounded-2xl flex items-center justify-center font-black text-sm shadow-xl shadow-gold/10">4</div>
+                                    <h2 className="serif text-3xl font-black text-[var(--t)]">Refund Method</h2>
+                                </div>
+                                <div className="space-y-6">
+                                    <div>
+                                        <label className="text-[9px] font-black text-[var(--tl)] uppercase tracking-widest mb-3 block ml-1">Enter UPI ID</label>
+                                        <input 
+                                            type="text" 
+                                            value={upiId} 
+                                            onChange={e => setUpiId(e.target.value)}
+                                            placeholder="yourname@upi"
+                                            className={`${inputClass} h-16`}
+                                        />
+                                    </div>
+                                    <div className="bg-[var(--p)]/5 rounded-2xl p-6 flex gap-4 border border-[var(--p)]/10">
+                                        <FiInfo className="text-[var(--p)] flex-shrink-0 mt-1" size={20} />
+                                        <p className="text-xs font-bold text-[var(--tm)] leading-relaxed">
+                                            Refund will be credited within 7 days after the item is picked up and verified.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Summary & Submit */}
+                        <div className="pt-10">
+                            <div className="bg-gradient-to-br from-[#111] to-[#040404] rounded-[2.5rem] p-8 sm:p-12 text-white relative overflow-hidden border border-[var(--b)]">
+                                <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                                    <FiRotateCcw size={140} />
+                                </div>
+                                <div className="relative z-10">
+                                    <div className="flex items-start gap-5 mb-10">
+                                        <FiRotateCcw className="text-[var(--p)] mt-1.5 flex-shrink-0" size={24} />
+                                        <p className="text-sm font-bold text-[var(--tl)] leading-relaxed">
+                                            Once submitted, a pickup will be arranged within 48 hours for valid requests. Ensure all original tags and packaging are intact.
+                                        </p>
+                                    </div>
+                                    <button 
+                                        onClick={handleSubmit} 
+                                        disabled={submitting || !selectedReason || !upiId.trim()}
+                                        className="w-full h-16 bg-[var(--p)] text-black rounded-2xl font-black text-xs uppercase tracking-[0.25em] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-2xl shadow-gold/20"
+                                    >
+                                        {submitting ? 'Processing Request...' : 'Submit Return Request'}
+                                    </button>
+                                    <p className="text-center mt-8 text-[9px] font-black text-[var(--tl)] uppercase tracking-[0.2em]">
+                                        By submitting, you agree to our <Link to="/refund-policy" className="text-[var(--p)] hover:underline">Return & Refund Policy</Link>
                                     </p>
                                 </div>
-                                <p className="font-body text-sm text-white flex-shrink-0">₹{(item.price * item.quantity).toLocaleString()}</p>
                             </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* STEP 1 — Reason */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-5">
-                        <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                            style={{ backgroundColor: GOLD, color: '#000' }}>1</span>
-                        <h2 className="font-body text-sm font-semibold text-white tracking-wide">Select a Return Reason</h2>
-                    </div>
-
-                    <div className="space-y-2">
-                        {RETURN_REASONS.map((reason, i) => {
-                            const active = selectedReason === reason.id;
-                            return (
-                                <button key={reason.id} onClick={() => setSelected(reason.id)}
-                                    className="w-full text-left p-4 rounded-lg transition-all"
-                                    style={{ backgroundColor: active ? `${GOLD}10` : BG2, border: `1px solid ${active ? GOLD : BORDER}`, cursor: 'pointer' }}>
-                                    <div className="flex items-center justify-between gap-3">
-                                        <div className="flex items-start gap-3 flex-1">
-                                            <span className="font-body text-xs flex-shrink-0 mt-0.5"
-                                                style={{ color: active ? GOLD : 'rgba(255,255,255,0.2)', fontWeight: 600, minWidth: '18px' }}>
-                                                {String(i + 1).padStart(2, '0')}
-                                            </span>
-                                            <div>
-                                                <p className="font-body text-sm font-medium" style={{ color: active ? '#fff' : 'rgba(255,255,255,0.75)' }}>{reason.label}</p>
-                                                <p className="font-body text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>{reason.desc}</p>
-                                            </div>
-                                        </div>
-                                        <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                                            style={{ backgroundColor: active ? GOLD : 'transparent', border: `2px solid ${active ? GOLD : 'rgba(255,255,255,0.15)'}`, transition: 'all 0.15s' }}>
-                                            {active && <FiCheck size={11} color="#000" strokeWidth={3} />}
-                                        </div>
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* STEP 2 — Photos */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-5">
-                        <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                            style={{ backgroundColor: GOLD, color: '#000' }}>2</span>
-                        <div>
-                            <h2 className="font-body text-sm font-semibold text-white tracking-wide">
-                                Upload Photos <span style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>(Optional · max 4)</span>
-                            </h2>
-                            <p className="font-body text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>Photos help us resolve your return faster</p>
                         </div>
                     </div>
-
-                    <div className="flex gap-3 flex-wrap">
-                        {images.map((img, idx) => (
-                            <div key={idx} className="relative w-20 h-24 flex-shrink-0"
-                                style={{ border: `1px solid ${BORDER}`, borderRadius: '6px', overflow: 'hidden' }}>
-                                <img src={img.preview} alt="" className="w-full h-full object-cover" />
-                                <button onClick={() => removeImage(idx)}
-                                    className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center rounded-full"
-                                    style={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.2)' }}>
-                                    <FiX size={10} color="#fff" />
-                                </button>
-                            </div>
-                        ))}
-                        {images.length < 4 && (
-                            <label className="w-20 h-24 flex flex-col items-center justify-center cursor-pointer flex-shrink-0 transition-all"
-                                style={{ border: '1px dashed rgba(255,255,255,0.15)', borderRadius: '6px', backgroundColor: 'rgba(255,255,255,0.02)' }}
-                                onMouseOver={e => e.currentTarget.style.borderColor = GOLD}
-                                onMouseOut={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'}>
-                                <FiUpload size={18} style={{ color: 'rgba(255,255,255,0.25)', marginBottom: '4px' }} />
-                                <span className="font-body text-[10px]" style={{ color: 'rgba(255,255,255,0.25)' }}>Add Photo</span>
-                                <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageAdd} />
-                            </label>
-                        )}
-                    </div>
                 </div>
-
-                {/* STEP 3 — Note */}
-                <div className="mb-10">
-                    <div className="flex items-center gap-3 mb-5">
-                        <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                            style={{ backgroundColor: GOLD, color: '#000' }}>3</span>
-                        <h2 className="font-body text-sm font-semibold text-white tracking-wide">
-                            Additional Details <span style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>(Optional)</span>
-                        </h2>
-                    </div>
-                    <textarea value={additionalNote} onChange={e => setNote(e.target.value)} maxLength={500} rows={4}
-                        placeholder="Describe the issue in more detail… e.g. 'The stitching came apart on the left sleeve after one wash'"
-                        className="w-full font-body text-sm resize-none outline-none"
-                        style={{ backgroundColor: BG2, border: `1px solid ${BORDER}`, borderRadius: '8px', padding: '14px 16px', color: '#fff', caretColor: GOLD }}
-                        onFocus={e => e.target.style.borderColor = `${GOLD}50`}
-                        onBlur={e => e.target.style.borderColor = BORDER} />
-                    <p className="font-body text-xs mt-1.5 text-right" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                        {additionalNote.length}/500
-                    </p>
-                </div>
-
-                {/* STEP 4 — Refund Details */}
-                <div className="mb-10">
-                    <div className="flex items-center gap-3 mb-5">
-                        <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                            style={{ backgroundColor: GOLD, color: '#000' }}>4</span>
-                        <div>
-                            <h2 className="font-body text-sm font-semibold text-white tracking-wide">Refund Details</h2>
-                            <p className="font-body text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>Enter your UPI ID to receive the refund</p>
-                        </div>
-                    </div>
-                    <input type="text" value={upiId} onChange={e => setUpiId(e.target.value)}
-                        placeholder="e.g. yourname@upi"
-                        className="w-full font-body text-sm outline-none"
-                        style={{ backgroundColor: BG2, border: `1px solid ${BORDER}`, borderRadius: '8px', padding: '14px 16px', color: '#fff', caretColor: GOLD }}
-                        onFocus={e => e.target.style.borderColor = `${GOLD}50`}
-                        onBlur={e => e.target.style.borderColor = BORDER} />
-                    <p className="font-body text-xs mt-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                        ✨ The amount will be credited to this account within 7 days of approval.
-                    </p>
-                </div>
-
-                {/* Info banner */}
-                <div className="mb-8 p-4 rounded-lg flex gap-3"
-                    style={{ backgroundColor: `${GOLD}08`, border: `1px solid ${GOLD}20` }}>
-                    <FiRotateCcw size={13} style={{ color: GOLD, marginTop: '2px', flexShrink: 0 }} />
-                    <p className="font-body text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                        Your request will be sent directly to the seller and our support team. You'll receive a response
-                        within <strong style={{ color: 'rgba(255,255,255,0.65)' }}>24–48 business hours</strong>. Once approved,
-                        a free pickup will be arranged for defective or wrong items.
-                    </p>
-                </div>
-
-                {/* Submit */}
-                <button onClick={handleSubmit} disabled={submitting || !selectedReason || !upiId.trim()}
-                    className="w-full py-4 font-body font-semibold text-sm tracking-widest uppercase transition-all"
-                    style={{
-                        backgroundColor: (selectedReason && upiId.trim()) ? GOLD : 'rgba(255,255,255,0.04)',
-                        color: (selectedReason && upiId.trim()) ? '#000' : 'rgba(255,255,255,0.15)',
-                        borderRadius: '6px',
-                        cursor: (selectedReason && upiId.trim() && !submitting) ? 'pointer' : 'not-allowed',
-                        opacity: submitting ? 0.65 : 1,
-                        border: `1px solid ${(selectedReason && upiId.trim()) ? GOLD : 'rgba(255,255,255,0.06)'}`,
-                    }}>
-                    {submitting ? 'Submitting Request…' : 'Submit Return Request'}
-                </button>
-
-                <p className="font-body text-xs text-center mt-4" style={{ color: 'rgba(255,255,255,0.18)' }}>
-                    By submitting, you agree to our{' '}
-                    <Link to="/refund-policy" style={{ color: 'rgba(255,255,255,0.35)', textDecoration: 'underline' }}>
-                        Return &amp; Refund Policy
-                    </Link>
-                </p>
-
             </div>
         </div>
     );

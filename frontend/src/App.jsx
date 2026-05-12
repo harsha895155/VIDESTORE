@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -27,6 +27,7 @@ import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ReturnRequestPage from './pages/ReturnRequestPage';
+import OffersPage from './pages/OffersPage';
 
 import GoogleAuthSuccess from './pages/GoogleAuthSuccess';
 
@@ -72,8 +73,8 @@ const ProtectedRoute = ({ children }) => {
 const AdminRoute = ({ children }) => {
   const { isLoggedIn, isAdmin, initializing } = useAuth();
   if (initializing) return (
-    <div style={{ backgroundColor: '#111', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: '#C9A84C', fontFamily: 'serif', letterSpacing: '0.3em' }}>Loading...</div>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+      <div className="serif text-xl tracking-[0.3em] animate-pulse" style={{ color: 'var(--p)' }}>Manifesting...</div>
     </div>
   );
   if (!isLoggedIn) return <Navigate to="/login" replace />;
@@ -84,8 +85,8 @@ const AdminRoute = ({ children }) => {
 const SellerRoute = ({ children }) => {
   const { isLoggedIn, user, initializing } = useAuth();
   if (initializing) return (
-    <div style={{ backgroundColor: '#111', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: '#C9A84C', fontFamily: 'serif', letterSpacing: '0.3em' }}>Loading...</div>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+      <div className="serif text-xl tracking-[0.3em] animate-pulse" style={{ color: 'var(--p)' }}>Manifesting...</div>
     </div>
   );
   if (!isLoggedIn) return <Navigate to="/login" replace />;
@@ -100,7 +101,6 @@ function ScrollToTop() {
   return null;
 }
 
-// Routes that get a full-screen layout (no Navbar/Footer)
 const DASHBOARD_ROUTES = ['/seller', '/admin'];
 const isDashboardRoute = (path) =>
   DASHBOARD_ROUTES.some(r => path === r || path.startsWith(r + '/'));
@@ -108,20 +108,15 @@ const isDashboardRoute = (path) =>
 const isLandingRoute = (path) => path === '/';
 
 const AppContent = () => {
-  const { pathname } = useLocation();
   const { isLoggedIn, initializing } = useAuth();
+  const { pathname } = useLocation();
+  const [forcedLoading, setForcedLoading] = useState(true);
 
-  // Hide Navbar+Footer for dashboard routes AND the landing page
-  const fullScreen = isDashboardRoute(pathname) || isLandingRoute(pathname);
-
-  // ✅ CORRECT FLOW:
-  // - initializing=true  → user=null → isLoggedIn=false → LandingPage shows ✅
-  // - initializing=false → user=null → isLoggedIn=false → LandingPage stays ✅
-  // - initializing=false → user=obj  → isLoggedIn=true  → redirect to /home ✅
-  // This works because AuthContext now starts user as null (not from localStorage)
-  if (!initializing && pathname === '/' && isLoggedIn) {
-    return <Navigate to="/home" replace />;
-  }
+  // ── Must declare ALL hooks unconditionally at the top ──
+  useEffect(() => {
+    const timer = setTimeout(() => setForcedLoading(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Sync FCM token on login
   useEffect(() => {
@@ -137,18 +132,17 @@ const AppContent = () => {
     try {
       const unsubscribe = onForegroundMessage((payload) => {
         toast.custom((t) => (
-          <div className="bg-[#1a1a1a] text-white p-4 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl max-w-sm flex items-start space-x-3 mt-4" style={{ fontFamily: 'Jost, sans-serif' }}>
-            <div className="flex-shrink-0 bg-[#C9A84C]/20 p-2 rounded-full mt-1">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
+          <div className="p-5 rounded-2xl border shadow-2xl max-w-sm flex items-start space-x-4 mt-6 transform transition-all duration-500 hover:scale-[1.02]" 
+               style={{ background: 'var(--card)', borderColor: 'var(--b)', backdropFilter: 'blur(20px)' }}>
+            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[var(--p)]/10 flex items-center justify-center">
+              <FiBell className="text-[var(--p)]" size={18} />
             </div>
             <div className="flex-1">
-              <h4 className="font-semibold text-[14px] text-[#C9A84C]">{payload.notification?.title || 'Trendorra'}</h4>
-              <p className="text-[13px] text-gray-300 mt-1 leading-snug">{payload.notification?.body}</p>
+              <h4 className="font-bold text-[10px] uppercase tracking-wider text-[var(--p)] mb-1">{payload.notification?.title || 'VideStore'}</h4>
+              <p className="text-[13px] text-[var(--t)] font-medium leading-relaxed">{payload.notification?.body}</p>
             </div>
-            <button onClick={() => toast.dismiss(t.id)} className="text-gray-500 hover:text-white transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            <button onClick={() => toast.dismiss(t.id)} className="text-[var(--tl)] hover:text-[var(--t)] transition-colors">
+              <FiX size={16} />
             </button>
           </div>
         ), { duration: 6000 });
@@ -157,13 +151,44 @@ const AppContent = () => {
     } catch (e) { console.error('Foreground listener error:', e) }
   }, []);
 
+  // ── Conditional renders AFTER all hooks ──
+  if ((initializing || forcedLoading) && pathname !== '/') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-10 text-center" 
+           style={{ backgroundColor: '#000000', zIndex: 9999 }}>
+        <div className="relative mb-12">
+          <div className="w-24 h-24 rounded-3xl border-2 border-[var(--p)] flex items-center justify-center animate-[spin_8s_linear_infinite] shadow-2xl shadow-gold/10"
+               style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <span className="serif text-[var(--p)] text-5xl font-black -rotate-[360deg]">V</span>
+          </div>
+          <div className="absolute -inset-3 rounded-[2.5rem] border border-dashed border-[var(--p)]/20 animate-[spin_12s_linear_infinite_reverse]" />
+        </div>
+        <div className="space-y-6">
+          <h1 className="serif text-4xl font-bold tracking-[0.25em] text-white">VIDESTORE</h1>
+          <div className="flex items-center justify-center gap-3">
+             <div className="w-1.5 h-1.5 rounded-full bg-[var(--p)] animate-bounce" style={{ animationDelay: '0s' }} />
+             <div className="w-1.5 h-1.5 rounded-full bg-[var(--p)] animate-bounce" style={{ animationDelay: '0.2s' }} />
+             <div className="w-1.5 h-1.5 rounded-full bg-[var(--p)] animate-bounce" style={{ animationDelay: '0.4s' }} />
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40">Curating Luxury</p>
+        </div>
+      </div>
+    );
+  }
+
+  const fullScreen = isDashboardRoute(pathname) || isLandingRoute(pathname);
+
+  if (!initializing && pathname === '/' && isLoggedIn) {
+    return <Navigate to="/home" replace />;
+  }
+
   return (
     <>
       <NotificationPermissionModal />
       <ScrollToTop />
-      <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#111111' }}>
+      <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-alt)' }}>
         {!fullScreen && <Navbar db={db} />}
-        <main className="flex-1" style={{ backgroundColor: '#111111' }}>
+        <main className={`flex-1 ${!fullScreen ? 'pt-[56px] md:pt-[64px]' : ''}`}>
           <Routes>
             {/* ── Customer Routes ── */}
             <Route path="/" element={<LandingPage />} />
@@ -182,6 +207,7 @@ const AppContent = () => {
             <Route path="/orders/:id" element={<ProtectedRoute><OrderDetailPage /></ProtectedRoute>} />
             <Route path="/orders/:id/return" element={<ProtectedRoute><ReturnRequestPage /></ProtectedRoute>} />
             <Route path="/order-confirmation/:id" element={<ProtectedRoute><OrderConfirmationPage /></ProtectedRoute>} />
+            <Route path="/offers" element={<OffersPage />} />
             <Route path="/auth/google/success" element={<GoogleAuthSuccess />} />
 
             {/* ── Admin Routes ── */}
@@ -227,9 +253,21 @@ const AppContent = () => {
         position="top-right"
         toastOptions={{
           duration: 4000,
-          style: { fontFamily: 'Jost, sans-serif', fontSize: '13px', borderRadius: '8px', backgroundColor: '#1a1a1a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' },
-          success: { duration: 3000, iconTheme: { primary: '#C9A84C', secondary: '#fff' } },
-          error: { duration: 5000, style: { backgroundColor: '#1a1a1a', color: '#f87171', border: '1px solid rgba(248,113,113,0.3)' } },
+          style: { 
+            fontFamily: 'inherit', 
+            fontSize: '11px', 
+            fontWeight: '700',
+            letterSpacing: '0.02em',
+            borderRadius: '16px', 
+            backgroundColor: 'var(--card)', 
+            color: 'var(--t)', 
+            border: '1px solid var(--b)', 
+            boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+            padding: '12px 20px',
+            textTransform: 'uppercase'
+          },
+          success: { duration: 3000, iconTheme: { primary: 'var(--s)', secondary: 'var(--card)' } },
+          error: { duration: 5000, iconTheme: { primary: 'var(--d)', secondary: 'var(--card)' } },
         }}
       />
     </>
@@ -242,7 +280,7 @@ export default function App() {
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
-            <Router>
+            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <AppContent />
             </Router>
           </WishlistProvider>

@@ -19,7 +19,7 @@ export default function SearchOverlay({ isOpen, onClose, isDark }) {
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState(false);
   const [recentSearches, setRecentSearches] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('trendorra_searches') || '[]'); } catch { return []; }
+    try { return JSON.parse(localStorage.getItem('videstore_searches') || '[]'); } catch { return []; }
   });
   const inputRef = useRef(null);
   const navigate = useNavigate();
@@ -65,7 +65,7 @@ export default function SearchOverlay({ isOpen, onClose, isDark }) {
   const saveSearch = (term) => {
     const updated = [term, ...recentSearches.filter(s => s !== term)].slice(0, 6);
     setRecentSearches(updated);
-    localStorage.setItem('trendorra_searches', JSON.stringify(updated));
+    localStorage.setItem('videstore_searches', JSON.stringify(updated));
   };
 
   const go = (path, term) => {
@@ -292,7 +292,7 @@ export default function SearchOverlay({ isOpen, onClose, isDark }) {
                           <p className="font-body text-[10px] tracking-[0.18em] uppercase flex items-center gap-1.5" style={{ color: DIM }}>
                             <FiClock size={11} /> Recent
                           </p>
-                          <button onClick={() => { setRecentSearches([]); localStorage.removeItem('trendorra_searches'); }}
+                          <button onClick={() => { setRecentSearches([]); localStorage.removeItem('videstore_searches'); }}
                             className="font-body text-xs hover:underline" style={{ color: GOLD }}>
                             Clear
                           </button>

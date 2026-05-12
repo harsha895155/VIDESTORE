@@ -2,58 +2,126 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Jost:wght@300;400;500;600;700;800&display=swap');
+
 @layer base {
   :root {
-    --gold: #C9A84C;
-    --gold-light: #E2C97E;
-    --gold-dark: #A07830;
+    /* Default Action Color - Gold */
+    --p: #C8A646;         
+    --pd: #B88D2D;        
+    --pl: #F7F3EE;        
+    
+    /* Semantic Status */
+    --s: #059669;         /* Success (refined for light) */
+    --sd: #047857;
+    --sl: #ECFDF5;
+    
+    --w: #D97706;         /* Warning (refined for light) */
+    --wd: #B45309;
+    --wl: #FFFBEB;
+    
+    --d: #DC2626;         /* Danger (refined for light) */
+    --dd: #B91C1C;
+    --dl: #FEF2F2;
+    
+    /* Neutrals & Surfaces (Luxury Light Palette - Ivory/Cream) */
+    --t: #1C1917;         /* Stone-900 (Warm Charcoal) */
+    --tm: #57534E;        /* Stone-600 */
+    --tl: #A8A29E;        /* Stone-400 */
+    
+    --bg: #F0F9FF;        /* Soft Sky Blue Background */
+    --bg-alt: #FFF1F2;    /* Soft Light Pink Background */
+    --card: #FFFFFF;      
+    --card-alt: #F8FAFC;  
+    
+    --b: #1C1917;         /* Deep Black for maximum visibility */
+    --b-inner: #333333;   
+    
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 24px 50px rgba(0, 0, 0, 0.2);
+    --shadow-premium: 0 10px 50px rgba(14, 165, 233, 0.2), 0 4px 20px rgba(253, 224, 241, 0.3); /* Sky Blue & Pink Glow */
+
+    --glass: rgba(252, 250, 247, 0.95);
+    --glass-b: rgba(28, 25, 23, 0.2);
+  }
+
+  [data-theme='dark'] {
+    /* Primary Action Color - Exact Luxury Gold */
+    --p: #C8A646;         
+    --pd: #B88D2D;        
+    --pl: #8C6A1F;        
+    --gold-line: #5E4716; 
+
+    /* Neutrals & Surfaces (Dark Luxury Palette) */
+    --t: #F5F3EE;         
+    --tm: #B8B1A1;        
+    --tl: #7F7765;        
+    
+    --bg: #040404;        
+    --bg-alt: #070707;    
+    --card: #0D0D0F;      
+    --card-alt: #121214;  
+    
+    --b: #333333;         /* Lightened for visibility in dark mode */
+    --b-inner: #222222;
+    
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 32px 64px rgba(0, 0, 0, 0.7);
+    --shadow-premium: 0 0 32px rgba(200, 166, 70, 0.12);
+
+    --glass: rgba(4, 4, 4, 0.88);
+    --glass-b: rgba(200, 166, 70, 0.15);
   }
 
   html {
     scroll-behavior: smooth;
-    /* FIX 1: Normalise scrollbar so Edge's wide scrollbar doesn't shift layout */
-    scrollbar-width: thin;
-    scrollbar-color: #C9A84C #1a1a1a;
   }
 
   body {
-    background-color: #111111;
-    color: #f0f0f0;
+    background: var(--bg);
+    background: linear-gradient(135deg, var(--bg) 0%, var(--bg-alt) 100%);
+    color: var(--t);
+    font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* FIX 2: Prevent horizontal overflow/scroll caused by Edge scrollbar width */
     overflow-x: hidden;
     width: 100%;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* FIX 3: Full box-sizing reset including pseudo-elements */
-  *,
-  *::before,
-  *::after {
+  [data-theme='dark'] body {
+    background-color: var(--bg);
+  }
+
+  *, *::before, *::after {
     box-sizing: border-box;
   }
 
-  /* FIX 4: Edge renders images inline — force block to kill baseline gap */
   img {
     display: block;
     max-width: 100%;
   }
 
-  /* FIX 5: Edge scrollbar styling */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
+    height: 4px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #1a1a1a;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #C9A84C;
-    border-radius: 3px;
+    background: var(--p);
+    border-radius: 10px;
+    opacity: 0.3;
   }
 
-  /* FIX 6: Edge button reset — Edge adds extra padding and border to buttons */
+  [data-theme='dark'] ::-webkit-scrollbar-thumb {
+    background: var(--p);
+  }
+
   button {
     -webkit-appearance: none;
     appearance: none;
@@ -68,333 +136,67 @@
 }
 
 @layer components {
-
-  .btn-gold {
-    padding: 0.75rem 2rem;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    transition: all 0.3s;
-    background-color: rgba(255, 255, 255, 0.08);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  .btn-primary {
+    @apply relative overflow-hidden transition-all duration-300 active:scale-95 px-6 py-3.5 rounded-[12px] font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-2;
+    background: var(--p);
+    color: #040404;
+    box-shadow: 0 8px 16px rgba(200, 166, 70, 0.12);
   }
 
-  .btn-gold:hover {
-    background-color: #C9A84C;
-    border-color: #C9A84C;
+  .btn-primary:hover {
+    @apply -translate-y-0.5;
+    background: var(--pd);
+    box-shadow: 0 15px 30px rgba(200, 166, 70, 0.25);
   }
 
-  .btn-outline {
-    padding: 0.75rem 2rem;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    transition: all 0.3s;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: rgba(255, 255, 255, 0.8);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .btn-outline:hover {
-    background-color: #C9A84C;
-    border-color: #C9A84C;
-    color: #fff;
-  }
-
-  .btn-gold-filled {
-    padding: 0.75rem 2rem;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    transition: all 0.3s;
-    background-color: #C9A84C;
-    color: #fff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .btn-gold-filled:hover {
-    background-color: #A07830;
-  }
-
-  .section-title {
-    font-size: 1.75rem;
-    font-weight: 300;
-    color: #fff;
-    margin-bottom: 0.25rem;
-    letter-spacing: -0.01em;
-  }
-
-  @media (min-width: 768px) {
-    .section-title {
-      font-size: 2.25rem;
-    }
-  }
-
-  .section-subtitle {
-    font-size: 0.65rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: #C9A84C;
-    margin-bottom: 0.5rem;
-    font-family: 'Jost', sans-serif;
+  .btn-premium {
+    @apply btn-primary;
+    background: linear-gradient(135deg, var(--p), var(--pd));
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .input-field {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-    transition: border-color 0.2s;
-    outline: none;
-    background-color: #1a1a1a;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #fff;
-  }
-
-  /* FIX 7: Remove Edge's built-in clear (X) and password-reveal eye buttons */
-  .input-field::-ms-clear,
-  .input-field::-ms-reveal {
-    display: none;
-    width: 0;
-    height: 0;
-  }
-
-  .input-field::placeholder {
-    color: rgba(255, 255, 255, 0.25);
+    @apply w-full bg-[var(--bg-alt)] border-2 border-[var(--b)] rounded-[12px] px-5 py-3.5 text-sm font-bold text-[var(--t)] outline-none transition-all;
   }
 
   .input-field:focus {
-    border-color: #C9A84C;
+    border-color: var(--p);
+    box-shadow: 0 0 0 4px rgba(200, 166, 70, 0.05);
   }
 
   .skeleton {
-    background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%);
+    background: linear-gradient(90deg, var(--bg-alt) 25%, var(--card) 50%, var(--bg-alt) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
   }
 
-  .nav-link {
-    font-size: 0.875rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.7);
-    transition: color 0.2s;
-  }
-
-  .nav-link:hover {
-    color: #C9A84C;
-  }
-
-  .badge-gold {
-    background-color: #C9A84C;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: 0.125rem 0.5rem;
-    display: inline-block;
-    line-height: 1.4;
-  }
-
-  .badge-black {
-    background-color: #000;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: 0.125rem 0.5rem;
-    display: inline-block;
-    line-height: 1.4;
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
   }
 
   .product-card {
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
+    @apply relative overflow-hidden transition-all duration-500 bg-[var(--card)] border border-[var(--b)] rounded-[24px];
   }
 
-  .dark-card {
-    background-color: #1a1a1a;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-}
-
-/* ─── Animations ──────────────────────────────────────────────────────────── */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
+  .product-card:hover {
+    @apply -translate-y-2;
+    border-color: var(--p);
+    box-shadow: var(--shadow-premium);
   }
 
-  100% {
-    background-position: 200% 0;
-  }
+  .serif { font-family: 'Cormorant Garamond', serif; }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.marquee-wrapper {
-  overflow: hidden;
-  width: 100%;
-}
-
-.marquee-track {
-  animation: marquee 20s linear infinite;
-  width: max-content;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out;
-}
-
-.animate-slide-up {
-  animation: slideUp 0.5s ease-out;
-}
-
-.hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-}
-
-/* FIX 8: gold-shimmer — Edge needs both prefixed + unprefixed background-clip */
-.gold-shimmer {
-  background: linear-gradient(90deg, #C9A84C, #E2C97E, #C9A84C);
-  background-size: 200%;
+.text-gradient-gold {
+  background: linear-gradient(to right, #C8A646, #F5F3EE, #B88D2D);
   -webkit-background-clip: text;
   background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: #C9A84C;
-  /* solid fallback if background-clip not supported */
-  animation: shimmer 3s infinite;
+  color: transparent;
 }
 
-/* FIX 9: scrollbar-hide */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* FIX 10: safe-area — Edge doesn't support env(); add plain 0 first */
-.safe-area-pb {
-  padding-bottom: 0px;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* FIX 11: select — remove Edge's custom arrow so your layout is consistent */
-select {
-  background-color: #1a1a1a;
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.15);
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
-
-select option {
-  background-color: #1a1a1a;
-  color: #fff;
-}
-
-input[type="radio"],
-input[type="checkbox"] {
-  accent-color: #C9A84C;
-}
-
-/* FIX 12: Product image slider scrollbar */
-.snap-x::-webkit-scrollbar {
-  display: none;
-}
-
-.snap-x {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* FIX 13: mix-blend-mode — Edge has patchy support; this helper class adds a
-   drop-shadow filter so the logo stays bright even if lighten blend fails */
-.logo-blend {
-  mix-blend-mode: lighten;
-  filter: brightness(1.1);
-}
-
-/* FIX 14: backdrop-filter — Edge (non-Chromium) ignores it.
-   Dark opaque fallback so overlays stay readable */
-[style*="backdropFilter"],
-[style*="backdrop-filter"] {
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-}
-
-/* FIX 15: sticky header — Edge breaks sticky when an ancestor has overflow:hidden.
-   Force GPU compositing layer to fix it. */
-header {
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  will-change: transform;
-}
-
-/* FIX 16: Framer Motion flickering in Edge — SCOPED to only named CSS classes,
-   NOT broad inline-style selectors which break Framer Motion gradient animations.
-   Use explicit class names instead of [style*="..."] attribute selectors. */
-.framer-motion-fix {
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-}
-
-/* FIX 17: Absolute-positioned mobile navbar logo — Edge quirk.
-   Tailwind's .inset-0 maps to inset shorthand; old Edge needs longhand. */
-.inset-0 {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
+.animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
+.animate-slide-up { animation: slideUp 0.8s ease-out forwards; }

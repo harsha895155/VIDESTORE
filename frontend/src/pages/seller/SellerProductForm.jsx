@@ -9,10 +9,11 @@ import {
 } from 'react-icons/fi';
 import { CATEGORIES, getSubCategoryNames, getGroupedSubCategories } from '../../constants/categories';
 
-const BG = '#0a0a0a';
-const CARD = '#111111';
-const BORDER = 'rgba(255,255,255,0.08)';
-const GOLD = '#C9A84C';
+const GOLD = 'var(--p)';
+const SKY = '#0EA5E9';
+const BG = 'var(--bg)';
+const CARD = 'var(--card)';
+const BORDER = 'var(--b)';
 
 // ── Presets ──────────────────────────────────────────────────────────────────
 const PRESET_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
@@ -68,15 +69,16 @@ const calcEarnings = (price) => {
   return { commission, fixed, earnings: p - commission - fixed };
 };
 const inp = {
-  width: '100%', boxSizing: 'border-box', backgroundColor: '#0d0d0d',
-  border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px',
-  padding: '10px 14px', color: '#fff', fontSize: '14px',
-  outline: 'none', fontFamily: 'inherit', transition: 'border-color 0.2s',
+  width: '100%', boxSizing: 'border-box', backgroundColor: 'var(--bg-alt)',
+  border: '1px solid var(--b)', borderRadius: '10px',
+  padding: '12px 16px', color: 'var(--t)', fontSize: '13px',
+  outline: 'none', fontFamily: 'inherit', transition: 'all 0.2s',
 };
 const lbl = {
-  display: 'block', color: 'rgba(255,255,255,0.4)', fontSize: '11px',
-  letterSpacing: '0.1em', textTransform: 'uppercase',
-  marginBottom: '7px', fontFamily: 'inherit',
+  display: 'block', color: 'var(--tm)', fontSize: '11px',
+  fontWeight: '600',
+  letterSpacing: '0.05em', textTransform: 'uppercase',
+  marginBottom: '6px', fontFamily: 'inherit',
 };
 
 /* ── Image Uploader ──────────────────────────────────────────────────────── */
@@ -111,7 +113,7 @@ function ImageUploader({ images, onChange }) {
           <div key={i} style={{
             position: 'relative', width: '80px', height: '90px',
             border: `1px solid ${i === 0 ? GOLD + '60' : BORDER}`,
-            borderRadius: '6px', overflow: 'hidden', backgroundColor: '#0d0d0d', flexShrink: 0,
+            borderRadius: '8px', overflow: 'hidden', backgroundColor: 'var(--bg-alt)', flexShrink: 0,
           }}>
             <img src={getUrl(img)} alt=""
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -143,7 +145,7 @@ function ImageUploader({ images, onChange }) {
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           border: `2px dashed ${uploading ? GOLD + '40' : BORDER}`, borderRadius: '6px',
           cursor: uploading ? 'not-allowed' : 'pointer',
-          backgroundColor: '#0d0d0d', transition: 'border-color 0.2s',
+          backgroundColor: 'var(--bg-alt)', transition: 'border-color 0.2s',
         }}
           onMouseOver={e => { if (!uploading) e.currentTarget.style.borderColor = GOLD; }}
           onMouseOut={e => { if (!uploading) e.currentTarget.style.borderColor = BORDER; }}
@@ -161,13 +163,13 @@ function ImageUploader({ images, onChange }) {
             </>
           ) : (
             <>
-              <FiUpload size={18} style={{ color: 'rgba(255,255,255,0.25)', marginBottom: '4px' }} />
-              <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '9px', fontFamily: 'inherit', textAlign: 'center', lineHeight: 1.3 }}>Upload</span>
+              <FiUpload size={18} style={{ color: 'var(--tl)', marginBottom: '4px' }} />
+              <span style={{ color: 'var(--tl)', fontSize: '9px', fontFamily: 'inherit', textAlign: 'center', lineHeight: 1.3 }}>Upload</span>
             </>
           )}
         </label>
       </div>
-      <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '11px', fontFamily: 'inherit' }}>
+      <p style={{ color: 'var(--tl)', fontSize: '11px', fontFamily: 'inherit' }}>
         First image is the main photo · JPG, PNG, WEBP · Max 5MB each
       </p>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -208,7 +210,7 @@ function VideoUploader({ videos, onChange }) {
           <div key={i} style={{
             position: 'relative', width: '120px', height: '90px',
             border: `1px solid ${BORDER}`, borderRadius: '6px',
-            overflow: 'hidden', backgroundColor: '#0d0d0d', flexShrink: 0,
+            overflow: 'hidden', backgroundColor: 'var(--bg-alt)', flexShrink: 0,
           }}>
             <video
               src={getUrl(vid)}
@@ -224,11 +226,11 @@ function VideoUploader({ videos, onChange }) {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: 'rgba(0,0,0,0.22)', pointerEvents: 'none',
             }}>
-              <FiVideo size={18} style={{ color: 'rgba(255,255,255,0.55)' }} />
+              <FiVideo size={18} style={{ color: 'var(--tl)' }} />
             </div>
             <span style={{
               position: 'absolute', bottom: 0, left: 0, right: 0,
-              backgroundColor: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.55)',
+              backgroundColor: 'rgba(0,0,0,0.55)', color: 'white',
               fontSize: '8px', fontWeight: 600, textAlign: 'center',
               padding: '2px', fontFamily: 'inherit',
             }}>VIDEO {i + 1}</span>
@@ -253,7 +255,7 @@ function VideoUploader({ videos, onChange }) {
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             border: `2px dashed ${uploading ? GOLD + '40' : BORDER}`, borderRadius: '6px',
             cursor: uploading ? 'not-allowed' : 'pointer',
-            backgroundColor: '#0d0d0d', transition: 'border-color 0.2s',
+            backgroundColor: 'var(--bg-alt)', transition: 'border-color 0.2s',
           }}
             onMouseOver={e => { if (!uploading) e.currentTarget.style.borderColor = GOLD; }}
             onMouseOut={e => { if (!uploading) e.currentTarget.style.borderColor = BORDER; }}
@@ -271,14 +273,14 @@ function VideoUploader({ videos, onChange }) {
               </>
             ) : (
               <>
-                <FiVideo size={18} style={{ color: 'rgba(255,255,255,0.25)', marginBottom: '4px' }} />
-                <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '9px', fontFamily: 'inherit', textAlign: 'center', lineHeight: 1.3 }}>Add Video</span>
+                <FiVideo size={18} style={{ color: 'var(--tl)', marginBottom: '4px' }} />
+                <span style={{ color: 'var(--tl)', fontSize: '9px', fontFamily: 'inherit', textAlign: 'center', lineHeight: 1.3 }}>Add Video</span>
               </>
             )}
           </label>
         )}
       </div>
-      <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '11px', fontFamily: 'inherit' }}>
+      <p style={{ color: 'var(--tl)', fontSize: '11px', fontFamily: 'inherit' }}>
         Hover to preview · MP4, MOV, WEBM · Max 50MB each · Up to 2 videos
       </p>
     </div>
@@ -301,8 +303,8 @@ function SizeSelector({ value, onChange }) {
               padding: '7px 14px', fontSize: '12px', fontFamily: 'inherit',
               borderRadius: '6px', cursor: 'pointer', transition: 'all 0.15s',
               backgroundColor: active ? GOLD : 'transparent',
-              border: active ? `1px solid ${GOLD}` : '1px solid rgba(255,255,255,0.15)',
-              color: active ? '#000' : 'rgba(255,255,255,0.55)',
+              border: active ? `1px solid ${GOLD}` : '1px solid var(--b)',
+              color: active ? '#000' : 'var(--tm)',
               fontWeight: active ? 700 : 400,
             }}
           >
@@ -335,7 +337,7 @@ function ColorSelector({ value, onChange }) {
                 border: active
                   ? `3px solid ${GOLD}`
                   : isWhite
-                    ? '2px solid rgba(255,255,255,0.25)'
+                    ? '2px solid var(--b)'
                     : '2px solid transparent',
                 outline: active ? `2px solid ${GOLD}40` : 'none',
                 outlineOffset: '2px',
@@ -348,7 +350,7 @@ function ColorSelector({ value, onChange }) {
                     position: 'absolute', top: '50%', left: '50%',
                     transform: 'translate(-50%,-50%)',
                     color: isWhite ? '#000' : '#fff',
-                    filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.5))',
+                    filter: isWhite ? 'none' : 'drop-shadow(0 1px 1px rgba(0,0,0,0.5))',
                   }}
                 />
               )}
@@ -364,9 +366,9 @@ function ColorSelector({ value, onChange }) {
               <span key={name} style={{
                 display: 'inline-flex', alignItems: 'center', gap: '5px',
                 padding: '3px 10px 3px 6px',
-                backgroundColor: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: '20px', fontSize: '12px', color: '#fff', fontFamily: 'inherit',
+                backgroundColor: 'var(--bg-alt)',
+                border: '1px solid var(--b)',
+                borderRadius: '20px', fontSize: '12px', color: 'var(--t)', fontFamily: 'inherit',
               }}>
                 <span style={{
                   width: '10px', height: '10px', borderRadius: '50%',
@@ -376,7 +378,7 @@ function ColorSelector({ value, onChange }) {
                 }} />
                 {name}
                 <button type="button" onClick={() => toggle(name)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: 0, lineHeight: 1, marginLeft: '2px' }}>
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tl)', padding: 0, lineHeight: 1, marginLeft: '2px' }}>
                   <FiX size={10} />
                 </button>
               </span>
@@ -395,28 +397,28 @@ function BadgeToggle({ active, onToggle, icon, label, description, activeColor, 
       style={{
         display: 'flex', alignItems: 'center', gap: '12px',
         padding: '12px 14px', width: '100%',
-        backgroundColor: active ? activeBg : '#0d0d0d',
-        border: `1px solid ${active ? activeColor + '60' : 'rgba(255,255,255,0.08)'}`,
-        borderRadius: '8px', cursor: 'pointer', textAlign: 'left',
+        backgroundColor: active ? activeBg : 'var(--bg-alt)',
+        border: `1px solid ${active ? activeColor + '60' : 'var(--b)'}`,
+        borderRadius: '10px', cursor: 'pointer', textAlign: 'left',
         transition: 'all 0.18s', fontFamily: 'inherit',
       }}
     >
       <div style={{
         width: '34px', height: '34px', borderRadius: '8px', flexShrink: 0,
-        backgroundColor: active ? activeColor + '20' : 'rgba(255,255,255,0.04)',
-        border: `1px solid ${active ? activeColor + '40' : 'rgba(255,255,255,0.08)'}`,
+        backgroundColor: active ? activeColor + '20' : 'var(--bg)',
+        border: `1px solid ${active ? activeColor + '40' : 'var(--b)'}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.18s',
       }}>
         {icon}
       </div>
       <div style={{ flex: 1 }}>
-        <p style={{ color: active ? activeColor : 'rgba(255,255,255,0.7)', fontSize: '13px', fontWeight: 600, margin: '0 0 2px', transition: 'color 0.18s' }}>{label}</p>
-        <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', margin: 0 }}>{description}</p>
+        <p style={{ color: active ? activeColor : 'var(--t)', fontSize: '13px', fontWeight: 600, margin: '0 0 2px', transition: 'color 0.18s' }}>{label}</p>
+        <p style={{ color: 'var(--tm)', fontSize: '11px', margin: 0 }}>{description}</p>
       </div>
       <div style={{
         width: '18px', height: '18px', borderRadius: '50%', flexShrink: 0,
         backgroundColor: active ? activeColor : 'transparent',
-        border: `2px solid ${active ? activeColor : 'rgba(255,255,255,0.2)'}`,
+        border: `2px solid ${active ? activeColor : 'var(--b)'}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.18s',
       }}>
         {active && <FiCheck size={10} style={{ color: '#000' }} />}
@@ -451,21 +453,21 @@ function SubCategoryDropdown({ category, value, onChange }) {
         style={{
           ...inp, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           cursor: noop ? 'not-allowed' : 'pointer',
-          borderColor: open ? GOLD : 'rgba(255,255,255,0.1)', marginBottom: 0,
+          borderColor: open ? GOLD : 'var(--b)', marginBottom: 0,
         }}
       >
-        <span style={{ color: value ? '#fff' : 'rgba(255,255,255,0.30)', fontSize: '14px' }}>
+        <span style={{ color: value ? 'var(--t)' : 'var(--tl)', fontSize: '14px' }}>
           {value || (noop ? 'No subcategories' : 'Select subcategory')}
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {value && (
             <span onClick={e => { e.stopPropagation(); onChange(''); }}
-              style={{ color: 'rgba(255,255,255,0.35)', cursor: 'pointer', lineHeight: 1 }}>
+              style={{ color: 'var(--tl)', cursor: 'pointer', lineHeight: 1 }}>
               <FiX size={13} />
             </span>
           )}
           <FiChevronDown size={14} style={{
-            color: open ? GOLD : 'rgba(255,255,255,0.35)',
+            color: open ? GOLD : 'var(--tl)',
             transform: open ? 'rotate(180deg)' : 'rotate(0)',
             transition: 'transform 0.18s, color 0.15s',
           }} />
@@ -474,9 +476,7 @@ function SubCategoryDropdown({ category, value, onChange }) {
       {open && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0,
-          zIndex: 300, background: '#141414',
-          border: `1px solid rgba(201,168,76,0.35)`, borderRadius: '8px',
-          boxShadow: '0 16px 48px rgba(0,0,0,0.70)', overflow: 'hidden',
+          boxShadow: '0 12px 32px rgba(0,0,0,0.6)', overflow: 'hidden',
         }}>
           <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
             <input ref={searchRef} value={search} onChange={e => setSearch(e.target.value)}
@@ -490,7 +490,7 @@ function SubCategoryDropdown({ category, value, onChange }) {
           <div style={{ maxHeight: '240px', overflowY: 'auto' }}>
             {filtered && (
               filtered.length === 0
-                ? <p style={{ padding: '14px', fontSize: '12px', color: 'rgba(255,255,255,0.35)', textAlign: 'center' }}>No results</p>
+                ? <p style={{ padding: '14px', fontSize: '12px', color: 'var(--tl)', textAlign: 'center' }}>No results</p>
                 : filtered.map(name => <DropItem key={name} name={name} active={value === name} onSelect={select} />)
             )}
             {!filtered && Object.entries(grouped).map(([group, names]) => (
@@ -498,7 +498,7 @@ function SubCategoryDropdown({ category, value, onChange }) {
                 <div style={{
                   padding: '7px 14px 4px', fontSize: '9px', letterSpacing: '0.18em',
                   textTransform: 'uppercase', color: GOLD, fontWeight: 500,
-                  background: 'rgba(201,168,76,0.05)', borderTop: '1px solid rgba(255,255,255,0.04)',
+                  background: 'var(--pl)', borderTop: '1px solid var(--b)',
                 }}>
                   {group}
                 </div>
@@ -517,13 +517,13 @@ function DropItem({ name, active, onSelect }) {
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         width: '100%', padding: '9px 16px', fontSize: '13px',
-        color: active ? GOLD : 'rgba(255,255,255,0.75)',
-        background: active ? 'rgba(201,168,76,0.08)' : 'transparent',
+        color: active ? GOLD : 'var(--t)',
+        background: active ? 'var(--pl)' : 'transparent',
         border: 'none', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
         transition: 'background 0.12s, color 0.12s',
       }}
-      onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.color = '#fff'; } }}
-      onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.75)'; } }}
+      onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'var(--bg-alt)'; e.currentTarget.style.color = 'var(--t)'; } }}
+      onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--t)'; } }}
     >
       <span>{name}</span>
       {active && <FiCheck size={13} style={{ color: GOLD, flexShrink: 0 }} />}
@@ -550,12 +550,12 @@ function SizeGuideEditor({ selectedSizes, sizeGuide, onChange }) {
     return (
       <div style={{
         padding: '14px 16px',
-        backgroundColor: 'rgba(255,255,255,0.03)',
+        backgroundColor: 'var(--bg-alt)',
         border: `1px dashed ${BORDER}`,
         borderRadius: '8px',
         textAlign: 'center',
       }}>
-        <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '12px', fontFamily: 'inherit', margin: 0 }}>
+        <p style={{ color: 'var(--tl)', fontSize: '12px', fontFamily: 'inherit', margin: 0 }}>
           Select sizes above to configure the Size Guide
         </p>
       </div>
@@ -595,11 +595,11 @@ function SizeGuideEditor({ selectedSizes, sizeGuide, onChange }) {
 
   const cellInp = {
     width: '100%', boxSizing: 'border-box',
-    backgroundColor: '#0a0a0a',
-    border: '1px solid rgba(255,255,255,0.08)',
+    backgroundColor: 'var(--bg)',
+    border: '1px solid var(--b)',
     borderRadius: '5px',
     padding: '7px 9px',
-    color: '#fff',
+    color: 'var(--t)',
     fontSize: '12px',
     outline: 'none',
     fontFamily: 'inherit',
@@ -617,7 +617,7 @@ function SizeGuideEditor({ selectedSizes, sizeGuide, onChange }) {
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
               background: 'none', border: 'none', cursor: 'pointer',
-              color: 'rgba(255,255,255,0.55)', fontSize: '12px', fontFamily: 'inherit', padding: 0,
+              color: 'var(--tm)', fontSize: '12px', fontFamily: 'inherit', padding: 0,
             }}
           >
             <FiChevronDown
@@ -628,7 +628,7 @@ function SizeGuideEditor({ selectedSizes, sizeGuide, onChange }) {
                 color: GOLD,
               }}
             />
-            <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: '12px' }}>
+            <span style={{ color: 'var(--tm)', fontSize: '12px' }}>
               {selectedSizes.length} size{selectedSizes.length > 1 ? 's' : ''} configured
             </span>
           </button>
@@ -638,13 +638,13 @@ function SizeGuideEditor({ selectedSizes, sizeGuide, onChange }) {
           onClick={resetAll}
           style={{
             display: 'flex', alignItems: 'center', gap: '5px',
-            background: 'none', border: `1px solid rgba(255,255,255,0.1)`,
+            background: 'none', border: `1px solid var(--b)`,
             borderRadius: '5px', padding: '5px 10px', cursor: 'pointer',
-            color: 'rgba(255,255,255,0.4)', fontSize: '11px', fontFamily: 'inherit',
+            color: 'var(--tm)', fontSize: '11px', fontFamily: 'inherit',
             transition: 'all 0.15s',
           }}
           onMouseOver={e => { e.currentTarget.style.borderColor = GOLD; e.currentTarget.style.color = GOLD; }}
-          onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.4)'; }}
+          onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--b)'; e.currentTarget.style.color = 'var(--tm)'; }}
         >
           <FiRefreshCw size={11} /> Reset All Defaults
         </button>
@@ -663,7 +663,7 @@ function SizeGuideEditor({ selectedSizes, sizeGuide, onChange }) {
             {['SIZE', 'CHEST', 'WAIST', 'HIPS', 'LENGTH', ''].map((h, i) => (
               <span key={i} style={{
                 fontSize: '9px', letterSpacing: '0.12em',
-                color: i === 0 ? GOLD : 'rgba(255,255,255,0.3)',
+                color: i === 0 ? GOLD : 'var(--tl)',
                 fontFamily: 'inherit', textTransform: 'uppercase',
                 paddingLeft: i === 0 ? '2px' : 0,
               }}>{h}</span>
@@ -684,13 +684,13 @@ function SizeGuideEditor({ selectedSizes, sizeGuide, onChange }) {
                     gap: '8px',
                     alignItems: 'center',
                     padding: '8px 10px',
-                    backgroundColor: '#0d0d0d',
-                    border: `1px solid rgba(255,255,255,0.06)`,
+                    backgroundColor: 'var(--card)',
+                    border: `1px solid var(--b)`,
                     borderRadius: '7px',
                     transition: 'border-color 0.15s',
                   }}
-                  onMouseOver={e => e.currentTarget.style.borderColor = `${GOLD}30`}
-                  onMouseOut={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'}
+                  onMouseOver={e => e.currentTarget.style.borderColor = SKY}
+                  onMouseOut={e => e.currentTarget.style.borderColor = 'var(--b)'}
                 >
                   {/* Size badge */}
                   <span style={{
@@ -714,8 +714,8 @@ function SizeGuideEditor({ selectedSizes, sizeGuide, onChange }) {
                       placeholder={placeholder}
                       onChange={e => updateField(size, key, e.target.value)}
                       style={cellInp}
-                      onFocus={e => e.target.style.borderColor = GOLD}
-                      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                      onFocus={e => e.target.style.borderColor = SKY}
+                      onBlur={e => e.target.style.borderColor = 'var(--b)'}
                     />
                   ))}
 
@@ -729,13 +729,13 @@ function SizeGuideEditor({ selectedSizes, sizeGuide, onChange }) {
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
                       padding: '6px 8px', borderRadius: '5px', cursor: hasDefault ? 'pointer' : 'not-allowed',
                       background: 'transparent',
-                      border: `1px solid ${hasDefault ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.04)'}`,
-                      color: hasDefault ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.15)',
+                      border: `1px solid ${hasDefault ? 'var(--b)' : 'var(--b-inner)'}`,
+                      color: hasDefault ? 'var(--tm)' : 'var(--tl)',
                       fontSize: '10px', fontFamily: 'inherit',
                       transition: 'all 0.15s', whiteSpace: 'nowrap',
                     }}
                     onMouseOver={e => { if (hasDefault) { e.currentTarget.style.borderColor = GOLD; e.currentTarget.style.color = GOLD; } }}
-                    onMouseOut={e => { if (hasDefault) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.35)'; } }}
+                    onMouseOut={e => { if (hasDefault) { e.currentTarget.style.borderColor = 'var(--b)'; e.currentTarget.style.color = 'var(--tm)'; } }}
                   >
                     <FiRefreshCw size={10} /> Reset
                   </button>
@@ -753,8 +753,8 @@ function SizeGuideEditor({ selectedSizes, sizeGuide, onChange }) {
             borderRadius: '7px',
           }}>
             <FiInfo size={12} style={{ color: GOLD, flexShrink: 0, marginTop: '1px' }} />
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', fontFamily: 'inherit', margin: 0, lineHeight: 1.6 }}>
-              These measurements will appear in the <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Size Guide</strong> on your product page.
+            <p style={{ color: 'var(--tm)', fontSize: '11px', fontFamily: 'inherit', margin: 0, lineHeight: 1.6 }}>
+              These measurements will appear in the <strong style={{ color: 'var(--t)' }}>Size Guide</strong> on your product page.
               Customers can tap "Size Guide" to compare before buying. All measurements in inches.
             </p>
           </div>
@@ -928,31 +928,31 @@ export default function SellerProductForm() {
 
       {/* ── Top bar ── */}
       <div className="pf-topbar" style={{
-        backgroundColor: '#050505', borderBottom: `1px solid ${BORDER}`,
+        backgroundColor: 'var(--bg-alt)', borderBottom: `1px solid ${BORDER}`,
         padding: '0 24px', display: 'flex', alignItems: 'center',
         justifyContent: 'space-between', height: '52px',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span style={{ color: GOLD, fontFamily: 'Cinzel, serif', fontSize: '15px', letterSpacing: '0.2em' }}>TRENDORRA</span>
-          <span style={{ color: 'rgba(255,255,255,0.2)' }}>|</span>
-          <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontFamily: 'inherit', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          <span style={{ color: GOLD, fontFamily: 'Cinzel, serif', fontSize: '15px', letterSpacing: '0.2em' }}>VIDESTORE</span>
+          <span style={{ color: 'var(--tl)' }}>|</span>
+          <span style={{ color: 'var(--tm)', fontSize: '12px', fontFamily: 'inherit', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
             {isEdit ? 'Edit Product' : 'Add Product'}
           </span>
         </div>
         <Link to="/"
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontFamily: 'inherit', textDecoration: 'none', padding: '6px 12px', border: `1px solid ${BORDER}`, borderRadius: '6px' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--tm)', fontSize: '12px', fontFamily: 'inherit', textDecoration: 'none', padding: '6px 12px', border: `1px solid ${BORDER}`, borderRadius: '6px' }}
           onMouseOver={e => { e.currentTarget.style.borderColor = GOLD; e.currentTarget.style.color = GOLD; }}
-          onMouseOut={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = 'rgba(255,255,255,0.4)'; }}>
+          onMouseOut={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = 'var(--tm)'; }}>
           <FiArrowLeft size={13} /> <span style={{ display: 'inline' }}>Back</span>
         </Link>
       </div>
 
-      <div className="pf-content" style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px' }}>
+      <div className="pf-content" style={{ maxWidth: '1000px', margin: '0 auto', padding: '16px 24px' }}>
         <button onClick={() => navigate('/seller/dashboard')}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: '13px', fontFamily: 'inherit', marginBottom: '24px' }}>
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: 'var(--tm)', cursor: 'pointer', fontSize: '13px', fontFamily: 'inherit', marginBottom: '24px' }}>
           <FiArrowLeft size={14} /> Back to Seller Dashboard
         </button>
-        <h1 style={{ color: '#fff', fontFamily: 'Cinzel, serif', fontSize: '20px', letterSpacing: '0.1em', marginBottom: '28px' }}>
+        <h1 style={{ color: 'var(--t)', fontFamily: 'Cinzel, serif', fontSize: '20px', letterSpacing: '0.1em', marginBottom: '28px' }}>
           {isEdit ? 'Edit Product' : 'Add New Product'}
         </h1>
 
@@ -962,36 +962,36 @@ export default function SellerProductForm() {
             {/* ── LEFT COLUMN ── */}
             <div>
               {/* Basic Information */}
-              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '10px', padding: '24px', marginBottom: '16px' }}>
+              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '20px', padding: '24px', marginBottom: '16px', boxShadow: 'var(--shadow)' }}>
                 <p style={{ color: GOLD, fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 18px', fontFamily: 'inherit' }}>Basic Information</p>
 
                 <label style={lbl}>Product Name *</label>
                 <input style={{ ...inp, marginBottom: '16px' }} value={form.name}
                   onChange={e => set('name', e.target.value)} placeholder="e.g. Classic Oversized Tee"
-                  onFocus={e => e.target.style.borderColor = GOLD}
-                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
+                  onFocus={e => e.target.style.borderColor = SKY}
+                  onBlur={e => e.target.style.borderColor = 'var(--b)'} required />
 
                 <label style={lbl}>Description</label>
                 <textarea style={{ ...inp, marginBottom: '16px', minHeight: '100px', resize: 'vertical' }}
                   value={form.description} onChange={e => set('description', e.target.value)}
                   placeholder="Describe your product…"
-                  onFocus={e => e.target.style.borderColor = GOLD}
-                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                  onFocus={e => e.target.style.borderColor = SKY}
+                  onBlur={e => e.target.style.borderColor = 'var(--b)'} />
 
                 <div className="pf-brand-tags" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
                   <div>
                     <label style={lbl}>Brand</label>
                     <input style={{ ...inp, marginBottom: 0 }} value={form.brand}
-                      onChange={e => set('brand', e.target.value)} placeholder="e.g. Trendorra"
-                      onFocus={e => e.target.style.borderColor = GOLD}
-                      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                      onChange={e => set('brand', e.target.value)} placeholder="e.g. VideStore"
+                      onFocus={e => e.target.style.borderColor = SKY}
+                      onBlur={e => e.target.style.borderColor = 'var(--b)'} />
                   </div>
                   <div>
                     <label style={lbl}>Tags (comma separated)</label>
                     <input style={{ ...inp, marginBottom: 0 }} value={form.tags}
                       onChange={e => set('tags', e.target.value)} placeholder="e.g. cotton, casual, summer"
-                      onFocus={e => e.target.style.borderColor = GOLD}
-                      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                      onFocus={e => e.target.style.borderColor = SKY}
+                      onBlur={e => e.target.style.borderColor = 'var(--b)'} />
                   </div>
                 </div>
 
@@ -1000,15 +1000,15 @@ export default function SellerProductForm() {
                     <label style={lbl}>Material</label>
                     <input style={{ ...inp, marginBottom: 0 }} value={form.material}
                       onChange={e => set('material', e.target.value)} placeholder="e.g. 100% Cotton"
-                      onFocus={e => e.target.style.borderColor = GOLD}
-                      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                      onFocus={e => e.target.style.borderColor = SKY}
+                      onBlur={e => e.target.style.borderColor = 'var(--b)'} />
                   </div>
                   <div>
                     <label style={lbl}>Care Instructions</label>
                     <input style={{ ...inp, marginBottom: 0 }} value={form.careInstructions}
                       onChange={e => set('careInstructions', e.target.value)} placeholder="e.g. Machine wash cold"
-                      onFocus={e => e.target.style.borderColor = GOLD}
-                      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                      onFocus={e => e.target.style.borderColor = SKY}
+                      onBlur={e => e.target.style.borderColor = 'var(--b)'} />
                   </div>
                 </div>
 
@@ -1017,8 +1017,8 @@ export default function SellerProductForm() {
                     <label style={lbl}>Category *</label>
                     <select style={{ ...inp, marginBottom: 0, appearance: 'none', cursor: 'pointer' }}
                       value={form.category} onChange={e => set('category', e.target.value)}
-                      onFocus={e => e.target.style.borderColor = GOLD}
-                      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required>
+                      onFocus={e => e.target.style.borderColor = SKY}
+                      onBlur={e => e.target.style.borderColor = 'var(--b)'} required>
                       <option value="">Select category</option>
                       {CATEGORIES.map(c => <option key={c} value={c} style={{ backgroundColor: '#0d0d0d' }}>{c}</option>)}
                     </select>
@@ -1031,29 +1031,29 @@ export default function SellerProductForm() {
               </div>
 
               {/* Pricing & Stock */}
-              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '10px', padding: '24px', marginBottom: '16px' }}>
+              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '20px', padding: '24px', marginBottom: '16px' }}>
                 <p style={{ color: GOLD, fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 18px', fontFamily: 'inherit' }}>Pricing & Stock</p>
                 <div className="pf-pricing-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px', marginBottom: '16px' }}>
                   <div>
                     <label style={lbl}>Selling Price (₹) *</label>
                     <input type="number" style={{ ...inp, marginBottom: 0 }} value={form.price}
                       onChange={e => set('price', e.target.value)} placeholder="0"
-                      onFocus={e => e.target.style.borderColor = GOLD}
-                      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} min="0" required />
+                      onFocus={e => e.target.style.borderColor = SKY}
+                      onBlur={e => e.target.style.borderColor = 'var(--b)'} min="0" required />
                   </div>
                   <div>
                     <label style={lbl}>Discount Price (₹)</label>
                     <input type="number" style={{ ...inp, marginBottom: 0 }} value={form.discountPrice}
                       onChange={e => set('discountPrice', e.target.value)} placeholder="0"
-                      onFocus={e => e.target.style.borderColor = GOLD}
-                      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} min="0" />
+                      onFocus={e => e.target.style.borderColor = SKY}
+                      onBlur={e => e.target.style.borderColor = 'var(--b)'} min="0" />
                   </div>
                   <div>
                     <label style={lbl}>Stock Quantity *</label>
                     <input type="number" style={{ ...inp, marginBottom: 0 }} value={form.stock}
                       onChange={e => set('stock', e.target.value)} placeholder="0"
-                      onFocus={e => e.target.style.borderColor = GOLD}
-                      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} min="0" required />
+                      onFocus={e => e.target.style.borderColor = SKY}
+                      onBlur={e => e.target.style.borderColor = 'var(--b)'} min="0" required />
                   </div>
                 </div>
                 {form.discountPrice && Number(form.discountPrice) > 0 && Number(form.price) > 0 && Number(form.discountPrice) < Number(form.price) && (
@@ -1064,17 +1064,17 @@ export default function SellerProductForm() {
                   </div>
                 )}
                 {Number(form.price) > 0 && (
-                  <div style={{ backgroundColor: '#0d0d0d', border: `1px solid ${GOLD}25`, borderRadius: '8px', padding: '14px' }}>
-                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px', fontFamily: 'inherit' }}>Your Earnings Preview</p>
+                  <div style={{ backgroundColor: 'var(--bg-alt)', border: `1px solid ${GOLD}25`, borderRadius: '8px', padding: '14px' }}>
+                    <p style={{ color: 'var(--tm)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px', fontFamily: 'inherit' }}>Your Earnings Preview</p>
                     <div className="pf-earnings-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '8px' }}>
                       {[
-                        { label: 'Selling Price', value: `₹${Number(form.price).toLocaleString()}`, color: '#fff' },
+                        { label: 'Selling Price', value: `₹${Number(form.price).toLocaleString()}`, color: 'var(--t)' },
                         { label: '10% Commission', value: `- ₹${commission}`, color: '#f87171' },
                         { label: 'Fixed Fee', value: `- ₹${fixed}`, color: '#fbbf24' },
                         { label: 'You Earn', value: `₹${earnings}`, color: '#4ade80' },
                       ].map(({ label, value, color }) => (
-                        <div key={label} style={{ textAlign: 'center', padding: '8px', backgroundColor: '#1a1a1a', borderRadius: '6px' }}>
-                          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', margin: '0 0 3px', fontFamily: 'inherit' }}>{label}</p>
+                        <div key={label} style={{ textAlign: 'center', padding: '8px', backgroundColor: 'var(--bg)', border: '1px solid var(--b)', borderRadius: '6px' }}>
+                          <p style={{ color: 'var(--tm)', fontSize: '10px', margin: '0 0 3px', fontFamily: 'inherit' }}>{label}</p>
                           <p style={{ color, fontSize: '14px', fontWeight: 700, margin: 0, fontFamily: 'inherit' }}>{value}</p>
                         </div>
                       ))}
@@ -1084,27 +1084,27 @@ export default function SellerProductForm() {
               </div>
 
               {/* Product Images */}
-              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '10px', padding: '24px', marginBottom: '16px' }}>
+              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '20px', padding: '24px', marginBottom: '16px', boxShadow: 'var(--shadow)' }}>
                 <p style={{ color: GOLD, fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 18px', fontFamily: 'inherit' }}>Product Images</p>
                 <ImageUploader images={form.images} onChange={imgs => set('images', imgs)} />
 
                 <div style={{ borderTop: `1px solid ${BORDER}`, marginTop: '20px', paddingTop: '20px' }}>
                   <p style={{ color: GOLD, fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 14px', fontFamily: 'inherit' }}>
-                    Product Videos <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '9px', letterSpacing: '0.05em', textTransform: 'none', fontWeight: 400 }}>(optional · max 2)</span>
+                    Product Videos <span style={{ color: 'var(--tl)', fontSize: '9px', letterSpacing: '0.05em', textTransform: 'none', fontWeight: 400 }}>(optional · max 2)</span>
                   </p>
                   <VideoUploader videos={form.videos} onChange={vids => set('videos', vids)} />
                 </div>
               </div>
 
               {/* Sizes & Colors */}
-              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '10px', padding: '24px', marginBottom: '16px' }}>
+              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '20px', padding: '24px', marginBottom: '16px' }}>
                 <p style={{ color: GOLD, fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 20px', fontFamily: 'inherit' }}>Sizes & Colors</p>
                 <div style={{ marginBottom: '24px' }}>
                   <label style={lbl}>Available Sizes</label>
                   {/* ── Use handleSizesChange so sizeGuide stays in sync ── */}
                   <SizeSelector value={form.sizes} onChange={handleSizesChange} />
                   {form.sizes.length > 0 && (
-                    <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '11px', marginTop: '8px', fontFamily: 'inherit' }}>
+                    <p style={{ color: 'var(--tl)', fontSize: '11px', marginTop: '8px', fontFamily: 'inherit' }}>
                       Selected: {form.sizes.join(', ')}
                     </p>
                   )}
@@ -1116,7 +1116,7 @@ export default function SellerProductForm() {
               </div>
 
               {/* ── NEW: Size Guide Editor card ── */}
-              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '10px', padding: '24px', marginBottom: '16px' }}>
+              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '20px', padding: '24px', marginBottom: '16px', boxShadow: 'var(--shadow)' }}>
                 {/* Header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1136,7 +1136,7 @@ export default function SellerProductForm() {
                   </div>
                   {form.sizes.length > 0 && (
                     <span style={{
-                      fontSize: '10px', color: 'rgba(255,255,255,0.3)',
+                      fontSize: '10px', color: 'var(--tm)',
                       fontFamily: 'inherit',
                     }}>
                       Shown to customers on product page
@@ -1144,8 +1144,8 @@ export default function SellerProductForm() {
                   )}
                 </div>
 
-                <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', margin: '0 0 16px', fontFamily: 'inherit', lineHeight: '1.6' }}>
-                  Customize measurements for each size. These values appear in the <strong style={{ color: 'rgba(255,255,255,0.55)' }}>Size Guide</strong> modal when a customer clicks "Size Guide" on your product.
+                <p style={{ color: 'var(--tm)', fontSize: '11px', margin: '0 0 16px', fontFamily: 'inherit', lineHeight: '1.6' }}>
+                  Customize measurements for each size. These values appear in the <strong style={{ color: 'var(--tm)' }}>Size Guide</strong> modal when a customer clicks "Size Guide" on your product.
                 </p>
 
                 <SizeGuideEditor
@@ -1157,22 +1157,22 @@ export default function SellerProductForm() {
               {/* ── END Size Guide Editor card ── */}
 
               {/* Product Badges */}
-              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '10px', padding: '24px' }}>
+              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '20px', padding: '24px', marginBottom: '16px', boxShadow: 'var(--shadow)' }}>
                 <p style={{ color: GOLD, fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 14px', fontFamily: 'inherit' }}>Product Badges</p>
-                <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', margin: '0 0 14px', fontFamily: 'inherit', lineHeight: '1.5' }}>
+                <p style={{ color: 'var(--tm)', fontSize: '11px', margin: '0 0 14px', fontFamily: 'inherit', lineHeight: '1.5' }}>
                   Enable badges to feature this product in special collections.
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <BadgeToggle active={form.isFeatured} onToggle={() => set('isFeatured', !form.isFeatured)}
-                    icon={<FiAward size={15} style={{ color: form.isFeatured ? '#a78bfa' : 'rgba(255,255,255,0.3)' }} />}
+                    icon={<FiAward size={15} style={{ color: form.isFeatured ? '#a78bfa' : 'var(--tl)' }} />}
                     label="Featured Product" description="Highlighted in Featured section & homepage banner"
                     activeColor="#a78bfa" activeBg="rgba(167,139,250,0.06)" />
                   <BadgeToggle active={form.isNewArrival} onToggle={() => set('isNewArrival', !form.isNewArrival)}
-                    icon={<FiZap size={15} style={{ color: form.isNewArrival ? '#60a5fa' : 'rgba(255,255,255,0.3)' }} />}
+                    icon={<FiZap size={15} style={{ color: form.isNewArrival ? '#60a5fa' : 'var(--tl)' }} />}
                     label="New Arrival" description="Shows in New Arrivals section & homepage"
                     activeColor="#60a5fa" activeBg="rgba(96,165,250,0.06)" />
                   <BadgeToggle active={form.isBestSeller} onToggle={() => set('isBestSeller', !form.isBestSeller)}
-                    icon={<FiStar size={15} style={{ color: form.isBestSeller ? '#f59e0b' : 'rgba(255,255,255,0.3)', fill: form.isBestSeller ? '#f59e0b' : 'none' }} />}
+                    icon={<FiStar size={15} style={{ color: form.isBestSeller ? '#f59e0b' : 'var(--tl)', fill: form.isBestSeller ? '#f59e0b' : 'none' }} />}
                     label="Best Seller" description="Highlighted in Best Sellers & trending pages"
                     activeColor="#f59e0b" activeBg="rgba(245,158,11,0.06)" />
                 </div>
@@ -1201,12 +1201,12 @@ export default function SellerProductForm() {
 
             {/* ── RIGHT COLUMN — sticky summary ── */}
             <div className="pf-sidebar">
-              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '10px', padding: '20px', position: 'sticky', top: '20px' }}>
+              <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '20px', padding: '24px', position: 'sticky', top: '20px', boxShadow: 'var(--shadow-lg)' }}>
                 <p style={{ color: GOLD, fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 16px', fontFamily: 'inherit' }}>Product Summary</p>
                 {firstImageUrl ? (
                   <div style={{ position: 'relative', marginBottom: '16px' }}>
                     <img src={firstImageUrl} alt=""
-                      style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px', backgroundColor: '#0d0d0d' }}
+                      style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px', backgroundColor: 'var(--bg-alt)' }}
                       onError={e => e.target.style.display = 'none'} />
                     <div style={{ position: 'absolute', top: '8px', left: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       {form.isFeatured && (
@@ -1227,9 +1227,9 @@ export default function SellerProductForm() {
                     </div>
                   </div>
                 ) : (
-                  <div style={{ width: '100%', height: '160px', backgroundColor: '#0d0d0d', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', border: `1px dashed ${BORDER}` }}>
-                    <FiImage size={28} style={{ color: 'rgba(255,255,255,0.1)', marginBottom: '8px' }} />
-                    <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '12px', fontFamily: 'inherit' }}>Upload images above</p>
+                  <div style={{ width: '100%', height: '160px', backgroundColor: 'var(--bg-alt)', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', border: `1px dashed ${BORDER}` }}>
+                    <FiImage size={28} style={{ color: 'var(--tl)', marginBottom: '8px', opacity: 0.3 }} />
+                    <p style={{ color: 'var(--tm)', fontSize: '12px', fontFamily: 'inherit' }}>Upload images above</p>
                   </div>
                 )}
                 {[
@@ -1255,13 +1255,13 @@ export default function SellerProductForm() {
                   { label: 'Badges', value: [form.isFeatured && 'Featured', form.isNewArrival && 'New Arrival', form.isBestSeller && 'Best Seller'].filter(Boolean).join(', ') || '—' },
                 ].map(({ label, value, highlight }) => (
                   <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: `1px solid ${BORDER}` }}>
-                    <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', fontFamily: 'inherit' }}>{label}</span>
+                    <span style={{ color: 'var(--tm)', fontSize: '12px', fontFamily: 'inherit' }}>{label}</span>
                     <span style={{
-                      color: value === '—' ? 'rgba(255,255,255,0.2)'
+                      color: value === '—' ? 'var(--tl)'
                         : highlight ? GOLD
                           : (label === 'Badges' && value !== '—') ? '#f59e0b'
                             : (label === 'Discount' && value !== '—') ? '#4ade80'
-                              : '#fff',
+                              : 'var(--t)',
                       fontSize: '12px', fontFamily: 'inherit', maxWidth: '160px',
                       textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}>{value}</span>
@@ -1269,7 +1269,7 @@ export default function SellerProductForm() {
                 ))}
                 {Number(form.price) > 0 && (
                   <div style={{ marginTop: '12px', padding: '12px', backgroundColor: `${GOLD}08`, border: `1px solid ${GOLD}20`, borderRadius: '8px' }}>
-                    <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '10px', margin: '0 0 4px', fontFamily: 'inherit' }}>You earn per sale</p>
+                    <p style={{ color: 'var(--tm)', fontSize: '10px', margin: '0 0 4px', fontFamily: 'inherit' }}>You earn per sale</p>
                     <p style={{ color: '#4ade80', fontSize: '20px', fontWeight: 700, margin: 0, fontFamily: 'inherit' }}>₹{earnings.toLocaleString()}</p>
                   </div>
                 )}

@@ -4,9 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiArrowRight, FiX } from 'react-icons/fi';
 import { productAPI } from '../../services/api';
 
-const GOLD = '#C9A84C';
-
-export default function LiveSearch({ isDark, placeholder = "Search for products, brands & more…", isDesktop = false }) {
+export default function LiveSearch({ isDark, placeholder = "Search collections...", isDesktop = false }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -51,45 +49,35 @@ export default function LiveSearch({ isDark, placeholder = "Search for products,
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const BG     = isDark ? '#111111' : '#ffffff';
-  const BORDER = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)';
-  const HOVER  = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)';
-  const DIM    = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
-  const TEXT   = isDark ? '#f0e8d8' : '#111';
-
   const highlight = (text, q) => {
     if (!q || q.length < 2) return text;
     const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
     const parts = text.split(regex);
     return parts.map((part, i) =>
       regex.test(part)
-        ? <mark key={i} style={{ backgroundColor: 'rgba(201,168,76,0.2)', color: GOLD, borderRadius: '2px', padding: '0 2px' }}>{part}</mark>
+        ? <mark key={i} className="bg-[var(--p)]/20 text-[var(--p)] rounded-sm px-0.5">{part}</mark>
         : part
     );
   };
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', flex: 1, width: '100%', maxWidth: isDesktop ? '560px' : 'none' }}>
+    <div ref={containerRef} className={`relative flex-1 w-full ${isDesktop ? 'max-w-[560px]' : 'max-w-none'}`}>
       <form onSubmit={handleSearch}
+        className={`flex items-center rounded-full overflow-hidden transition-all duration-300 border ${isDesktop ? 'p-1 pl-4' : 'p-1 pl-3.5'}`}
         style={{
-          display: 'flex', alignItems: 'center',
-          backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
-          borderRadius: '100px',
-          overflow: 'hidden', transition: 'all 0.2s',
-          padding: isDesktop ? '6px 6px 6px 20px' : '4px 4px 4px 14px',
+          backgroundColor: 'var(--card)',
+          borderColor: 'var(--b)',
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
         }}
         onFocusCapture={e => {
-            e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.06)';
-            e.currentTarget.style.borderColor = `${GOLD}60`;
+            e.currentTarget.style.borderColor = 'var(--p)';
+            e.currentTarget.style.boxShadow = '0 0 0 4px rgba(200, 166, 70, 0.1)';
         }}
         onBlurCapture={e => {
-            if (!query) {
-                e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)';
-                e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-            }
+            e.currentTarget.style.borderColor = 'var(--b)';
+            e.currentTarget.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.1)';
         }}>
-        <FiSearch size={isDesktop ? 18 : 16} style={{ color: DIM, flexShrink: 0 }} />
+        <FiSearch size={isDesktop ? 18 : 16} className="opacity-40" style={{ color: 'var(--tm)' }} />
         <input 
           ref={inputRef}
           type="text" 
@@ -97,94 +85,81 @@ export default function LiveSearch({ isDark, placeholder = "Search for products,
           onChange={e => { setQuery(e.target.value); setShowDropdown(true); }}
           onFocus={() => setShowDropdown(true)}
           placeholder={placeholder}
+          className="flex-1 bg-transparent border-none outline-none font-bold"
           style={{ 
-            flex: 1, padding: isDesktop ? '10px 16px' : '8px 12px', 
-            backgroundColor: 'transparent', border: 'none', outline: 'none', 
-            color: TEXT, fontSize: isDesktop ? '14px' : '13px', fontFamily: 'inherit' 
+            padding: isDesktop ? '10px 16px' : '8px 12px', 
+            color: 'var(--t)', 
+            fontSize: isDesktop ? '14px' : '13px',
           }} 
         />
         {query && (
-          <button type="button" onClick={() => { setQuery(''); inputRef.current?.focus(); }} style={{ background: 'none', border: 'none', padding: '0 12px', color: DIM, cursor: 'pointer' }}>
-            <FiX size={16} />
+          <button type="button" onClick={() => { setQuery(''); inputRef.current?.focus(); }} className="px-3 opacity-40 hover:opacity-100 transition-opacity">
+            <FiX size={16} style={{ color: 'var(--tm)' }} />
           </button>
         )}
         <button type="submit"
+          className="flex items-center justify-center rounded-full transition-all duration-300 shadow-lg shadow-gold/20"
           style={{ 
             width: isDesktop ? '40px' : '36px',
             height: isDesktop ? '40px' : '36px',
-            borderRadius: '50%',
-            background: `linear-gradient(135deg, ${GOLD}, #a38230)`, border: 'none', cursor: 'pointer', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', 
-            flexShrink: 0, transition: 'transform 0.15s, box-shadow 0.15s',
-            boxShadow: `0 4px 14px ${GOLD}35`
+            background: 'var(--p)',
           }}
-          onMouseOver={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = `0 6px 16px ${GOLD}45`; }}
-          onMouseOut={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = `0 4px 14px ${GOLD}35`; }}
         >
-          <FiArrowRight size={isDesktop ? 18 : 16} style={{ color: '#000' }} />
+          <FiArrowRight size={isDesktop ? 18 : 16} style={{ color: '#040404' }} />
         </button>
       </form>
 
       <AnimatePresence>
         {showDropdown && query.trim().length >= 2 && (
           <motion.div
-            initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.15 }}
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} transition={{ duration: 0.2 }}
+            className="absolute top-full left-0 right-0 mt-3 rounded-[24px] border shadow-2xl overflow-hidden py-3 z-[9999]"
             style={{
-              position: 'absolute', top: 'calc(100% + 8px)', left: 0, right: 0,
-              backgroundColor: BG, border: `1px solid ${BORDER}`,
-              borderRadius: '12px', boxShadow: isDark ? '0 10px 40px rgba(0,0,0,0.8)' : '0 10px 30px rgba(0,0,0,0.15)',
-              zIndex: 9999, overflow: 'hidden', padding: '8px 0'
+              backgroundColor: 'var(--card)',
+              borderColor: 'var(--b)',
             }}>
             {loading && results.length === 0 ? (
-               <div style={{ padding: '24px 16px', color: DIM, fontSize: '13px', textAlign: 'center' }}>Searching perfectly matching styles...</div>
+               <div className="py-12 text-center text-[11px] font-bold uppercase tracking-widest opacity-40" style={{ color: 'var(--tm)' }}>Searching...</div>
             ) : results.length > 0 ? (
               <>
-                <p style={{ margin: '0 0 4px', padding: '4px 16px', fontSize: '10px', color: DIM, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '600' }}>
+                <p className="px-6 py-2 text-[9px] font-black uppercase tracking-[0.2em] opacity-40" style={{ color: 'var(--tm)' }}>
                   {results.length} result{results.length !== 1 ? 's' : ''}
                 </p>
                 {results.map((p, i) => (
                   <button key={p._id}
                     onClick={() => { navigate(`/product/${p._id}`); setShowDropdown(false); setQuery(''); }}
+                    className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[var(--bg-alt)] transition-all text-left"
                     style={{
-                      width: '100%', display: 'flex', alignItems: 'center', gap: '14px',
-                      padding: '12px 16px', backgroundColor: 'transparent', border: 'none', cursor: 'pointer',
-                      borderBottom: i < results.length - 1 ? `1px solid ${BORDER}` : 'none',
-                      textAlign: 'left', transition: 'background-color 0.15s'
+                      borderBottom: i < results.length - 1 ? '1px solid var(--b-inner)' : 'none',
                     }}
-                    onMouseOver={e => e.currentTarget.style.backgroundColor = HOVER}
-                    onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <div style={{ width: '40px', height: '48px', backgroundColor: isDark ? '#222' : '#eee', borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
-                      <img src={p.images?.[0]?.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div className="w-10 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-[var(--bg-alt)] border border-[var(--b)]">
+                      <img src={p.images?.[0]?.url} alt="" className="w-full h-full object-cover" />
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: 0, fontSize: '14px', color: TEXT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: '500' }}>
+                    <div className="flex-1 min-w-0">
+                      <p className="m-0 text-sm font-black truncate tracking-tight" style={{ color: 'var(--t)' }}>
                         {highlight(p.name, query)}
                       </p>
-                      <p style={{ margin: '2px 0 0', fontSize: '11px', color: DIM }}>{p.category} · {p.brand}</p>
+                      <p className="m-0 text-[10px] font-bold opacity-60 uppercase tracking-tighter" style={{ color: 'var(--tm)' }}>{p.category} · {p.brand}</p>
                     </div>
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <p style={{ margin: 0, fontSize: '13px', color: GOLD, fontWeight: '700' }}>₹{(p.discountPrice || p.price)?.toLocaleString()}</p>
+                    <div className="text-right flex-shrink-0">
+                      <p className="m-0 text-sm font-black" style={{ color: 'var(--p)' }}>₹{(p.discountPrice || p.price)?.toLocaleString()}</p>
                     </div>
                   </button>
                 ))}
-                <button
-                  onClick={() => handleSearch()}
-                  style={{
-                    width: 'calc(100% - 32px)', margin: '8px 16px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                    padding: '12px', backgroundColor: `${GOLD}15`, border: `1px solid ${GOLD}40`, color: GOLD,
-                    borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: '600', transition: 'all 0.15s'
-                  }}
-                  onMouseOver={e => { e.currentTarget.style.backgroundColor = `${GOLD}25`; }}
-                  onMouseOut={e => { e.currentTarget.style.backgroundColor = `${GOLD}15`; }}
-                >
-                  See all results for {query} <FiArrowRight size={15} />
-                </button>
+                <div className="px-4 mt-2">
+                  <button
+                    onClick={() => handleSearch()}
+                    className="w-full flex items-center justify-center gap-3 py-4 bg-[var(--p)]/5 border border-[var(--p)]/10 text-[var(--p)] rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[var(--p)]/10 transition-all"
+                  >
+                    View all results <FiArrowRight size={14} />
+                  </button>
+                </div>
               </>
             ) : (
-              <div style={{ padding: '32px 16px', textAlign: 'center' }}>
-                <p style={{ fontSize: '14px', color: TEXT, margin: '0 0 6px', fontWeight: '500' }}>No styles found</p>
-                <p style={{ fontSize: '12px', color: DIM, margin: 0 }}>Try different keywords for {query}</p>
+              <div className="py-12 text-center px-8">
+                <p className="text-sm font-black tracking-tight" style={{ color: 'var(--t)' }}>No products found</p>
+                <p className="text-[11px] font-bold opacity-60 uppercase tracking-tighter mt-2" style={{ color: 'var(--tm)' }}>Try different keywords</p>
               </div>
             )}
           </motion.div>

@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
 
   // On mount — verify token is still valid
   useEffect(() => {
-    const token = localStorage.getItem('trendora_token');
+    const token = localStorage.getItem('videstore_token');
     if (!token) {
       // No token — definitely not logged in
       setInitializing(false);
@@ -25,12 +25,12 @@ export const AuthProvider = ({ children }) => {
     authAPI.getMe()
       .then(res => {
         setUser(res.user);
-        localStorage.setItem('trendora_user', JSON.stringify(res.user));
+        localStorage.setItem('videstore_user', JSON.stringify(res.user));
       })
       .catch(() => {
         // Token expired or invalid — clear everything
-        localStorage.removeItem('trendora_token');
-        localStorage.removeItem('trendora_user');
+        localStorage.removeItem('videstore_token');
+        localStorage.removeItem('videstore_user');
         setUser(null);
       })
       .finally(() => setInitializing(false));
@@ -40,8 +40,8 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await authAPI.login({ email, password });
-      localStorage.setItem('trendora_token', res.token);
-      localStorage.setItem('trendora_user', JSON.stringify(res.user));
+      localStorage.setItem('videstore_token', res.token);
+      localStorage.setItem('videstore_user', JSON.stringify(res.user));
       setUser(res.user);
       toast.success(`Welcome back, ${res.user.name?.split(' ')[0]}!`);
       return { success: true, user: res.user };
@@ -57,8 +57,8 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await authAPI.register(data);
-      localStorage.setItem('trendora_token', res.token);
-      localStorage.setItem('trendora_user', JSON.stringify(res.user));
+      localStorage.setItem('videstore_token', res.token);
+      localStorage.setItem('videstore_user', JSON.stringify(res.user));
       setUser(res.user);
       toast.success('Account created successfully!');
       return { success: true };
@@ -72,29 +72,29 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('trendora_token');
-    localStorage.removeItem('trendora_user');
+    localStorage.removeItem('videstore_token');
+    localStorage.removeItem('videstore_user');
     setUser(null);
     toast.success('Logged out successfully');
   };
 
   const updateUser = (updatedUser) => {
     setUser(updatedUser);
-    localStorage.setItem('trendora_user', JSON.stringify(updatedUser));
+    localStorage.setItem('videstore_user', JSON.stringify(updatedUser));
   };
 
   // ✅ loginWithToken — used after Google OAuth redirect
   const loginWithToken = async (token) => {
     try {
-      localStorage.setItem('trendora_token', token);
+      localStorage.setItem('videstore_token', token);
       const res = await authAPI.getMe();
-      localStorage.setItem('trendora_user', JSON.stringify(res.user));
+      localStorage.setItem('videstore_user', JSON.stringify(res.user));
       setUser(res.user);
       toast.success(`Welcome, ${res.user.name?.split(' ')[0]}! 🎉`);
       return { success: true, user: res.user };
     } catch (err) {
-      localStorage.removeItem('trendora_token');
-      localStorage.removeItem('trendora_user');
+      localStorage.removeItem('videstore_token');
+      localStorage.removeItem('videstore_user');
       setUser(null);
       toast.error('Google login failed. Please try again.');
       return { success: false };
@@ -113,6 +113,7 @@ export const AuthProvider = ({ children }) => {
       logout,
       updateUser,
       isAdmin,
+      isSeller: user?.role === 'seller' || user?.role === 'seller_owner' || user?.role === 'seller_staff',
       isLoggedIn: !!user,
       loginWithToken,
     }}>

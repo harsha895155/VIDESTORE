@@ -46,7 +46,7 @@ export default function ShippingPolicy() {
       ]} />
 
       <H2>7. Undeliverable Packages</H2>
-      <P>If a package cannot be delivered due to an incorrect address provided by you, Trendorra is not responsible for the non-delivery. Re-shipping charges will apply. Please double-check your address before placing an order.</P>
+      <P>If a package cannot be delivered due to an incorrect address provided by you, VideStore is not responsible for the non-delivery. Re-shipping charges will apply. Please double-check your address before placing an order.</P>
 
       <H2>8. Multiple Items in One Order</H2>
       <P>If your order contains multiple items, they may be shipped in separate packages on different days depending on stock availability. You will receive separate tracking numbers for each shipment.</P>
@@ -55,10 +55,10 @@ export default function ShippingPolicy() {
       <P>Some remote pincodes may not be serviceable. If your pincode is not serviceable, you will be notified at checkout. We are constantly expanding our delivery network.</P>
 
       <H2>10. International Shipping</H2>
-      <P>Currently, Trendorra ships only within India. International shipping will be available soon. Follow us on Instagram @Trendorra.in for updates.</P>
+      <P>Currently, VideStore ships only within India. International shipping will be available soon. Follow us on Instagram @VideStore.in for updates.</P>
 
       <H2>11. Contact for Shipping Queries</H2>
-      <P>Email: hello@Trendorra.in | Phone: +91 98765 43210 | Hours: Mon–Sat, 9am–6pm IST</P>
+      <P>Email: vibestore2027@gmail.com | Phone: +91 8951556645 | Hours: Mon–Sat, 9am–6pm IST</P>
     </LegalLayout>
   );
 }

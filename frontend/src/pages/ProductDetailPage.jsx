@@ -13,7 +13,7 @@ import {
   FiZoomIn, FiX, FiInfo, FiZap
 } from 'react-icons/fi';
 
-const GOLD = '#C9A84C';
+const PRIMARY = 'var(--p)';
 
 /* ── Inject page-level styles once ─────────────────────────────── */
 const injectDetailStyles = () => {
@@ -22,216 +22,107 @@ const injectDetailStyles = () => {
   const s = document.createElement('style');
   s.id = 'pdp-styles';
   s.textContent = `
-    @property --pdp-angle {
-      syntax: '<angle>'; inherits: false; initial-value: 0deg;
-    }
-    @keyframes pdp-spin       { to { --pdp-angle: 360deg; } }
-    @keyframes pdp-glow-pulse { 0%,100%{opacity:0.3} 50%{opacity:0.85} }
-    @keyframes pdp-fade-up    { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes pdp-badge-pop  { 0%{transform:scale(0.7)} 70%{transform:scale(1.08)} 100%{transform:scale(1)} }
-    @keyframes pdp-btn-pulse  { 0%{box-shadow:0 0 0 0 rgba(201,168,76,0.5)} 70%{box-shadow:0 0 0 10px rgba(201,168,76,0)} 100%{box-shadow:0 0 0 0 rgba(201,168,76,0)} }
-    @keyframes pdp-skel-pulse { 0%,100%{opacity:0.4} 50%{opacity:0.85} }
-    @keyframes pdp-buynow-shine {
-      0%   { background-position: -200% center; }
-      100% { background-position: 200% center; }
+    /* ── Main image card ── */
+    .pdp-main-card {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--b);
+      aspect-ratio: 2/3;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.06);
     }
 
-    /* ── Animated gold border — main image card ── */
-    .pdp-border-card {
-      position: relative; border-radius: 12px; padding: 1.5px; background: transparent;
-    }
-    .pdp-border-card::before {
-      content: ''; position: absolute; inset: 0;
-      border-radius: 12px; padding: 1.5px;
-      background: conic-gradient(
-        from var(--pdp-angle),
-        transparent 0deg, transparent 45deg,
-        #6b4e10 65deg, #C9A84C 88deg, #f5e09a 110deg,
-        #C9A84C 132deg, #6b4e10 152deg,
-        transparent 172deg, transparent 360deg
-      );
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor; mask-composite: exclude;
-      animation: pdp-spin 4s linear infinite;
-    }
-    .pdp-border-card::after {
-      content: ''; position: absolute; inset: -2px;
-      border-radius: 14px; pointer-events: none;
-      box-shadow: 0 0 18px rgba(201,168,76,0.2);
-      animation: pdp-glow-pulse 3s ease-in-out infinite;
-    }
-    .pdp-border-card-inner {
-      position: relative; border-radius: 10px; overflow: hidden; background: #141414; z-index: 1;
-    }
-
-    /* ── Active thumbnail spinning border ── */
-    .pdp-thumb-active { position: relative; }
-    .pdp-thumb-active::before {
-      content: ''; position: absolute; inset: -2px;
-      border-radius: 10px; padding: 2px;
-      background: conic-gradient(from var(--pdp-angle), transparent 0deg, #C9A84C 90deg, transparent 180deg, #C9A84C 270deg, transparent 360deg);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor; mask-composite: exclude;
-      animation: pdp-spin 2.5s linear infinite;
+    .pdp-main-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      transition: transform 0.8s cubic-bezier(0.2, 0, 0, 1);
     }
 
     /* ── Size buttons ── */
     .pdp-size-btn {
-      min-width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-      border: 1.5px solid rgba(255,255,255,0.12); border-radius: 6px; cursor: pointer;
-      font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.6);
-      background: rgba(255,255,255,0.03); transition: all 0.2s ease; padding: 0 9px; font-family: inherit;
+      min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--b); border-radius: 12px; cursor: pointer;
+      font-size: 12px; font-weight: 600; color: var(--tm);
+      background: var(--card-alt); transition: all 0.3s ease; padding: 0 12px; font-family: inherit;
     }
-    .pdp-size-btn:hover  { border-color: rgba(201,168,76,0.5); color: #fff; background: rgba(201,168,76,0.08); }
-    .pdp-size-btn.active { border-color: #C9A84C; background: #C9A84C; color: #000; font-weight: 700; }
+    .pdp-size-btn:hover  { border-color: var(--p); color: var(--p); background: var(--card); }
+    .pdp-size-btn.active { border-color: var(--p); background: var(--p); color: #000; box-shadow: 0 4px 15px rgba(200,166,70,0.3); }
 
     /* ── Color swatches ── */
     .pdp-color-swatch {
-      width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
-      border: 2px solid transparent; transition: all 0.2s ease; position: relative; flex-shrink: 0;
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+      border: 2px solid var(--card); transition: all 0.3s ease; position: relative; flex-shrink: 0;
+      box-shadow: 0 0 0 1px var(--b);
     }
     .pdp-color-swatch.active {
-      border-color: #C9A84C; box-shadow: 0 0 0 3px rgba(201,168,76,0.25); transform: scale(1.15);
+      box-shadow: 0 0 0 2px var(--p); transform: scale(1.15);
     }
 
     /* ── Tab underline ── */
     .pdp-tab {
-      position: relative; padding: 10px 4px; font-size: 11px; letter-spacing: 0.12em;
-      text-transform: uppercase; cursor: pointer; background: none; border: none; font-family: inherit; transition: color 0.2s;
+      position: relative; padding: 16px 0; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer;
+      background: none; border: none; font-family: inherit; color: var(--tm); transition: color 0.3s;
     }
+    .pdp-tab.active { color: var(--p); }
     .pdp-tab::after {
       content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-      height: 2px; background: #C9A84C; transform: scaleX(0); transition: transform 0.25s ease; border-radius: 2px;
+      height: 2px; background: var(--p); transform: scaleX(0); transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1); border-radius: 2px;
     }
     .pdp-tab.active::after { transform: scaleX(1); }
 
     /* ── Review card ── */
     .pdp-review-card {
-      padding: 12px; border-radius: 10px;
-      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
-      animation: pdp-fade-up 0.35s ease both;
+      padding: 24px; border-radius: 20px;
+      margin-bottom: 16px; transition: all 0.3s ease;
+      background: var(--card);
+      border: 1px solid var(--b);
     }
+    .pdp-review-card:hover { border-color: var(--p); box-shadow: var(--shadow-premium); }
 
     /* ── Perk cards ── */
     .pdp-perk {
-      display: flex; align-items: center; gap: 7px; padding: 8px 10px; border-radius: 8px;
-      background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.06); transition: border-color 0.2s;
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px;
+      background: var(--card-alt); border: 1px solid var(--b); transition: all 0.3s;
     }
-    .pdp-perk:hover { border-color: rgba(201,168,76,0.2); }
-
-    /* ── Related product cards — animated border ── */
-    .pdp-rel-card {
-      position: relative; border-radius: 11px; padding: 1.5px;
-      background: transparent; text-decoration: none; display: block;
-    }
-    .pdp-rel-card::before {
-      content: ''; position: absolute; inset: 0; border-radius: 11px; padding: 1.5px;
-      background: conic-gradient(from var(--pdp-angle), transparent 0deg, transparent 50deg, #8B6914 70deg, #C9A84C 90deg, #f5e09a 110deg, #C9A84C 130deg, #8B6914 150deg, transparent 170deg, transparent 360deg);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor; mask-composite: exclude;
-      opacity: 0; animation: pdp-spin 4s linear infinite paused; transition: opacity 0.3s;
-    }
-    .pdp-rel-card:hover::before { opacity: 1; animation-play-state: running; }
-    .pdp-rel-card::after {
-      content: ''; position: absolute; inset: -1px; border-radius: 12px; pointer-events: none; transition: box-shadow 0.3s;
-    }
-    .pdp-rel-card:hover::after { box-shadow: 0 0 20px rgba(201,168,76,0.15), 0 8px 30px rgba(0,0,0,0.4); }
-    .pdp-rel-inner { border-radius: 9px; overflow: hidden; background: #000; position: relative; z-index: 1; }
-
-    /* ── DESKTOP: larger related product image ── */
-    .pdp-rel-img   { width: 100%; padding-top: 120%; position: relative; overflow: hidden; background: #111; }
-    @media (max-width: 639px) {
-      .pdp-rel-img { padding-top: 130%; }
-    }
-
-    .pdp-rel-img img {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      object-fit: cover; object-position: center top; transition: transform 0.5s ease;
-    }
-    .pdp-rel-card:hover .pdp-rel-img img { transform: scale(1.06); }
-
-    /* Mobile: always-on border */
-    @media (hover: none), (pointer: coarse) {
-      .pdp-rel-card::before { opacity: 1; animation-play-state: running; }
-      .pdp-rel-card::after  { box-shadow: 0 0 12px rgba(201,168,76,0.2); animation: pdp-glow-pulse 3s ease-in-out infinite; }
-    }
-
-    /* ── Skeleton ── */
-    .pdp-skel { background: rgba(30,22,12,0.6); border-radius: 10px; animation: pdp-skel-pulse 1.4s ease-in-out infinite; }
+    .pdp-perk:hover { background: var(--card); border-color: var(--p); }
 
     /* ── Qty stepper ── */
     .pdp-qty-btn {
-      width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-      color: #fff; cursor: pointer; transition: all 0.2s; font-family: inherit;
+      width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      background: var(--card); border: 1px solid var(--b);
+      color: var(--t); cursor: pointer; transition: all 0.2s; font-family: inherit;
     }
-    .pdp-qty-btn:hover { background: rgba(201,168,76,0.15); border-color: rgba(201,168,76,0.4); }
+    .pdp-qty-btn:hover { border-color: var(--p); color: var(--p); background: var(--card-alt); }
 
     /* ── Breadcrumb ── */
-    .pdp-crumb { font-size: 10px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s; }
-    .pdp-crumb:hover { color: #C9A84C; }
+    .pdp-crumb { font-size: 11px; color: var(--tm); text-decoration: none; transition: color 0.2s; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+    .pdp-crumb:hover { color: var(--p); }
 
-    /* ── Size guide modal ── */
+    /* ── Skeleton ── */
+    .pdp-skel { background: var(--card-alt); border-radius: 16px; animation: pdp-skel-pulse 1.4s ease-in-out infinite; }
+    @keyframes pdp-skel-pulse { 0%,100%{opacity:0.4} 50%{opacity:0.8} }
+
+    /* ── Size Guide Modal ── */
     .pdp-sg-overlay {
-      position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.82);
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px; backdrop-filter: blur(8px);
+      position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 24px;
     }
     .pdp-sg-modal {
-      background: #141414; border: 1px solid rgba(201,168,76,0.2);
-      border-radius: 14px; width: 100%; max-width: 460px;
-      max-height: 85vh; overflow-y: auto;
+      background: var(--card); width: 100%; max-width: 540px; border-radius: 28px;
+      box-shadow: var(--shadow-lg); overflow: hidden; border: 1px solid var(--b);
     }
-    .pdp-sg-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .pdp-sg-table th {
-      padding: 7px 11px; text-align: left; font-size: 9.5px;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.03);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .pdp-sg-table td {
-      padding: 8px 11px; color: rgba(255,255,255,0.75);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .pdp-sg-table tr:last-child td { border-bottom: none; }
-    .pdp-sg-table tr:hover td { background: rgba(201,168,76,0.04); }
-
-    /* ── ATC button pulse ── */
-    .pdp-atc-btn { animation: pdp-btn-pulse 2s ease-in-out infinite; }
-
-    /* ── Buy Now button shine effect ── */
-    .pdp-buynow-btn {
-      position: relative; overflow: hidden;
-      background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
-      border: 1.5px solid rgba(201,168,76,0.5);
-      transition: all 0.25s ease;
-    }
-    .pdp-buynow-btn::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(
-        105deg,
-        transparent 30%,
-        rgba(201,168,76,0.18) 50%,
-        transparent 70%
-      );
-      background-size: 200% 100%;
-      animation: pdp-buynow-shine 2.2s linear infinite;
-    }
-    .pdp-buynow-btn:hover {
-      background: linear-gradient(135deg, #1e1a0e 0%, #2e2510 50%, #1e1a0e 100%);
-      border-color: #C9A84C;
-      box-shadow: 0 0 18px rgba(201,168,76,0.25), inset 0 0 12px rgba(201,168,76,0.05);
-    }
-    .pdp-buynow-btn:active { transform: scale(0.98); }
-
-    /* ── Related product info area black bg ── */
-    .pdp-rel-info { padding: 10px 10px 12px; background: #000; }
+    .pdp-sg-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .pdp-sg-table th { text-align: left; padding: 12px; border-bottom: 2px solid var(--b); font-size: 10px; text-transform: uppercase; color: var(--tm); letter-spacing: 0.1em; font-weight: 700; }
+    .pdp-sg-table td { padding: 14px 12px; border-bottom: 1px solid var(--b); font-size: 13px; color: var(--t); }
   `;
   document.head.appendChild(s);
 };
 
-/* ── Default size measurements — fallback when seller hasn't set custom ones ── */
+/* ── Default size measurements ── */
 const SIZE_MEASUREMENTS = {
   XS: { chest: '32–33"', waist: '24–25"', hips: '34–35"', length: '25"' },
   S: { chest: '34–35"', waist: '26–27"', hips: '36–37"', length: '26"' },
@@ -252,46 +143,30 @@ function SizeGuideModal({ sizes, sizeGuide, onClose }) {
     <div className="pdp-sg-overlay" onClick={onClose}>
       <motion.div
         className="pdp-sg-modal"
-        initial={{ scale: 0.92, opacity: 0 }}
+        initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.92, opacity: 0 }}
-        transition={{ duration: 0.22 }}
+        exit={{ scale: 0.95, opacity: 0 }}
         onClick={e => e.stopPropagation()}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 18px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid var(--b)' }}>
           <div>
-            <p style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: GOLD, margin: '0 0 3px' }}>Trendorra</p>
-            <h3 style={{ fontSize: 14, fontWeight: 400, color: '#fff', margin: 0 }}>Size Guide</h3>
+            <p style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--p)', fontWeight: 700, margin: '0 0 4px' }}>VideStore</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--t)', margin: 0 }}>Size Guide</h3>
           </div>
-          <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 7, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'rgba(255,255,255,0.6)' }}>
-            <FiX size={14} />
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, background: '#f1f5f9', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--t-muted)' }}>
+            <FiX size={16} />
           </button>
         </div>
 
-        <div style={{ margin: '12px 14px', padding: '9px 12px', borderRadius: 7, background: 'rgba(201,168,76,0.07)', border: '1px solid rgba(201,168,76,0.18)', display: 'flex', gap: 9, alignItems: 'flex-start' }}>
-          <FiInfo size={13} style={{ color: GOLD, flexShrink: 0, marginTop: 1 }} />
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, margin: 0 }}>
-            <strong style={{ color: GOLD }}>How to measure:</strong> Use a soft measuring tape. Measure chest at fullest point, waist at narrowest, hips at fullest. All measurements in inches.
-          </p>
-        </div>
-
-        {sizes?.length > 0 && (
-          <div style={{ padding: '0 14px 10px' }}>
-            <p style={{ fontSize: 9.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 7 }}>
-              Available in this product
+        <div style={{ padding: '24px' }}>
+          <div style={{ padding: '12px 16px', borderRadius: '12px', background: 'var(--primary-glow)', border: '1px solid rgba(79, 70, 229, 0.15)', display: 'flex', gap: '10px', marginBottom: '20px' }}>
+            <FiInfo size={16} style={{ color: 'var(--p)', flexShrink: 0, marginTop: 2 }} />
+            <p style={{ fontSize: '12px', color: 'var(--p)', lineHeight: 1.5, margin: 0, fontWeight: 500 }}>
+              Measure chest at fullest point, waist at narrowest, and hips at fullest. All measurements in inches.
             </p>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-              {sizes.map(sz => (
-                <span key={sz} style={{ padding: '3px 11px', borderRadius: 5, background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.3)', fontSize: 11.5, fontWeight: 600, color: GOLD }}>
-                  {sz}
-                </span>
-              ))}
-            </div>
           </div>
-        )}
 
-        <div style={{ padding: '0 14px 18px', overflowX: 'auto' }}>
-          {displaySizes.length > 0 ? (
+          <div style={{ overflowX: 'auto' }}>
             <table className="pdp-sg-table">
               <thead>
                 <tr>
@@ -307,7 +182,7 @@ function SizeGuideModal({ sizes, sizeGuide, onClose }) {
                   const m = mergedMeasurements[sz];
                   return (
                     <tr key={sz}>
-                      <td style={{ fontWeight: 700, color: '#fff' }}>{sz}</td>
+                      <td style={{ fontWeight: 700, color: '#111827' }}>{sz}</td>
                       <td>{m.chest || '—'}</td>
                       <td>{m.waist || '—'}</td>
                       <td>{m.hips || '—'}</td>
@@ -317,15 +192,11 @@ function SizeGuideModal({ sizes, sizeGuide, onClose }) {
                 })}
               </tbody>
             </table>
-          ) : (
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', textAlign: 'center', padding: '16px 0' }}>
-              No size measurements available for this product.
-            </p>
-          )}
+          </div>
         </div>
 
-        <div style={{ padding: '10px 14px 16px', borderTop: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
-          <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.28)', margin: 0 }}>If between sizes, we recommend sizing up for comfort.</p>
+        <div style={{ padding: '16px 24px', borderTop: '1px solid #F3F4F6', textAlign: 'center' }}>
+          <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>If between sizes, we recommend sizing up for comfort.</p>
         </div>
       </motion.div>
     </div>
@@ -354,11 +225,11 @@ function VideoPlayer({ src, style }) {
   useEffect(() => () => clearTimeout(hideTimer.current), []);
 
   return (
-    <div onClick={() => { setShowCtrl(true); if (playing) { clearTimeout(hideTimer.current); hideTimer.current = setTimeout(() => setShowCtrl(false), 1800); } }} style={{ position: 'relative', ...style }}>
+    <div onClick={() => { setShowCtrl(true); if (playing) { clearTimeout(hideTimer.current); hideTimer.current = setTimeout(() => setShowCtrl(false), 1800); } }} style={{ position: 'relative', overflow: 'hidden', ...style }}>
       <video ref={videoRef} src={src} playsInline loop muted style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 'inherit' }} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
-      <div onClick={toggle} style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: showCtrl ? 1 : 0, transition: 'opacity 0.3s', background: playing && !showCtrl ? 'transparent' : 'rgba(0,0,0,0.2)', cursor: 'pointer', borderRadius: 'inherit' }}>
-        <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', border: `2px solid rgba(201,168,76,0.7)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {playing ? <FiPause size={16} color={GOLD} /> : <FiPlay size={16} color={GOLD} style={{ marginLeft: 2 }} />}
+      <div onClick={toggle} style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: showCtrl ? 1 : 0, transition: 'opacity 0.3s', background: playing && !showCtrl ? 'transparent' : 'rgba(0,0,0,0.15)', cursor: 'pointer', borderRadius: 'inherit' }}>
+        <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#fff', border: `1px solid #E5E7EB`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+          {playing ? <FiPause size={18} color={PRIMARY} /> : <FiPlay size={18} color={PRIMARY} style={{ marginLeft: 2 }} />}
         </div>
       </div>
     </div>
@@ -368,13 +239,14 @@ function VideoPlayer({ src, style }) {
 /* ── Stars ── */
 function Stars({ rating, size = 12 }) {
   return (
-    <div style={{ display: 'flex', gap: 2 }}>
+    <div style={{ display: 'flex', gap: '4px' }}>
       {[1, 2, 3, 4, 5].map(s => (
-        <span key={s} style={{ fontSize: size, color: s <= Math.round(rating) ? GOLD : 'rgba(255,255,255,0.12)' }}>★</span>
+        <span key={s} style={{ fontSize: size, color: s <= Math.round(rating) ? 'var(--p)' : 'var(--b)' }}>★</span>
       ))}
     </div>
   );
 }
+
 
 /* ══════════════════════════════════════════════════════════════════
    MAIN PAGE
@@ -424,30 +296,9 @@ export default function ProductDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  /* ── Inject OG meta tags dynamically when product loads ── */
   useEffect(() => {
     if (!product) return;
-    const setMeta = (prop, content, isName = false) => {
-      const attr = isName ? 'name' : 'property';
-      let el = document.querySelector(`meta[${attr}="${prop}"]`);
-      if (!el) { el = document.createElement('meta'); el.setAttribute(attr, prop); document.head.appendChild(el); }
-      el.setAttribute('content', content);
-    };
-    const effectivePrice = product.discountPrice != null && product.discountPrice > 0
-      ? product.discountPrice : product.price;
-    document.title = `${product.name} | Trendorra`;
-    setMeta('og:title', product.name);
-    setMeta('og:description', product.description?.slice(0, 150) || product.name);
-    setMeta('og:image', product.images?.[0]?.url || '');
-    setMeta('og:url', window.location.href);
-    setMeta('og:type', 'product');
-    setMeta('og:site_name', 'Trendorra');
-    setMeta('product:price:amount', String(effectivePrice));
-    setMeta('product:price:currency', 'INR');
-    setMeta('twitter:card', 'summary_large_image', true);
-    setMeta('twitter:title', product.name, true);
-    setMeta('twitter:description', product.description?.slice(0, 150) || product.name, true);
-    setMeta('twitter:image', product.images?.[0]?.url || '', true);
+    document.title = `${product.name} | VideStore`;
   }, [product]);
 
   const handleReadReviews = e => {
@@ -461,11 +312,16 @@ export default function ProductDetailPage() {
   const handleAddToCart = async () => {
     if (product.sizes?.length && !selectedSize) { toast.error('Please select a size'); return; }
     setAddingCart(true);
-    await addToCart(product._id, selectedSize, selectedColor, quantity);
-    setAddingCart(false);
+    try {
+      await addToCart(product._id, selectedSize, selectedColor, quantity);
+      toast.success('Added to cart');
+    } catch (err) {
+      toast.error('Failed to add to cart');
+    } finally {
+      setAddingCart(false);
+    }
   };
 
-  /* ── FIX: Buy Now — adds to cart then navigates to checkout ── */
   const handleBuyNow = async () => {
     if (product.sizes?.length && !selectedSize) { toast.error('Please select a size'); return; }
     setBuyingNow(true);
@@ -473,7 +329,7 @@ export default function ProductDetailPage() {
       await addToCart(product._id, selectedSize, selectedColor, quantity);
       navigate('/checkout');
     } catch (err) {
-      toast.error('Something went wrong. Please try again.');
+      toast.error('Something went wrong');
     } finally {
       setBuyingNow(false);
     }
@@ -481,45 +337,18 @@ export default function ProductDetailPage() {
 
   const handleShare = async () => {
     const url = window.location.href;
-    const effectivePriceVal = hasDiscount ? product.discountPrice : product.price;
-    const savingsLine = hasDiscount
-      ? `💰 Save ₹${(product.price - product.discountPrice).toLocaleString()} (${discountPct}% OFF)`
-      : '';
-
-    // ✅ Text ONLY — no URL in text. URL passed separately via `url` field.
-    // WhatsApp appends the URL at the end and fetches OG image from it automatically.
-    const premiumText = [
-      `✨ *${product.name}*`,
-      `━━━━━━━━━━━━━━━━`,
-      hasDiscount
-        ? `💸 *₹${effectivePriceVal?.toLocaleString()}* ~₹${product.price?.toLocaleString()}~`
-        : `💸 *₹${effectivePriceVal?.toLocaleString()}*`,
-      savingsLine,
-      product.sizes?.length ? `📐 Sizes: ${product.sizes.join(' · ')}` : '',
-      product.colors?.length ? `🎨 Colors: ${product.colors.map(c => c.name).join(' · ')}` : '',
-      `━━━━━━━━━━━━━━━━`,
-      `🛍️ Shop now on *Trendorra*`,
-    ]
-      .filter(Boolean)
-      .join('\n');
-
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: product.name,
-          text: premiumText + '\n',  // trailing newline so URL preview renders below
-          url,                        // ✅ URL passed here only — NOT inside text
-        });
-        return;
-      } catch (e) { if (e.name === 'AbortError') return; }
+        await navigator.share({ title: product.name, url });
+      } catch (e) { if (e.name !== 'AbortError') toast.error('Share failed'); }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success('Link copied!');
+      } catch { toast.error('Copy failed'); }
     }
-
-    // Clipboard fallback
-    try {
-      await navigator.clipboard.writeText(`${premiumText}\n${url}`);
-      toast.success('Copied to clipboard!');
-    } catch { toast.error('Share failed'); }
   };
+
   const handleReview = async e => {
     e.preventDefault();
     if (!isLoggedIn) { toast.error('Please login to review'); return; }
@@ -533,14 +362,13 @@ export default function ProductDetailPage() {
     finally { setSubmitting(false); }
   };
 
-  /* ── Loading skeleton ── */
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: '#0d0d0d', padding: '20px 16px' }}>
-      <div style={{ maxWidth: 960, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr', gap: 20 }} className="lg:grid-cols-2">
-        <div className="pdp-skel" style={{ width: '100%', paddingTop: '100%', borderRadius: 12 }} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div style={{ minHeight: '100vh', padding: '40px 16px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr', gap: 40 }} className="lg:grid-cols-2">
+        <div className="pdp-skel" style={{ width: '100%', aspectRatio: '2/3', borderRadius: 24 }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {[80, 55, 40, 65, 45, 75, 40].map((w, i) => (
-            <div key={i} className="pdp-skel" style={{ height: i === 0 ? 24 : 11, width: `${w}%` }} />
+            <div key={i} className="pdp-skel" style={{ height: i === 0 ? 32 : 14, width: `${w}%` }} />
           ))}
         </div>
       </div>
@@ -548,9 +376,9 @@ export default function ProductDetailPage() {
   );
 
   if (!product) return (
-    <div style={{ textAlign: 'center', padding: '80px 16px', background: '#0d0d0d', minHeight: '100vh' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 15, marginBottom: 16 }}>Product not found</p>
-      <Link to="/shop" style={{ color: GOLD, textDecoration: 'none', fontSize: 11.5, letterSpacing: '0.12em', textTransform: 'uppercase', border: `1px solid ${GOLD}`, padding: '8px 20px', borderRadius: 6 }}>Back to Shop</Link>
+    <div style={{ textAlign: 'center', padding: '80px 16px', minHeight: '100vh' }}>
+      <p style={{ color: '#6B7280', fontSize: 16, marginBottom: 24 }}>Product not found</p>
+      <Link to="/shop" style={{ background: PRIMARY, color: '#fff', textDecoration: 'none', fontSize: 13, fontWeight: 700, padding: '12px 24px', borderRadius: 12 }}>Back to Shop</Link>
     </div>
   );
 
@@ -560,617 +388,262 @@ export default function ProductDetailPage() {
     ...images.map((img, i) => ({ type: 'image', index: i, url: img.url })),
     ...videos.map((vid, i) => ({ type: 'video', index: i, url: vid.url })),
   ];
-  const activeMobIdx = allMedia.findIndex(x => x.type === activeMedia.type && x.index === activeMedia.index);
 
   const hasDiscount = product.discountPrice != null && product.discountPrice > 0;
   const effectivePrice = hasDiscount ? product.discountPrice : product.price;
-  const discountPct = hasDiscount
-    ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
-    : null;
-
-  const noReturns = product.createdBy?.sellerInfo?.noReturnsEnabled;
+  const discountPct = hasDiscount ? Math.round(((product.price - product.discountPrice) / product.price) * 100) : null;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0d0d0d' }}>
-
-      {/* ── Breadcrumb ── */}
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '10px 16px' }} className="sm:px-6">
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
+    <div style={{ minHeight: '100vh', background: 'transparent' }}>
+      <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0px 24px 20px' }}>
+        
+        {/* Breadcrumb */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
           <Link to="/" className="pdp-crumb">Home</Link>
-          <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: 9 }}>/</span>
-          <Link to="/shop" className="pdp-crumb">Shop</Link>
-          <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: 9 }}>/</span>
-          <Link to={`/shop/${product.category?.toLowerCase()}`} className="pdp-crumb">{product.category}</Link>
-          <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: 9 }}>/</span>
-          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</span>
+          <FiChevronRight size={10} style={{ color: 'var(--b)' }} />
+          <Link to="/shop" className="pdp-crumb">Collection</Link>
+          <FiChevronRight size={10} style={{ color: 'var(--b)' }} />
+          <span style={{ fontSize: '11px', color: 'var(--t)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{product.name}</span>
         </nav>
-      </div>
 
-      {/* ── Main grid ── */}
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 16px 32px' }} className="sm:px-6">
-        <div style={{ display: 'grid', gap: 24, alignItems: 'start' }} className="lg:grid-cols-2">
-
-          {/* ════ LEFT — GALLERY ════ */}
-          <div>
-            {/* MOBILE */}
-            <div className="lg:hidden">
-              <div className="pdp-border-card" style={{ marginBottom: 7 }}>
-                <div className="pdp-border-card-inner">
-                  <div style={{ position: 'relative', width: '100%', paddingTop: '108%', background: '#1a1a1a' }}>
-                    <AnimatePresence mode="wait">
-                      {activeMedia.type === 'image' ? (
-                        <motion.img key={`mi-${activeMedia.index}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}
-                          src={images[activeMedia.index]?.url} alt={product.name}
-                          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', cursor: 'zoom-in' }}
-                          onClick={() => setImgZoomed(true)} />
-                      ) : (
-                        <motion.div key={`mv-${activeMedia.index}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0 }}>
-                          <VideoPlayer src={videos[activeMedia.index]?.url} style={{ width: '100%', height: '100%' }} />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', flexDirection: 'column', gap: 3, zIndex: 4 }}>
-                      {product.isNewArrival && <span style={{ background: GOLD, color: '#000', fontSize: 8, fontWeight: 800, letterSpacing: '0.14em', padding: '2px 7px', textTransform: 'uppercase' }}>New</span>}
-                      {product.isBestSeller && <span style={{ background: '#111', color: '#fff', fontSize: 8, fontWeight: 700, padding: '2px 7px', textTransform: 'uppercase', border: '1px solid rgba(255,255,255,0.15)' }}>Best Seller</span>}
-                      {discountPct && <span style={{ background: '#ef4444', color: '#fff', fontSize: 8, fontWeight: 800, padding: '2px 7px', textTransform: 'uppercase' }}>-{discountPct}% OFF</span>}
-                    </div>
-
-                    {activeMedia.type === 'image' && (
-                      <button onClick={() => setImgZoomed(true)} style={{ position: 'absolute', bottom: 8, right: 8, width: 28, height: 28, borderRadius: 6, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 4 }}>
-                        <FiZoomIn size={12} color="#fff" />
-                      </button>
-                    )}
-
-                    {allMedia.length > 1 && (<>
-                      <button onClick={() => { const i = (activeMobIdx - 1 + allMedia.length) % allMedia.length; setActiveMedia({ type: allMedia[i].type, index: allMedia[i].index }); }}
-                        style={{ position: 'absolute', left: 7, top: '50%', transform: 'translateY(-50%)', width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 4 }}>
-                        <FiChevronLeft size={13} color="#fff" />
-                      </button>
-                      <button onClick={() => { const i = (activeMobIdx + 1) % allMedia.length; setActiveMedia({ type: allMedia[i].type, index: allMedia[i].index }); }}
-                        style={{ position: 'absolute', right: 7, top: '50%', transform: 'translateY(-50%)', width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 4 }}>
-                        <FiChevronRight size={13} color="#fff" />
-                      </button>
-                    </>)}
-                  </div>
-                </div>
-              </div>
-
-              {allMedia.length > 1 && (
-                <div style={{ display: 'flex', gap: 5, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 3 }}>
-                  {allMedia.map((m, i) => {
-                    const active = i === activeMobIdx;
-                    return (
-                      <button key={i} onClick={() => setActiveMedia({ type: m.type, index: m.index })}
-                        className={active ? 'pdp-thumb-active' : ''}
-                        style={{ flexShrink: 0, width: 44, height: 54, borderRadius: 7, overflow: 'hidden', border: `1.5px solid ${active ? GOLD : 'rgba(255,255,255,0.1)'}`, background: '#1a1a1a', cursor: 'pointer', position: 'relative', transition: 'border-color 0.2s' }}>
-                        {m.type === 'image'
-                          ? <img src={m.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
-                          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1a1a1a' }}><FiPlay size={11} color={GOLD} /></div>
-                        }
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+        <div style={{ display: 'grid', gap: 24 }} className="lg:grid-cols-2">
+          
+          {/* Gallery */}
+          <div style={{ display: 'flex', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 80 }} className="hidden sm:flex">
+              {allMedia.map((m, i) => (
+                <button key={i} onClick={() => setActiveMedia({ type: m.type, index: m.index })}
+                  style={{ width: '100%', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', border: `2px solid ${activeMedia.index === m.index && activeMedia.type === m.type ? PRIMARY : '#F3F4F6'}`, background: '#fff', cursor: 'pointer', transition: 'all 0.2s' }}>
+                  {m.type === 'image' ? <img src={m.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FiPlay size={20} color={PRIMARY} /></div>}
+                </button>
+              ))}
             </div>
 
-            {/* DESKTOP */}
-            <div className="hidden lg:flex" style={{ gap: 8, alignItems: 'flex-start' }}>
-              {allMedia.length > 1 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: 52, maxHeight: 460, overflowY: 'auto', scrollbarWidth: 'none', flexShrink: 0 }}>
-                  {allMedia.map((m, i) => {
-                    const active = activeMedia.type === m.type && activeMedia.index === m.index;
-                    return (
-                      <button key={i} onClick={() => setActiveMedia({ type: m.type, index: m.index })}
-                        className={active ? 'pdp-thumb-active' : ''}
-                        style={{ width: '100%', aspectRatio: '3/4', borderRadius: 7, overflow: 'hidden', border: `1.5px solid ${active ? GOLD : 'rgba(255,255,255,0.1)'}`, background: '#1a1a1a', cursor: 'pointer', flexShrink: 0, position: 'relative', transition: 'border-color 0.2s' }}>
-                        {m.type === 'image'
-                          ? <img src={m.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
-                          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1a1a1a' }}><FiPlay size={11} color={GOLD} /></div>
-                        }
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-
-              <div className="pdp-border-card" style={{ flex: 1 }}>
-                <div className="pdp-border-card-inner" style={{ aspectRatio: '2/3', position: 'relative', cursor: 'zoom-in' }} onClick={() => setImgZoomed(true)}>
-                  <AnimatePresence mode="wait">
-                    {activeMedia.type === 'image' ? (
-                      <motion.img key={`di-${activeMedia.index}`} initial={{ opacity: 0, scale: 1.02 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }}
-                        src={images[activeMedia.index]?.url} alt={product.name}
-                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
-                    ) : (
-                      <motion.div key={`dv-${activeMedia.index}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ position: 'absolute', inset: 0 }}>
-                        <VideoPlayer src={videos[activeMedia.index]?.url} style={{ width: '100%', height: '100%' }} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', flexDirection: 'column', gap: 4, zIndex: 4 }}>
-                    {product.isNewArrival && <span style={{ background: GOLD, color: '#000', fontSize: 8, fontWeight: 800, letterSpacing: '0.14em', padding: '2px 8px', textTransform: 'uppercase' }}>New Arrival</span>}
-                    {product.isBestSeller && <span style={{ background: '#111', color: '#fff', fontSize: 8, fontWeight: 700, padding: '2px 8px', textTransform: 'uppercase', border: '1px solid rgba(255,255,255,0.15)' }}>Best Seller</span>}
-                    {discountPct && <span style={{ background: '#ef4444', color: '#fff', fontSize: 8, fontWeight: 800, padding: '2px 8px', textTransform: 'uppercase' }}>-{discountPct}% OFF</span>}
-                  </div>
-
-                  <button onClick={e => { e.stopPropagation(); setImgZoomed(true); }}
-                    style={{ position: 'absolute', bottom: 10, right: 10, width: 30, height: 30, borderRadius: 7, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 4 }}>
-                    <FiZoomIn size={13} color="#fff" />
-                  </button>
-                </div>
-              </div>
+            <div className="pdp-main-card" style={{ flex: 1 }}>
+              <AnimatePresence mode="wait">
+                {activeMedia.type === 'image' ? (
+                  <motion.img key={`img-${activeMedia.index}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} src={allMedia.find(m => m.type === 'image' && m.index === activeMedia.index)?.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <motion.div key={`vid-${activeMedia.index}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ height: '100%' }}>
+                    <VideoPlayer src={allMedia.find(m => m.type === 'video' && m.index === activeMedia.index)?.url} style={{ height: '100%' }} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <button onClick={() => setImgZoomed(true)} style={{ position: 'absolute', bottom: '20px', right: '20px', width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)', border: '1px solid var(--b)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-premium)', transition: 'all 0.3s' }}>
+                <FiZoomIn size={22} color="var(--t)" />
+              </button>
             </div>
           </div>
 
-          {/* ════ RIGHT — PRODUCT INFO ════ */}
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }} style={{ display: 'flex', flexDirection: 'column' }}>
-
-            {/* Brand + Name */}
-            <div style={{ marginBottom: 8 }}>
-              <p style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: GOLD, marginBottom: 4, fontFamily: 'Jost,sans-serif' }}>{product.brand || 'Trendorra'}</p>
-              <h1 style={{ fontSize: 'clamp(1.1rem,2.8vw,1.5rem)', fontWeight: 300, color: '#fff', lineHeight: 1.25, margin: 0 }}>{product.name}</h1>
-            </div>
-
-            {/* Ratings */}
-            {product.numReviews > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12, flexWrap: 'wrap' }}>
-                <Stars rating={product.ratings} />
-                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{product.ratings?.toFixed(1)} · {product.numReviews} reviews</span>
-                <a href="#reviews" onClick={handleReadReviews} style={{ fontSize: 10.5, color: GOLD, textDecoration: 'underline', textDecorationColor: 'rgba(201,168,76,0.4)', cursor: 'pointer' }}>Read reviews</a>
-              </div>
-            )}
-
-            {/* ── PRICE ── */}
-            <div style={{ padding: '10px 0', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)', marginBottom: hasDiscount ? 8 : 14 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 'clamp(1.2rem,3.5vw,1.65rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.01em' }}>
-                  ₹{effectivePrice?.toLocaleString()}
-                </span>
-                {hasDiscount && (
-                  <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', textDecoration: 'line-through' }}>₹{product.price?.toLocaleString()}</span>
-                )}
+          {/* Product Details */}
+          <div>
+            <div style={{ marginBottom: '24px' }}>
+              <p style={{ fontSize: '10px', fontWeight: 700, color: 'var(--p)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>{product.brand || 'Exclusive'}</p>
+              <h1 className="serif" style={{ fontSize: 'clamp(1.8rem, 5vw, 2.8rem)', color: 'var(--t)', marginBottom: '12px', lineHeight: 1.1 }}>{product.name}</h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <Stars rating={product.ratings} size={14} />
+                <span style={{ fontSize: '12px', color: 'var(--t-muted)', fontWeight: 500 }}>{product.numReviews} Reviews</span>
               </div>
             </div>
 
-            {/* ── Offer label — shown below price bar when discount exists ── */}
-            {hasDiscount && (
-              <div style={{ marginBottom: 14, marginTop: 0 }}>
-                <span style={{
-                  display: 'inline-block',
-                  background: '#22c55e',
-                  color: '#fff',
-                  fontSize: 11,
-                  fontWeight: 800,
-                  letterSpacing: '0.07em',
-                  padding: '3px 10px',
-                  borderRadius: 5,
-                }}>
-                  {discountPct}% OFF
-                </span>
-                <span style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.35)', marginLeft: 8 }}>
-                  You save ₹{(product.price - product.discountPrice)?.toLocaleString()}
-                </span>
+            <div style={{ marginBottom: '32px' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                <span style={{ fontSize: '28px', fontWeight: 800, color: 'var(--t)', letterSpacing: '-0.02em' }}>₹{effectivePrice?.toLocaleString()}</span>
+                {hasDiscount && <span style={{ fontSize: '18px', color: 'var(--t-muted)', textDecoration: 'line-through', opacity: 0.5 }}>₹{product.price?.toLocaleString()}</span>}
+                {discountPct && <div style={{ padding: '4px 10px', background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', borderRadius: '40px', fontSize: '11px', fontWeight: 700 }}>{discountPct}% OFF</div>}
               </div>
-            )}
+            </div>
 
-            {/* Color */}
+            {/* Colors */}
             {product.colors?.length > 0 && (
-              <div style={{ marginBottom: 13 }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.42)', marginBottom: 7 }}>
-                  Color: <span style={{ color: '#fff', fontWeight: 500 }}>{selectedColor}</span>
-                </p>
-                <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+              <div style={{ marginBottom: '24px' }}>
+                <p style={{ fontSize: '10px', fontWeight: 700, color: 'var(--t-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>Color: <span style={{ color: 'var(--t)', fontWeight: 700 }}>{selectedColor}</span></p>
+                <div style={{ display: 'flex', gap: '12px' }}>
                   {product.colors.map(c => (
-                    <div key={c.name} className={`pdp-color-swatch${selectedColor === c.name ? ' active' : ''}`}
-                      onClick={() => setSelectedColor(c.name)} title={c.name}
-                      style={{ backgroundColor: c.hex || '#555' }} />
+                    <button key={c.name} onClick={() => setSelectedColor(c.name)} className={`pdp-color-swatch ${selectedColor === c.name ? 'active' : ''}`} style={{ background: c.hex, border: 'none' }} title={c.name} />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Size */}
+            {/* Sizes */}
             {product.sizes?.length > 0 && (
-              <div style={{ marginBottom: 13 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 7 }}>
-                  <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.42)', margin: 0 }}>Size</p>
-                  <button onClick={() => setSizeGuideOpen(true)}
-                    style={{ fontSize: 10, color: GOLD, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', textDecorationColor: 'rgba(201,168,76,0.35)', display: 'flex', alignItems: 'center', gap: 3 }}>
-                    <FiInfo size={10} /> Size Guide
-                  </button>
+              <div style={{ marginBottom: '32px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <p style={{ fontSize: '10px', fontWeight: 700, color: 'var(--t-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Select Size: <span style={{ color: 'var(--t)', fontWeight: 700 }}>{selectedSize}</span></p>
+                  <button onClick={() => setSizeGuideOpen(true)} style={{ background: 'none', border: 'none', color: 'var(--p)', fontSize: '10px', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Size Guide</button>
                 </div>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {product.sizes.map(size => (
-                    <button key={size} className={`pdp-size-btn${selectedSize === size ? ' active' : ''}`}
-                      onClick={() => setSelectedSize(size)}>{size}</button>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  {product.sizes.map(s => (
+                    <button key={s} onClick={() => setSelectedSize(s)} className={`pdp-size-btn ${selectedSize === s ? 'active' : ''}`}>{s}</button>
                   ))}
                 </div>
               </div>
             )}
 
             {/* Quantity */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-              <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, overflow: 'hidden' }}>
-                <button className="pdp-qty-btn" style={{ borderRadius: 0, border: 'none', borderRight: '1px solid rgba(255,255,255,0.08)' }} onClick={() => setQuantity(q => Math.max(1, q - 1))}>
-                  <FiMinus size={11} />
-                </button>
-                <span style={{ width: 36, textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#fff' }}>{quantity}</span>
-                <button className="pdp-qty-btn" style={{ borderRadius: 0, border: 'none', borderLeft: '1px solid rgba(255,255,255,0.08)' }} onClick={() => setQuantity(q => Math.min(product.stock || 99, q + 1))}>
-                  <FiPlus size={11} />
-                </button>
+            <div style={{ marginBottom: '32px' }}>
+              <p style={{ fontSize: '10px', fontWeight: 700, color: 'var(--t-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>Quantity</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', background: 'var(--card-alt)', borderRadius: '10px', border: '1px solid var(--b)', padding: '2px' }}>
+                  <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="pdp-qty-btn" style={{ border: 'none' }}><FiMinus size={14} /></button>
+                  <span style={{ width: '32px', textAlign: 'center', fontSize: '14px', fontWeight: 700, color: 'var(--t)' }}>{quantity}</span>
+                  <button onClick={() => setQuantity(q => q + 1)} className="pdp-qty-btn" style={{ border: 'none' }}><FiPlus size={14} /></button>
+                </div>
+                <div>
+                   <p style={{ fontSize: '12px', color: product.stock < 10 ? '#EF4444' : '#10B981', fontWeight: 700, margin: 0 }}>
+                    {product.stock < 10 ? `Only ${product.stock} left` : 'In Stock'}
+                  </p>
+                  <p style={{ fontSize: '11px', color: 'var(--t-muted)', margin: '2px 0 0' }}>Express Shipping</p>
+                </div>
               </div>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
-                {product.stock > 0
-                  ? <><span style={{ color: '#22c55e' }}>●</span> {product.stock} in stock</>
-                  : <><span style={{ color: '#ef4444' }}>●</span> Out of stock</>}
-              </span>
             </div>
 
-            {/* ── CTA ROW: Add to Cart + Wishlist + Share ── */}
-            <div style={{ display: 'flex', gap: 7, marginBottom: 9 }}>
-              <button className="pdp-atc-btn" onClick={handleAddToCart} disabled={addingCart}
-                style={{ flex: 1, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: addingCart ? 'rgba(201,168,76,0.6)' : GOLD, color: '#000', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', cursor: addingCart ? 'not-allowed' : 'pointer', fontFamily: 'inherit', transition: 'background 0.2s' }}>
-                <FiShoppingCart size={14} />
-                {addingCart ? 'Adding...' : 'Add to Cart'}
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+              <button onClick={handleAddToCart} disabled={addingCart} className="btn-premium" style={{ flex: 1, height: '44px', fontSize: '13px' }}>
+                <FiShoppingCart size={18} /> {addingCart ? 'Adding...' : 'Add to Cart'}
               </button>
-              <button onClick={() => toggleWishlist(product._id)}
-                style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1.5px solid ${isWishlisted(product._id) ? GOLD : 'rgba(255,255,255,0.12)'}`, borderRadius: 8, background: isWishlisted(product._id) ? GOLD : 'transparent', color: isWishlisted(product._id) ? '#000' : 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', flexShrink: 0 }}>
-                <FiHeart size={15} fill={isWishlisted(product._id) ? 'currentColor' : 'none'} />
-              </button>
-              <button onClick={handleShare}
-                style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px solid rgba(255,255,255,0.12)', borderRadius: 8, background: 'transparent', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', transition: 'all 0.2s', flexShrink: 0 }}>
-                <FiShare2 size={15} />
+              <button onClick={() => toggleWishlist(product._id)} style={{ width: '44px', height: '44px', borderRadius: '12px', border: '1px solid var(--b)', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: isWishlisted(product._id) ? '#EF4444' : 'var(--t-muted)', transition: 'all 0.3s', boxShadow: 'var(--shadow-premium)' }}>
+                <FiHeart size={22} fill={isWishlisted(product._id) ? 'currentColor' : 'none'} />
               </button>
             </div>
-
-            {/* ── BUY NOW BUTTON — stylish dark gold shimmer ── */}
-            <button
-              className="pdp-buynow-btn"
-              onClick={handleBuyNow}
-              disabled={buyingNow}
-              style={{
-                width: '100%',
-                height: 44,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 7,
-                borderRadius: 8,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-                cursor: buyingNow ? 'not-allowed' : 'pointer',
-                fontFamily: 'inherit',
-                color: buyingNow ? 'rgba(201,168,76,0.5)' : GOLD,
-                marginBottom: 14,
-                opacity: buyingNow ? 0.7 : 1,
-              }}
-            >
-              <FiZap size={13} style={{ filter: `drop-shadow(0 0 4px ${GOLD})` }} />
+            <button onClick={handleBuyNow} disabled={buyingNow} style={{ width: '100%', height: '44px', background: 'var(--card-alt)', color: 'var(--t)', border: '1px solid var(--b)', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', marginBottom: '32px', letterSpacing: '0.05em', textTransform: 'uppercase', transition: 'all 0.3s' }}>
               {buyingNow ? 'Redirecting...' : 'Buy Now'}
             </button>
 
             {/* Perks */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 14 }}>
-              {[
-                { icon: FiTruck, text: 'Free shipping above ₹999', sub: 'Delivered in 3-5 days' },
-                { icon: noReturns ? FiXCircle : FiRefreshCw, text: noReturns ? 'Non-returnable' : '7-day returns', sub: noReturns ? 'Check description' : 'Hassle-free process', red: noReturns },
-                { icon: FiShield, text: '100% Authentic', sub: 'Verified products' },
-                { icon: FiCheck, text: 'Cash on Delivery', sub: 'Available everywhere' },
-              ].map(({ icon: Icon, text, sub, red }) => (
-                <div key={text} className="pdp-perk">
-                  <Icon size={13} style={{ color: red ? '#f87171' : GOLD, flexShrink: 0 }} />
-                  <div>
-                    <p style={{ fontSize: 10, fontWeight: 600, color: red ? '#f87171' : '#fff', margin: '0 0 1px' }}>{text}</p>
-                    <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', margin: 0 }}>{sub}</p>
-                  </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="pdp-perk">
+                <FiTruck size={18} color="var(--p)" />
+                <div>
+                  <p style={{ fontSize: '10px', fontWeight: 700, color: 'var(--t)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Free Delivery</p>
+                  <p style={{ fontSize: '10px', color: 'var(--t-muted)', margin: '2px 0 0' }}>Over ₹999</p>
                 </div>
-              ))}
-            </div>
-
-            {/* Return policy */}
-            <div style={{ borderRadius: 10, border: `1px solid ${noReturns ? 'rgba(248,113,113,0.22)' : 'rgba(255,255,255,0.07)'}`, overflow: 'hidden' }}>
-              <div style={{ background: noReturns ? 'rgba(248,113,113,0.08)' : 'rgba(34,197,94,0.06)', borderBottom: `1px solid ${noReturns ? 'rgba(248,113,113,0.12)' : 'rgba(255,255,255,0.06)'}`, padding: '7px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                {noReturns ? <FiXCircle size={10} style={{ color: '#f87171', flexShrink: 0 }} /> : <FiRefreshCw size={10} style={{ color: '#22c55e', flexShrink: 0 }} />}
-                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: noReturns ? '#f87171' : '#22c55e' }}>
-                  {noReturns ? 'Non-Returnable Item' : 'Return & Exchange Policy'}
-                </span>
               </div>
-              <div style={{ padding: 10, background: '#0d0d0d', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                {(noReturns
-                  ? [{ l: 'Return Window', v: 'Not applicable', r: true }, { l: 'Replacement', v: 'Not available', r: true }, { l: 'Reason', v: 'Seller policy' }, { l: 'Support', v: 'Within 48hrs' }]
-                  : [{ l: 'Return Window', v: '7 days', g: true }, { l: 'Refund Mode', v: 'Original payment' }, { l: 'Condition', v: 'Unused & intact' }, { l: 'Process', v: 'Pickup arranged' }]
-                ).map(({ l, v, r, g }) => (
-                  <div key={l} style={{ background: '#161616', borderRadius: 5, padding: '6px 8px' }}>
-                    <p style={{ fontSize: 8, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.26)', margin: '0 0 2px' }}>{l}</p>
-                    <p style={{ fontSize: 10.5, fontWeight: 500, color: r ? '#f87171' : g ? '#22c55e' : 'rgba(255,255,255,0.7)', margin: 0 }}>{v}</p>
-                  </div>
-                ))}
+              <div className="pdp-perk">
+                <FiRefreshCw size={18} color="var(--p)" />
+                <div>
+                  <p style={{ fontSize: '10px', fontWeight: 700, color: 'var(--t)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Easy Returns</p>
+                  <p style={{ fontSize: '10px', color: 'var(--t-muted)', margin: '2px 0 0' }}>7-day policy</p>
+                </div>
               </div>
             </div>
-
-          </motion.div>
+          </div>
         </div>
 
-        {/* ════ TABS ════ */}
-        <div ref={reviewsRef} style={{ marginTop: 36, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-          <div style={{ display: 'flex', gap: 22, borderBottom: '1px solid rgba(255,255,255,0.07)', overflowX: 'auto', scrollbarWidth: 'none' }}>
-            {['description', 'reviews', 'care'].map(tab => (
-              <button key={tab} className={`pdp-tab${activeTab === tab ? ' active' : ''}`}
-                onClick={() => setActiveTab(tab)}
-                style={{ color: activeTab === tab ? '#fff' : 'rgba(255,255,255,0.35)', whiteSpace: 'nowrap' }}>
-                {tab === 'reviews' ? `Reviews (${reviews.length})` : tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
+        {/* Tabs */}
+        <div style={{ marginTop: '64px' }}>
+          <div style={{ display: 'flex', gap: '32px', borderBottom: '1px solid var(--b)', marginBottom: '32px' }}>
+            {['description', 'reviews', 'shipping'].map(t => (
+              <button key={t} onClick={() => setActiveTab(t)} className={`pdp-tab ${activeTab === t ? 'active' : ''}`}>{t}</button>
             ))}
           </div>
 
-          <div style={{ padding: '22px 0' }}>
-            <AnimatePresence mode="wait">
+          <div style={{ maxWidth: '900px' }}>
+            {activeTab === 'description' && (
+              <div style={{ color: 'var(--t)', lineHeight: 1.8 }}>
+                <p className="serif" style={{ fontSize: '16px', marginBottom: '24px', color: 'var(--t)' }}>{product.description}</p>
+                <div style={{ display: 'grid', gap: '20px' }} className="sm:grid-cols-2">
+                  <div style={{ background: 'var(--bg-alt)', padding: '20px', borderRadius: '12px', border: '1px solid var(--b)' }}>
+                    <h4 style={{ fontSize: '10px', fontWeight: 700, color: 'var(--p)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Material & Care</h4>
+                    <p style={{ fontSize: '13px', margin: 0, color: 'var(--t)', fontWeight: 500 }}>{product.material || 'Premium Fabric'}</p>
+                    <p style={{ fontSize: '12px', margin: '8px 0 0', color: 'var(--t-muted)' }}>{product.careInstructions || 'Dry clean only'}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
-              {activeTab === 'description' && (
-                <motion.div key="desc" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }} style={{ maxWidth: 600 }}>
-                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.58)', lineHeight: 1.85, margin: '0 0 12px' }}>{product.description}</p>
-                  {product.material && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.42)' }}><strong style={{ color: 'rgba(255,255,255,0.68)' }}>Material:</strong> {product.material}</p>}
-                </motion.div>
-              )}
-
-              {activeTab === 'care' && (
-                <motion.div key="care" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }} style={{ maxWidth: 600 }}>
-                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.58)', lineHeight: 1.85 }}>
-                    {product.careInstructions || 'Machine wash cold with similar colors. Do not bleach. Tumble dry low. Cool iron if needed. Do not dry clean.'}
-                  </p>
-                </motion.div>
-              )}
-
-              {activeTab === 'reviews' && (
-                <motion.div key="reviews" id="reviews" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }} style={{ maxWidth: 680 }}>
-
-                  {reviews.length > 0 && (
-                    <div style={{ display: 'flex', gap: 20, padding: 16, borderRadius: 10, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', marginBottom: 18, flexWrap: 'wrap' }}>
-                      <div style={{ textAlign: 'center', minWidth: 64 }}>
-                        <p style={{ fontSize: 44, fontWeight: 200, color: GOLD, lineHeight: 1, margin: '0 0 4px' }}>{product.ratings?.toFixed(1)}</p>
-                        <Stars rating={product.ratings} size={11} />
-                        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.32)', marginTop: 2 }}>{product.numReviews} reviews</p>
-                      </div>
-                      <div style={{ flex: 1, minWidth: 130, display: 'flex', flexDirection: 'column', gap: 4, justifyContent: 'center' }}>
-                        {[5, 4, 3, 2, 1].map(star => {
-                          const cnt = reviews.filter(r => Math.round(r.rating) === star).length;
-                          const pct = reviews.length ? Math.round((cnt / reviews.length) * 100) : 0;
-                          return (
-                            <div key={star} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', width: 7 }}>{star}</span>
-                              <span style={{ fontSize: 10, color: GOLD }}>★</span>
-                              <div style={{ flex: 1, height: 3, borderRadius: 3, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
-                                <div style={{ width: `${pct}%`, height: '100%', background: GOLD, borderRadius: 3, transition: 'width 0.8s ease' }} />
-                              </div>
-                              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.26)', width: 16, textAlign: 'right' }}>{cnt}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {isLoggedIn ? (
-                    <div style={{ padding: 16, borderRadius: 10, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', marginBottom: 18 }}>
-                      <h3 style={{ fontSize: 13, fontWeight: 400, color: '#fff', margin: '0 0 12px' }}>Write a Review</h3>
-                      <form onSubmit={handleReview} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        <div>
-                          <p style={{ fontSize: 9, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.32)', marginBottom: 6 }}>Rating</p>
-                          <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                            {[1, 2, 3, 4, 5].map(s => (
-                              <button key={s} type="button" onClick={() => setReviewForm(p => ({ ...p, rating: s }))}
-                                style={{ fontSize: 20, color: s <= reviewForm.rating ? GOLD : 'rgba(255,255,255,0.1)', background: 'none', border: 'none', cursor: 'pointer', transition: 'color 0.15s', padding: 0 }}>★</button>
-                            ))}
-                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', marginLeft: 4 }}>
-                              {['', 'Terrible', 'Poor', 'Average', 'Good', 'Excellent'][reviewForm.rating]}
-                            </span>
-                          </div>
+            {activeTab === 'reviews' && (
+              <div ref={reviewsRef}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 40, flexWrap: 'wrap' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: 36, fontWeight: 800, color: 'var(--t)', margin: 0 }}>{product.ratings?.toFixed(1)}</p>
+                    <Stars rating={product.ratings} size={14} />
+                    <p style={{ fontSize: 12, color: 'var(--t-muted)', marginTop: 4 }}>{product.numReviews} Reviews</p>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    {[5, 4, 3, 2, 1].map(star => (
+                      <div key={star} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
+                        <span style={{ fontSize: 11, width: 12, color: 'var(--t-muted)' }}>{star}</span>
+                        <div style={{ flex: 1, height: 4, background: 'var(--card-alt)', borderRadius: 2, overflow: 'hidden' }}>
+                          <div style={{ height: '100%', background: '#FBBF24', width: `${(reviews.filter(r => Math.round(r.rating) === star).length / (reviews.length || 1)) * 100}%` }} />
                         </div>
-                        {[
-                          { key: 'title', label: 'Review Title', placeholder: 'e.g. Great quality!', type: 'input' },
-                          { key: 'comment', label: 'Your Review', placeholder: 'Tell others what you think...', type: 'textarea' },
-                        ].map(({ key, label, placeholder, type }) => (
-                          <div key={key}>
-                            <p style={{ fontSize: 9, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.32)', marginBottom: 4 }}>{label}</p>
-                            {type === 'input'
-                              ? <input required placeholder={placeholder} value={reviewForm[key]} onChange={e => setReviewForm(p => ({ ...p, [key]: e.target.value }))}
-                                style={{ width: '100%', padding: '8px 12px', background: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, color: '#fff', fontSize: 12, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
-                              : <textarea required rows={3} placeholder={placeholder} value={reviewForm[key]} onChange={e => setReviewForm(p => ({ ...p, [key]: e.target.value }))}
-                                style={{ width: '100%', padding: '8px 12px', background: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, color: '#fff', fontSize: 12, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
-                            }
-                          </div>
-                        ))}
-                        <button type="submit" disabled={submitting}
-                          style={{ alignSelf: 'flex-start', padding: '8px 20px', background: submitting ? 'rgba(201,168,76,0.5)' : GOLD, color: '#000', border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: submitting ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
-                          {submitting ? 'Submitting...' : 'Submit Review'}
-                        </button>
-                      </form>
-                    </div>
-                  ) : (
-                    <div style={{ padding: 16, borderRadius: 10, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', textAlign: 'center', marginBottom: 18 }}>
-                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.42)', marginBottom: 10 }}>Login to write a review</p>
-                      <Link to="/login" style={{ display: 'inline-block', padding: '7px 20px', background: GOLD, color: '#000', borderRadius: 6, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none' }}>Login to Review</Link>
-                    </div>
-                  )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                  {reviews.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '32px 0' }}>
-                      <p style={{ fontSize: 28, marginBottom: 7 }}>⭐</p>
-                      <p style={{ fontSize: 14, fontWeight: 300, color: '#fff', marginBottom: 4 }}>No reviews yet</p>
-                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.32)' }}>Be the first to share your experience!</p>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {reviews.map((review, ri) => (
-                        <div key={review._id} className="pdp-review-card" style={{ animationDelay: `${ri * 0.05}s` }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            <div style={{ width: 30, height: 30, borderRadius: '50%', background: GOLD, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#000', flexShrink: 0 }}>
-                              {review.user?.name?.charAt(0)?.toUpperCase()}
-                            </div>
-                            <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{review.user?.name}</span>
-                                {review.isVerifiedPurchase && <span style={{ fontSize: 8, background: 'rgba(34,197,94,0.12)', color: '#22c55e', padding: '2px 6px', borderRadius: 3, fontWeight: 600 }}>✓ Verified</span>}
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 1 }}>
-                                <Stars rating={review.rating} size={9} />
-                                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.28)' }}>
-                                  {new Date(review.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          {review.title && <h4 style={{ fontSize: 12, fontWeight: 600, color: '#fff', margin: '0 0 3px' }}>{review.title}</h4>}
-                          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.58)', lineHeight: 1.65, margin: 0 }}>{review.comment}</p>
-                        </div>
+                {isLoggedIn && (
+                  <form onSubmit={handleReview} style={{ background: 'var(--card)', padding: '24px', borderRadius: '16px', marginBottom: '40px', border: '1px solid var(--b)' }}>
+                    <h3 className="serif" style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px', color: 'var(--t)' }}>Add a Review</h3>
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+                      {[1, 2, 3, 4, 5].map(s => (
+                        <button key={s} type="button" onClick={() => setReviewForm(f => ({ ...f, rating: s }))} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', color: s <= reviewForm.rating ? 'var(--p)' : 'var(--b)', transition: 'transform 0.2s' }}>★</button>
                       ))}
                     </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    <input required placeholder="Review Title" value={reviewForm.title} onChange={e => setReviewForm(f => ({ ...f, title: e.target.value }))} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--b)', background: 'var(--bg)', marginBottom: '12px', outline: 'none', fontSize: '13px', color: 'var(--t)' }} />
+                    <textarea required placeholder="Your thoughts..." rows={3} value={reviewForm.comment} onChange={e => setReviewForm(f => ({ ...f, comment: e.target.value }))} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--b)', background: 'var(--bg)', marginBottom: '16px', outline: 'none', resize: 'none', fontSize: '13px', color: 'var(--t)' }} />
+                    <button disabled={submitting} type="submit" className="btn-premium" style={{ padding: '0 24px', height: '40px', fontSize: '12px' }}>{submitting ? 'Sharing...' : 'Submit Review'}</button>
+                  </form>
+                )}
+
+                <div style={{ display: 'grid', gap: 20 }}>
+                  {reviews.map(r => (
+                    <div key={r._id} className="pdp-review-card">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                        <div>
+                          <Stars rating={r.rating} size={12} />
+                          <p style={{ fontWeight: 700, fontSize: '14px', margin: '4px 0 2px', color: 'var(--t)' }}>{r.title}</p>
+                        </div>
+                        <span style={{ fontSize: 11, color: 'var(--tm)' }}>{new Date(r.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <p style={{ color: 'var(--tm)', fontSize: '13px', margin: '0 0 12px' }}>{r.comment}</p>
+                      <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--t)' }}>- {r.user?.name}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* ════ RELATED PRODUCTS ════ */}
+        {/* Related Products */}
         {related.length > 0 && (
-          <section style={{ marginTop: 36, paddingTop: 28, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 3, height: 20, borderRadius: 2, background: GOLD, flexShrink: 0 }} />
-                <div>
-                  <p style={{ fontSize: 8, letterSpacing: '0.25em', textTransform: 'uppercase', color: GOLD, margin: '0 0 2px', fontFamily: 'Jost,sans-serif' }}>You may also like</p>
-                  <h2 style={{ fontSize: 'clamp(0.9rem,2.4vw,1.25rem)', fontWeight: 300, color: '#fff', margin: 0 }}>More from {product.category}</h2>
-                </div>
-              </div>
-              <Link to={`/shop/${product.category?.toLowerCase()}`} style={{ fontSize: 10, color: GOLD, textDecoration: 'none', letterSpacing: '0.07em', display: 'flex', alignItems: 'center', gap: 3 }}>
-                View All <FiChevronRight size={11} />
-              </Link>
-            </div>
-
-            <div
-              className="pdp-related-grid"
-              style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(2, 1fr)' }}
-            >
-              <style>{`
-                @media (min-width: 640px) {
-                  .pdp-related-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 16px !important; }
-                }
-              `}</style>
-
-              {related.map((p, i) => (
-                <motion.div key={p._id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07, duration: 0.3 }}>
-                  <Link
-                    to={`/product/${p._id}`}
-                    className="pdp-rel-card"
-                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    style={{ textDecoration: 'none' }}
-                  >
-                    <div className="pdp-rel-inner">
-                      <div className="pdp-rel-img">
-                        <img
-                          src={p.images?.[0]?.url || 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400'}
-                          alt={p.name}
-                          onError={e => { e.target.src = 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400'; }}
-                        />
-                        <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', flexDirection: 'column', gap: 4, zIndex: 3, pointerEvents: 'none' }}>
-                          {p.isNewArrival && (
-                            <span style={{ background: GOLD, color: '#000', fontSize: 8, fontWeight: 800, padding: '2px 7px', letterSpacing: '0.12em', textTransform: 'uppercase' }}>NEW</span>
-                          )}
-                          {p.isBestSeller && (
-                            <span style={{ background: '#111', color: '#fff', fontSize: 8, fontWeight: 700, padding: '2px 7px', textTransform: 'uppercase', border: '1px solid rgba(255,255,255,0.2)' }}>BEST SELLER</span>
-                          )}
-                          {p.discountPrice != null && p.discountPrice > 0 && (
-                            <span style={{ background: '#ef4444', color: '#fff', fontSize: 8, fontWeight: 700, padding: '2px 7px' }}>
-                              -{Math.round(((p.price - p.discountPrice) / p.price) * 100)}%
-                            </span>
-                          )}
-                        </div>
-                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '35%', background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent)', zIndex: 2, pointerEvents: 'none' }} />
-                      </div>
-                      <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent)' }} />
-                      <div className="pdp-rel-info">
-                        <p style={{ fontSize: 8, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)', marginBottom: 3 }}>
-                          {p.brand || 'Trendorra'}
-                        </p>
-                        <h3 style={{ fontSize: 12, fontWeight: 500, color: '#fff', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: '0 0 5px' }}>
-                          {p.name}
-                        </h3>
-                        {p.numReviews > 0 && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 5 }}>
-                            <Stars rating={p.ratings} size={10} />
-                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>({p.numReviews})</span>
-                          </div>
-                        )}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>
-                            ₹{(p.discountPrice != null && p.discountPrice > 0 ? p.discountPrice : p.price)?.toLocaleString()}
-                          </span>
-                          {p.discountPrice != null && p.discountPrice > 0 && (
-                            <span style={{ fontSize: 11, textDecoration: 'line-through', color: 'rgba(255,255,255,0.28)' }}>
-                              ₹{p.price?.toLocaleString()}
-                            </span>
-                          )}
-                        </div>
-                        {p.discountPrice != null && p.discountPrice > 0 && (
-                          <div style={{ marginTop: 6 }}>
-                            <span style={{
-                              display: 'inline-block',
-                              background: '#22c55e',
-                              color: '#fff',
-                              fontSize: 10,
-                              fontWeight: 800,
-                              letterSpacing: '0.06em',
-                              padding: '2px 8px',
-                              borderRadius: 4,
-                            }}>
-                              {Math.round(((p.price - p.discountPrice) / p.price) * 100)}% OFF
-                            </span>
-                          </div>
-                        )}
-                      </div>
+          <div style={{ marginTop: '100px', borderTop: '1px solid var(--b)', paddingTop: '80px' }}>
+            <h2 className="serif" style={{ fontSize: '32px', marginBottom: '48px', color: 'var(--t)' }}>Curated For You</h2>
+            <div style={{ display: 'grid', gap: '32px', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+              {related.map(p => (
+                <Link key={p._id} to={`/product/${p._id}`} style={{ textDecoration: 'none' }}>
+                  <div style={{ background: 'var(--bg)', border: '1px solid var(--b)', borderRadius: '24px', overflow: 'hidden', transition: 'all 0.4s cubic-bezier(0.2, 0, 0, 1)', boxShadow: 'var(--shadow-premium)' }}>
+                    <div style={{ aspectRatio: '4/5', overflow: 'hidden' }}>
+                      <img src={p.images?.[0]?.url} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s' }} className="hover-zoom" />
                     </div>
-                  </Link>
-                </motion.div>
+                    <div style={{ padding: '24px' }}>
+                      <p style={{ fontSize: '10px', color: 'var(--p)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>{p.brand}</p>
+                      <h4 className="serif" style={{ color: 'var(--t)', margin: '0 0 12px', fontSize: '18px' }}>{p.name}</h4>
+                      <p style={{ fontWeight: 800, color: 'var(--t)', margin: 0, fontSize: '16px' }}>₹{p.price?.toLocaleString()}</p>
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
-          </section>
+          </div>
         )}
       </div>
 
-      {/* ════ SIZE GUIDE MODAL ════ */}
-      <AnimatePresence>
-        {sizeGuideOpen && (
-          <SizeGuideModal
-            sizes={product.sizes}
-            sizeGuide={product.sizeGuide}
-            onClose={() => setSizeGuideOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* ════ ZOOM LIGHTBOX ════ */}
+      {/* Zoom Modal */}
       <AnimatePresence>
         {imgZoomed && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => setImgZoomed(false)}
-            style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, backdropFilter: 'blur(8px)', cursor: 'zoom-out' }}>
-            <motion.img initial={{ scale: 0.88, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }} transition={{ duration: 0.22 }}
-              src={images[activeMedia.type === 'image' ? activeMedia.index : 0]?.url} alt={product.name}
-              style={{ maxWidth: '92vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 10, boxShadow: '0 0 60px rgba(201,168,76,0.14)' }}
-              onClick={e => e.stopPropagation()} />
-            <button onClick={() => setImgZoomed(false)}
-              style={{ position: 'absolute', top: 16, right: 16, width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              ×
-            </button>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setImgZoomed(false)} style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out' }}>
+            <motion.img initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} src={allMedia.find(m => m.type === 'image' && m.index === activeMedia.index)?.url} style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain' }} />
           </motion.div>
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {sizeGuideOpen && <SizeGuideModal sizes={product.sizes} sizeGuide={product.sizeGuide} onClose={() => setSizeGuideOpen(false)} />}
+      </AnimatePresence>
     </div>
   );
-}
+}

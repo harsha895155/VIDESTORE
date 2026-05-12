@@ -1,138 +1,199 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
-import { FiTrash2, FiShoppingBag, FiArrowRight } from 'react-icons/fi';
-
-const BG = '#0d0d0d';
-const BG2 = '#111';
-const BORDER = 'rgba(255,255,255,0.08)';
-const GOLD = '#C9A84C';
+import { FiTrash2, FiShoppingBag, FiArrowRight, FiMinus, FiPlus, FiChevronLeft, FiLock, FiShield, FiTag } from 'react-icons/fi';
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, cartTotal } = useCart();
   const navigate = useNavigate();
   const items = cart.items || [];
-  const total = cartTotal;
 
   if (items.length === 0) return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-6"
-      style={{ backgroundColor: BG }}>
-      <FiShoppingBag size={64} className="mb-6" style={{ color: 'rgba(255,255,255,0.1)' }} />
-      <h2 className="font-display text-4xl font-light text-white mb-3">Your cart is empty</h2>
-      <p className="font-body mb-8" style={{ color: 'rgba(255,255,255,0.4)' }}>Nothing added yet.</p>
-      <Link to="/shop" className="btn-gold-filled px-8 py-3">Start Shopping</Link>
+    <div className="min-h-[85vh] flex flex-col items-center justify-center text-center px-8" style={{ background: 'var(--bg)' }}>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-40 h-40 rounded-[32px] flex items-center justify-center mb-12 shadow-2xl relative border"
+        style={{ background: 'var(--card)', borderColor: 'var(--b)' }}
+      >
+        <div className="absolute inset-0 bg-[var(--p)]/5 rounded-[32px] blur-2xl" />
+        <FiShoppingBag size={56} className="text-[var(--p)] relative z-10" />
+      </motion.div>
+      <h2 className="serif text-6xl font-black mb-8 tracking-tighter" style={{ color: 'var(--t)' }}>Selection Empty</h2>
+      <p className="max-w-xl mx-auto mb-16 text-xl font-medium leading-relaxed opacity-60 uppercase tracking-widest" style={{ color: 'var(--tl)' }}>
+        Your strategic collection awaits. Discover pieces that redefine your presence.
+      </p>
+      <Link to="/shop" className="btn-primary group" style={{ padding: '24px 60px', fontSize: '14px' }}>
+        Begin Browsing <FiArrowRight className="ml-3 group-hover:translate-x-2 transition-transform" />
+      </Link>
     </div>
   );
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 py-12 max-w-7xl mx-auto" style={{ backgroundColor: BG }}>
-      <div className="flex items-end justify-between mb-8 pb-5"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-        <div>
-          <p style={{ fontSize: '10px', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '6px', fontFamily: 'Jost,sans-serif' }}>
-            Review your order
-          </p>
-          <h1 className="font-display font-light text-white" style={{ fontSize: 'clamp(1.6rem,4vw,2.25rem)', margin: 0 }}>
-            Shopping Cart
-          </h1>
-        </div>
-        <div className="px-4 py-2 font-body text-sm"
-          style={{ backgroundColor: 'rgba(201,168,76,0.1)', color: '#C9A84C', borderRadius: '20px', border: '1px solid rgba(201,168,76,0.2)' }}>
-          {items.length} item{items.length > 1 ? 's' : ''}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Items */}
-        <div className="lg:col-span-2">
-          <div className="hidden sm:grid grid-cols-12 gap-4 pb-4 text-xs font-body tracking-[0.15em] uppercase"
-            style={{ borderBottom: `1px solid ${BORDER}`, color: 'rgba(255,255,255,0.3)' }}>
-            <div className="col-span-6">Product</div>
-            <div className="col-span-2 text-center">Price</div>
-            <div className="col-span-2 text-center">Qty</div>
-            <div className="col-span-2 text-right">Total</div>
+    <div className="min-h-screen pt-0 pb-16" style={{ background: 'var(--bg)' }}>
+      <div className="max-w-[1440px] mx-auto px-8 sm:px-16">
+        
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-4 gap-10">
+          <div>
+            <Link to="/shop" className="inline-flex items-center font-black text-[10px] uppercase tracking-[0.25em] mb-2 transition-all hover:gap-4 group" style={{ color: 'var(--p)' }}>
+              <FiChevronLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" /> Return to Boutique
+            </Link>
+            <h1 className="serif text-7xl font-black tracking-tighter uppercase" style={{ color: 'var(--t)' }}>Your Selection</h1>
           </div>
+          <div className="flex items-center gap-6 px-10 py-6 rounded-[24px] border bg-[var(--card)] shadow-2xl shadow-black/5" style={{ borderColor: 'var(--b)' }}>
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-[0.25em] opacity-40 mb-2" style={{ color: 'var(--tl)' }}>Curated Assets</p>
+              <div className="flex items-end gap-3">
+                 <span className="text-5xl font-black tracking-tighter serif" style={{ color: 'var(--p)' }}>{items.length}</span>
+                 <span className="text-xs font-black uppercase tracking-widest pb-2 opacity-60" style={{ color: 'var(--tl)' }}>Active Nodes</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <AnimatePresence>
-            {items.map(item => {
-              const product = item.product;
-              const price = item.price || product?.price || 0;
-              const image = product?.images?.[0]?.url || 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=200';
-              return (
-                <motion.div key={item._id} layout initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                  className="grid grid-cols-12 gap-4 py-6 items-center"
-                  style={{ borderBottom: `1px solid ${BORDER}` }}>
-                  <div className="col-span-12 sm:col-span-6 flex items-center gap-4">
-                    <Link to={`/product/${product?._id}`}>
-                      <img src={image} alt={product?.name} className="w-20 h-24 object-cover flex-shrink-0" style={{ borderRadius: '10px' }} />
-                    </Link>
-                    <div>
-                      <Link to={`/product/${product?._id}`}>
-                        <h3 className="font-body font-medium text-sm text-white hover:text-gold transition-colors">{product?.name}</h3>
-                      </Link>
-                      <div className="flex gap-3 mt-1">
-                        {item.size && <span className="font-body text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>Size: {item.size}</span>}
-                        {item.color && <span className="font-body text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>Color: {item.color}</span>}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-20">
+          
+          {/* Items List */}
+          <div className="xl:col-span-8">
+            <div className="rounded-[32px] border shadow-2xl shadow-black/5 overflow-hidden bg-[var(--card)]" style={{ borderColor: 'var(--b)' }}>
+              <div className="hidden md:grid grid-cols-12 gap-8 px-12 py-8 border-b" style={{ background: 'var(--bg-alt)', borderColor: 'var(--b)' }}>
+                <div className="col-span-6 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--tl)' }}>Asset Description</div>
+                <div className="col-span-2 text-center text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--tl)' }}>Valuation</div>
+                <div className="col-span-2 text-center text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--tl)' }}>Quantity</div>
+                <div className="col-span-2 text-right text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--tl)' }}>Aggregated</div>
+              </div>
+
+              <div className="divide-y" style={{ borderColor: 'var(--b)' }}>
+                <AnimatePresence>
+                  {items.map(item => (
+                    <motion.div 
+                      key={item._id} 
+                      layout 
+                      initial={{ opacity: 0, x: -20 }} 
+                      animate={{ opacity: 1, x: 0 }} 
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="grid grid-cols-1 md:grid-cols-12 gap-10 px-12 py-12 items-center hover:bg-[var(--bg-alt)]/30 transition-colors group"
+                    >
+                      {/* Product Info */}
+                      <div className="col-span-12 md:col-span-6 flex items-center gap-10">
+                        <Link to={`/product/${item.product?._id}`} className="block w-32 h-44 rounded-2xl overflow-hidden shadow-2xl border flex-shrink-0 relative" style={{ background: 'var(--bg-alt)', borderColor: 'var(--b)' }}>
+                          <img 
+                            src={item.product?.images?.[0]?.url} 
+                            alt={item.product?.name} 
+                            className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-2" 
+                          />
+                        </Link>
+                        <div className="flex-1 min-w-0">
+                          <Link to={`/product/${item.product?._id}`} className="block">
+                            <h3 className="serif text-2xl font-black transition-colors truncate tracking-tight mb-2" style={{ color: 'var(--t)' }}>
+                              {item.product?.name}
+                            </h3>
+                          </Link>
+                          <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-6" style={{ color: 'var(--p)' }}>{item.product?.brand || 'Institutional'}</p>
+                          <div className="flex flex-wrap gap-3">
+                            {item.size && (
+                              <span className="px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm" style={{ background: 'var(--card)', color: 'var(--t)', borderColor: 'var(--b)' }}>Size: {item.size}</span>
+                            )}
+                            {item.color && (
+                              <span className="px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm" style={{ background: 'var(--card)', color: 'var(--t)', borderColor: 'var(--b)' }}>{item.color}</span>
+                            )}
+                          </div>
+                          <button 
+                            onClick={() => removeFromCart(item._id)}
+                            className="mt-8 inline-flex items-center text-[10px] font-black uppercase tracking-[0.2em] opacity-40 hover:opacity-100 text-red-500 transition-all"
+                          >
+                            <FiTrash2 size={16} className="mr-3" /> Terminate Node
+                          </button>
+                        </div>
                       </div>
-                      <button onClick={() => removeFromCart(item._id)}
-                        className="flex items-center gap-1 mt-2 text-xs font-body text-red-400 hover:text-red-300 transition-colors">
-                        <FiTrash2 size={12} /> Remove
-                      </button>
-                    </div>
-                  </div>
-                  <div className="col-span-4 sm:col-span-2 text-center font-body text-sm text-white">₹{price.toLocaleString()}</div>
-                  <div className="col-span-4 sm:col-span-2 flex justify-center">
-                    <div className="flex items-center" style={{ border: `1px solid ${BORDER}`, borderRadius: '10px', overflow: 'hidden' }}>
-                      <button onClick={() => updateQuantity(item._id, item.quantity - 1)}
-                        className="w-8 h-8 flex items-center justify-center text-sm text-white hover:text-gold transition-colors">−</button>
-                      <span className="w-8 text-center font-body text-sm text-white">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                        className="w-8 h-8 flex items-center justify-center text-sm text-white hover:text-gold transition-colors">+</button>
-                    </div>
-                  </div>
-                  <div className="col-span-4 sm:col-span-2 text-right font-body font-medium text-sm text-white">
-                    ₹{(price * item.quantity).toLocaleString()}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
 
-          <div className="mt-6">
-            <Link to="/shop" className="font-body text-sm hover:text-gold transition-colors"
-              style={{ color: 'rgba(255,255,255,0.4)' }}>← Continue Shopping</Link>
+                      {/* Price */}
+                      <div className="col-span-4 md:col-span-2 text-center">
+                        <span className="text-lg font-black tracking-tight serif" style={{ color: 'var(--t)' }}>₹{(item.price || item.product?.price || 0).toLocaleString()}</span>
+                      </div>
+
+                      {/* Quantity */}
+                      <div className="col-span-4 md:col-span-2 flex justify-center">
+                        <div className="flex items-center rounded-xl p-1.5 border shadow-inner" style={{ background: 'var(--bg-alt)', borderColor: 'var(--b)' }}>
+                          <button 
+                            onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[var(--card)] hover:shadow-xl hover:shadow-black/5 transition-all text-[var(--tl)] hover:text-[var(--p)]"
+                          >
+                            <FiMinus size={16} />
+                          </button>
+                          <span className="w-12 text-center font-black text-sm serif" style={{ color: 'var(--t)' }}>{item.quantity}</span>
+                          <button 
+                            onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[var(--card)] hover:shadow-xl hover:shadow-black/5 transition-all text-[var(--tl)] hover:text-[var(--p)]"
+                          >
+                            <FiPlus size={16} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Subtotal */}
+                      <div className="col-span-4 md:col-span-2 text-right">
+                        <span className="text-2xl font-black tracking-tighter serif" style={{ color: 'var(--p)' }}>
+                          ₹{((item.price || item.product?.price || 0) * item.quantity).toLocaleString()}
+                        </span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Summary */}
-        <div className="lg:col-span-1">
-          <div className="p-8 sticky top-32" style={{ backgroundColor: BG2, border: `1px solid ${BORDER}` }}>
-            <h2 className="font-display text-2xl font-light text-white mb-6">Order Summary</h2>
-            <div className="space-y-3 mb-6 pb-6" style={{ borderBottom: `1px solid ${BORDER}` }}>
-              <div className="flex justify-between font-body text-sm">
-                <span style={{ color: 'rgba(255,255,255,0.45)' }}>Subtotal ({items.length} item{items.length > 1 ? 's' : ''})</span>
-                <span style={{ color: '#fff' }}>₹{cartTotal.toLocaleString()}</span>
+          {/* Checkout Summary */}
+          <div className="xl:col-span-4">
+            <div className="rounded-[32px] border p-12 sticky top-32 bg-[var(--card)] shadow-2xl shadow-black/5" style={{ borderColor: 'var(--b)' }}>
+              <h2 className="serif text-4xl font-black mb-12 tracking-tight uppercase" style={{ color: 'var(--t)' }}>Summary</h2>
+              
+              <div className="space-y-8 mb-12">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60" style={{ color: 'var(--tl)' }}>Subtotal</span>
+                  <span className="text-lg font-black tracking-tight serif" style={{ color: 'var(--t)' }}>₹{cartTotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60" style={{ color: 'var(--tl)' }}>Logistics</span>
+                  <div className="flex items-center gap-2 text-emerald-500">
+                     <FiShield size={12} />
+                     <span className="font-black uppercase text-[10px] tracking-[0.2em]">Complimentary</span>
+                  </div>
+                </div>
+                
+                <div className="pt-10 border-t" style={{ borderColor: 'var(--b)' }}>
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-3" style={{ color: 'var(--p)' }}>Total Valuation</p>
+                      <span className="text-5xl font-black tracking-tighter serif" style={{ color: 'var(--t)' }}>₹{cartTotal.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-between font-body text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                <span>Delivery charge calculated at checkout</span>
+
+              <button 
+                onClick={() => navigate('/checkout')}
+                className="btn-primary w-full h-20 text-lg group rounded-[14px] shadow-2xl shadow-gold/20"
+                style={{ background: 'var(--p)', color: '#040404', border: 'none' }}
+              >
+                Proceed to Checkout
+                <FiArrowRight size={24} className="ml-4 group-hover:translate-x-3 transition-transform duration-700" />
+              </button>
+
+              <div className="mt-12 pt-12 border-t" style={{ borderColor: 'var(--b)' }}>
+                <div className="flex items-center justify-center gap-4 mb-8 opacity-40">
+                  <FiLock size={16} style={{ color: 'var(--tl)' }} />
+                  <p className="text-center text-[10px] font-black uppercase tracking-[0.25em]" style={{ color: 'var(--tl)' }}>Encrypted Protocol</p>
+                </div>
+                <div className="flex justify-center flex-wrap gap-8 opacity-20 grayscale">
+                   {['VISA', 'MASTERCARD', 'AMEX', 'UPI'].map(p => (
+                     <span key={p} className="text-[11px] font-black tracking-widest">{p}</span>
+                   ))}
+                </div>
               </div>
-            </div>
-            <div className="flex justify-between font-body font-medium text-lg text-white mb-8">
-              <span>Subtotal</span>
-              <span style={{ color: GOLD }}>₹{total.toLocaleString()}</span>
-            </div>
-            <button onClick={() => navigate('/checkout')}
-              className="w-full py-4 flex items-center justify-center gap-3 font-body text-sm tracking-[0.15em] uppercase transition-colors"
-              style={{ backgroundColor: GOLD, color: '#fff' }}
-              onMouseOver={e => e.target.style.backgroundColor = '#A07830'}
-              onMouseOut={e => e.target.style.backgroundColor = GOLD}>
-              Proceed to Checkout <FiArrowRight size={16} />
-            </button>
-            <div className="mt-6 flex justify-center gap-3">
-              {['Visa', 'Mastercard', 'UPI', 'Razorpay'].map(p => (
-                <span key={p} className="text-[9px] px-2 py-1 font-body"
-                  style={{ border: `1px solid ${BORDER}`, color: 'rgba(255,255,255,0.3)' }}>{p}</span>
-              ))}
             </div>
           </div>
         </div>

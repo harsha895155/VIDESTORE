@@ -4,12 +4,12 @@ export default function PrivacyPolicy() {
   return (
     <LegalLayout title="Privacy Policy" lastUpdated="March 2026">
       <InfoBox>
-        At Trendorra, we respect your privacy and are committed to protecting your personal data. This policy explains how we collect, use, and safeguard your information.
+        At VideStore, we respect your privacy and are committed to protecting your personal data. This policy explains how we collect, use, and safeguard your information.
       </InfoBox>
 
       <H2>1. Who We Are</H2>
-      <P>Trendorra Fashion Pvt. Ltd. ("Trendorra", "we", "us") operates the website Trendorra.in. We are registered in India and comply with the Information Technology Act, 2000 and applicable data protection regulations.</P>
-      <P><strong style={{color:'#fff'}}>Contact:</strong> hello@Trendorra.in | +91 98765 43210 | MG Road, Bengaluru – 560001, Karnataka, India</P>
+      <P>VideStore Fashion Pvt. Ltd. ("VideStore", "we", "us") operates the website VideStore.in. We are registered in India and comply with the Information Technology Act, 2000 and applicable data protection regulations.</P>
+      <P><strong style={{color:'#fff'}}>Contact:</strong> vibestore2027@gmail.com | +91 98765 43210 | MG Road, Bengaluru – 560001, Karnataka, India</P>
 
       <H2>2. Information We Collect</H2>
       <P>We collect the following types of information:</P>
@@ -56,7 +56,7 @@ export default function PrivacyPolicy() {
         'Opt-out: unsubscribe from marketing emails at any time',
         'Data portability: receive your data in a machine-readable format',
       ]} />
-      <P>To exercise your rights, email us at hello@Trendorra.in with subject "Data Request".</P>
+      <P>To exercise your rights, email us at vibestore2027@gmail.com with subject "Data Request".</P>
 
       <H2>8. Cookies</H2>
       <P>We use essential, analytics, and marketing cookies. You can manage cookie preferences in your browser settings. See our Cookie Policy for details.</P>

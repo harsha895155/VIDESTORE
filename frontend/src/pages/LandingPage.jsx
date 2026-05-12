@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { FiArrowRight } from 'react-icons/fi';
 
-const GOLD = '#C9A84C';
-const GOLD_LIGHT = '#F0D080';
-const GOLD_DARK = '#8B6914';
-const GOLD_MID = '#D4A843';
+const PRIMARY = 'var(--p)';
+const PRIMARY_LIGHT = 'var(--pl)';
+const PRIMARY_DARK = 'var(--pd)';
 
 // ── High-quality fashion images ────────────────────────────────────────────
 const SLIDES = [
@@ -42,13 +42,14 @@ function Grain() {
 }
 
 // ── Particles ─────────────────────────────────────────────────────────────
-const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+const PARTICLES = Array.from({ length: 25 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
-    sz: Math.random() * 3 + 1.5,
-    delay: Math.random() * 9,
-    dur: Math.random() * 11 + 8,
-    op: Math.random() * 0.35 + 0.08,
+    sz: Math.random() * 4 + 1.5,
+    delay: Math.random() * 10,
+    dur: Math.random() * 12 + 8,
+    op: Math.random() * 0.4 + 0.1,
+    color: ['var(--p)', 'var(--s)', 'var(--a)'][i % 3],
 }));
 
 function Particles() {
@@ -60,8 +61,8 @@ function Particles() {
                     style={{
                         position: 'absolute', left: `${p.x}%`, bottom: 0,
                         width: `${p.sz}px`, height: `${p.sz}px`, borderRadius: '50%',
-                        background: GOLD, opacity: p.op,
-                        filter: `blur(${p.sz * 0.4}px)`,
+                        background: p.color, opacity: p.op * 0.6,
+                        filter: `blur(${p.sz * 0.5}px)`,
                     }}
                     animate={{ y: [0, -900], opacity: [p.op, p.op * 0.4, 0] }}
                     transition={{ duration: p.dur, delay: p.delay, repeat: Infinity, ease: 'linear' }}
@@ -76,11 +77,11 @@ function Loader({ onDone }) {
     const [ph, setPh] = useState(0);
     useEffect(() => {
         const ts = [
-            setTimeout(() => setPh(1), 350),
-            setTimeout(() => setPh(2), 900),
-            setTimeout(() => setPh(3), 2000),
-            setTimeout(() => setPh(4), 2700),
-            setTimeout(onDone, 3300),
+            setTimeout(() => setPh(1), 800),
+            setTimeout(() => setPh(2), 1800),
+            setTimeout(() => setPh(3), 3500),
+            setTimeout(() => setPh(4), 5000),
+            setTimeout(onDone, 6000),
         ];
         return () => ts.forEach(clearTimeout);
     }, []);
@@ -90,7 +91,7 @@ function Loader({ onDone }) {
             exit={{ opacity: 0, scale: 1.03 }}
             transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
             style={{
-                position: 'fixed', inset: 0, zIndex: 9999, background: '#000',
+                position: 'fixed', inset: 0, zIndex: 9999, background: 'var(--bg)',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 0,
             }}
         >
@@ -98,70 +99,78 @@ function Loader({ onDone }) {
             <motion.div
                 animate={{ height: ph >= 4 ? '0vh' : '8vh' }}
                 transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
-                style={{ position: 'absolute', top: 0, left: 0, right: 0, background: '#0a0a0a' }}
+                style={{ position: 'absolute', top: 0, left: 0, right: 0, background: '#040404' }}
             />
             {/* Bottom cinematic bar */}
             <motion.div
                 animate={{ height: ph >= 4 ? '0vh' : '8vh' }}
                 transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
-                style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: '#0a0a0a' }}
+                style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: '#040404' }}
             />
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', position: 'relative', zIndex: 2 }}>
-                {/* Animated circle + T */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '40px', position: 'relative', zIndex: 2 }}>
+                {/* Modern Rounded Logo Box */}
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.75 }}
-                    animate={{ opacity: ph >= 1 ? 1 : 0, scale: ph >= 1 ? 1 : 0.75 }}
-                    transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    style={{ position: 'relative', width: '88px', height: '88px' }}
+                    initial={{ opacity: 0, scale: 0.8, rotate: -15 }}
+                    animate={{ 
+                        opacity: ph >= 1 ? 1 : 0, 
+                        scale: ph >= 1 ? 1 : 0.8,
+                        rotate: ph >= 2 ? 0 : -15
+                    }}
+                    transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                    className="w-24 h-24 rounded-3xl border-2 border-[var(--p)] flex items-center justify-center relative"
+                    style={{ 
+                        background: 'rgba(255,255,255,0.02)',
+                        boxShadow: `0 0 40px ${PRIMARY}15`
+                    }}
                 >
-                    <svg viewBox="0 0 88 88" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-                        <motion.circle cx="44" cy="44" r="40" fill="none" stroke={GOLD} strokeWidth="0.8"
-                            strokeDasharray="251"
-                            initial={{ strokeDashoffset: 251 }}
-                            animate={{ strokeDashoffset: ph >= 2 ? 0 : 251 }}
-                            transition={{ duration: 1.1, ease: 'easeInOut' }}
-                        />
-                        <circle cx="44" cy="44" r="32" fill="none" stroke={`${GOLD}25`} strokeWidth="0.4" />
-                    </svg>
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ color: GOLD, fontSize: '32px', fontFamily: "'Cinzel',Georgia,serif", fontWeight: 700, letterSpacing: '0.04em' }}>T</span>
-                    </div>
-                </motion.div>
-
-                {/* Brand name */}
-                <motion.div
-                    initial={{ opacity: 0, letterSpacing: '0.7em' }}
-                    animate={{ opacity: ph >= 2 ? 1 : 0, letterSpacing: ph >= 2 ? '0.38em' : '0.7em' }}
-                    transition={{ duration: 0.9, delay: 0.15 }}
-                    style={{ color: GOLD, fontSize: '12px', fontFamily: "'Cinzel',Georgia,serif", textTransform: 'uppercase' }}
-                >
-                    TRENDORRA
-                </motion.div>
-
-                {/* Progress bar */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: ph >= 2 ? 1 : 0 }}
-                    style={{ width: '140px', height: '1px', background: `${GOLD}18`, position: 'relative', overflow: 'hidden', borderRadius: '999px' }}
-                >
-                    <motion.div
-                        initial={{ x: '-100%' }}
-                        animate={{ x: ph >= 2 ? '0%' : '-100%' }}
-                        transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
-                        style={{ position: 'absolute', inset: 0, background: `linear-gradient(90deg, transparent, ${GOLD}, ${GOLD_LIGHT}, ${GOLD})` }}
+                    <span className="serif text-5xl font-black" style={{ color: PRIMARY }}>V</span>
+                    <motion.div 
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+                        className="absolute -inset-2 rounded-[2rem] border border-dashed opacity-20"
+                        style={{ borderColor: PRIMARY }}
                     />
                 </motion.div>
 
-                {/* Tagline */}
-                <motion.p
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: ph >= 3 ? 0.38 : 0, y: ph >= 3 ? 0 : 8 }}
-                    transition={{ duration: 0.5 }}
-                    style={{ color: 'rgba(255,255,255,0.38)', fontSize: '9px', letterSpacing: '0.26em', textTransform: 'uppercase', fontFamily: "'Cormorant Garamond',Georgia,serif", fontStyle: 'italic', margin: 0 }}
-                >
-                    Premium Fashion · Est. 2024
-                </motion.p>
+                {/* Brand name */}
+                <div className="text-center space-y-4">
+                    <motion.h1
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: ph >= 2 ? 1 : 0, y: ph >= 2 ? 0 : 10 }}
+                        transition={{ duration: 0.8 }}
+                        className="serif text-4xl font-bold tracking-[0.2em] uppercase"
+                        style={{ color: '#FFFFFF' }}
+                    >
+                        VIDESTORE
+                    </motion.h1>
+
+                    {/* Three Dots Loader */}
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: ph >= 2 ? 1 : 0 }}
+                        className="flex items-center justify-center gap-3 py-2"
+                    >
+                        {[0, 1, 2].map(i => (
+                            <motion.div
+                                key={i}
+                                animate={{ y: [0, -6, 0] }}
+                                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+                                className="w-1.5 h-1.5 rounded-full"
+                                style={{ backgroundColor: PRIMARY }}
+                            />
+                        ))}
+                    </motion.div>
+
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: ph >= 3 ? 0.4 : 0 }}
+                        className="text-[10px] font-black uppercase tracking-[0.6em]"
+                        style={{ color: '#FFFFFF' }}
+                    >
+                        CURATING LUXURY
+                    </motion.p>
+                </div>
             </div>
         </motion.div>
     );
@@ -216,65 +225,44 @@ function ExploreBtn({ onClick }) {
                     transition={{ duration: 0.4 }}
                     style={{
                         position: 'absolute', inset: '-24px', borderRadius: '8px',
-                        background: `radial-gradient(ellipse, ${GOLD}35 0%, transparent 65%)`,
+                        background: `radial-gradient(ellipse, ${PRIMARY}35 0%, transparent 65%)`,
                         filter: 'blur(22px)', pointerEvents: 'none', zIndex: 0,
                     }}
                 />
 
                 {/* Button face */}
                 <motion.div
-                    animate={{
-                        background: hover
-                            ? `linear-gradient(135deg, ${GOLD_DARK} 0%, ${GOLD} 35%, ${GOLD_LIGHT} 65%, ${GOLD_MID} 100%)`
-                            : 'rgba(0,0,0,0.2)',
-                        borderColor: hover ? GOLD_LIGHT : `${GOLD}80`,
-                    }}
-                    transition={{ duration: 0.35 }}
                     style={{
                         position: 'relative', zIndex: 1,
-                        border: `1.5px solid ${GOLD}80`,
-                        borderRadius: '3px',
-                        padding: '24px 64px',
-                        display: 'flex', alignItems: 'center', gap: '22px',
+                        borderRadius: '999px',
+                        padding: '20px 48px',
+                        display: 'flex', alignItems: 'center', gap: '16px',
                         overflow: 'hidden',
-                        backdropFilter: hover ? 'none' : 'blur(8px)',
-                        WebkitBackdropFilter: hover ? 'none' : 'blur(8px)',
+                        background: hover ? 'var(--p)' : 'rgba(13,13,15,0.8)',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: `1px solid ${hover ? 'var(--p)' : '#232323'}`,
+                        boxShadow: hover ? '0 20px 40px rgba(200, 166, 70, 0.2)' : '0 4px 20px rgba(0,0,0,0.5)',
+                        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                     }}
                 >
-                    {/* Shimmer sweep */}
-                    {hover && !fired && (
-                        <motion.div
-                            initial={{ x: '-130%', skewX: -15 }}
-                            animate={{ x: '230%', skewX: -15 }}
-                            transition={{ duration: 0.7, ease: 'easeOut' }}
-                            style={{ position: 'absolute', top: 0, bottom: 0, width: '55%', background: 'linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent)', pointerEvents: 'none' }}
-                        />
-                    )}
-
-                    {/* Label */}
                     <motion.span
-                        animate={{ color: hover ? '#06040a' : GOLD_LIGHT }}
-                        transition={{ duration: 0.3 }}
+                        animate={{ color: hover ? '#040404' : 'var(--p)' }}
                         style={{
-                            fontSize: 'clamp(11px,1.1vw,13px)',
-                            fontWeight: 700, letterSpacing: '0.34em',
+                            fontSize: '12px',
+                            fontWeight: 600, letterSpacing: '0.2em',
                             textTransform: 'uppercase',
-                            fontFamily: "'Cinzel',Georgia,serif",
+                            fontFamily: 'Inter, sans-serif',
                             whiteSpace: 'nowrap', position: 'relative', zIndex: 1,
                         }}
                     >
-                        {fired ? 'ENTERING...' : 'EXPLORE COLLECTION'}
+                        {fired ? 'Entering Store...' : 'Explore Collection'}
                     </motion.span>
-
-                    {/* Arrow */}
                     <motion.div
-                        animate={{ x: hover ? 8 : 0, color: hover ? '#06040a' : GOLD }}
-                        transition={{ duration: 0.3 }}
-                        style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', flexShrink: 0 }}
+                        animate={{ x: hover ? 5 : 0, color: hover ? '#040404' : 'var(--p)' }}
+                        style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center' }}
                     >
-                        <svg width="24" height="13" viewBox="0 0 24 13" fill="none">
-                            <path d="M0 6.5H22M16 1L22 6.5L16 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
+                        <FiArrowRight size={18} />
                     </motion.div>
                 </motion.div>
 
@@ -286,7 +274,7 @@ function ExploreBtn({ onClick }) {
                             animate={{ scale: 10, opacity: 0 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.85, ease: 'easeOut' }}
-                            style={{ position: 'absolute', inset: 0, margin: 'auto', width: '50px', height: '50px', borderRadius: '50%', background: GOLD, pointerEvents: 'none', zIndex: 3 }}
+                            style={{ position: 'absolute', inset: 0, margin: 'auto', width: '50px', height: '50px', borderRadius: '50%', background: PRIMARY, pointerEvents: 'none', zIndex: 3 }}
                         />
                     )}
                 </AnimatePresence>
@@ -304,8 +292,8 @@ function SlideDots({ total, cur, onPick }) {
                     <motion.div
                         animate={{
                             height: i === cur ? '36px' : '6px',
-                            background: i === cur ? GOLD : `${GOLD}30`,
-                            boxShadow: i === cur ? `0 0 10px ${GOLD}80, 0 0 20px ${GOLD}40` : 'none',
+                            background: i === cur ? PRIMARY : `${PRIMARY}30`,
+                            boxShadow: i === cur ? `0 0 15px var(--p), 0 0 30px var(--p)` : '0 0 0px rgba(0,0,0,0)',
                         }}
                         transition={{ duration: 0.4, ease: 'easeOut' }}
                         style={{ width: '2px', borderRadius: '999px' }}
@@ -345,7 +333,7 @@ export default function LandingPage() {
             <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
         *{margin:0;padding:0;box-sizing:border-box}
-        html,body{overflow:hidden;background:#000;width:100%;height:100%}
+        html,body{overflow:hidden;width:100%;height:100%}
       `}</style>
 
             <AnimatePresence>
@@ -357,7 +345,7 @@ export default function LandingPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1.0 }}
-                    style={{ position: 'fixed', inset: 0, background: '#000', overflow: 'hidden' }}
+                    style={{ position: 'fixed', inset: 0, overflow: 'hidden' }}
                 >
                     {/* ── Background with wipe transition ── */}
                     <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
@@ -379,14 +367,14 @@ export default function LandingPage() {
                     </div>
 
                     {/* ── Overlays ── */}
-                    {/* Bottom darkness */}
-                    <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(to top, rgba(0,0,0,0.97) 0%, rgba(0,0,0,0.68) 28%, rgba(0,0,0,0.22) 58%, rgba(0,0,0,0.42) 100%)' }} />
-                    {/* Left darkness for text */}
-                    <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(105deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 42%, transparent 72%)' }} />
-                    {/* Gold warmth */}
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%', zIndex: 2, background: `linear-gradient(to top, ${GOLD}10 0%, transparent 100%)` }} />
+                    {/* Bottom fade */}
+                    <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(to top, rgba(4,4,4,1) 0%, rgba(4,4,4,0.6) 28%, transparent 58%, rgba(4,4,4,0.3) 100%)' }} />
+                    {/* Left fade for text */}
+                    <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(105deg, rgba(4,4,4,0.9) 0%, rgba(4,4,4,0.4) 42%, transparent 72%)' }} />
+                    {/* Primary warmth */}
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%', zIndex: 2, background: `linear-gradient(to top, ${PRIMARY}15 0%, transparent 100%)` }} />
                     {/* Vignette */}
-                    <div style={{ position: 'absolute', inset: 0, zIndex: 2, boxShadow: 'inset 0 0 140px rgba(0,0,0,0.55)' }} />
+                    <div style={{ position: 'absolute', inset: 0, zIndex: 2, boxShadow: 'inset 0 0 140px rgba(0,0,0,0.6)' }} />
 
                     <Grain />
                     <Particles />
@@ -398,19 +386,19 @@ export default function LandingPage() {
                         transition={{ duration: 1.4, ease: [0.76, 0, 0.24, 1] }}
                         style={{
                             position: 'absolute', top: 0, left: 0, right: 0, height: '2px', zIndex: 20,
-                            background: `linear-gradient(90deg, transparent 0%, ${GOLD_DARK} 12%, ${GOLD} 38%, ${GOLD_LIGHT} 55%, ${GOLD} 78%, transparent 100%)`,
+                            background: `linear-gradient(90deg, transparent 0%, ${PRIMARY_DARK} 12%, ${PRIMARY} 38%, ${PRIMARY_LIGHT} 55%, ${PRIMARY} 78%, transparent 100%)`,
                             transformOrigin: 'left',
                         }}
                     />
 
                     {/* ── Auto-progress bar at bottom ── */}
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', zIndex: 20, background: `${GOLD}12` }}>
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', zIndex: 20, background: `${PRIMARY}12` }}>
                         <motion.div
                             key={idx}
                             initial={{ width: '0%' }}
                             animate={{ width: '100%' }}
                             transition={{ duration: 6.5, ease: 'linear' }}
-                            style={{ height: '100%', background: `linear-gradient(90deg, ${GOLD_DARK}, ${GOLD}, ${GOLD_LIGHT})` }}
+                            style={{ height: '100%', background: `linear-gradient(90deg, ${PRIMARY_DARK}, ${PRIMARY}, ${PRIMARY_LIGHT})` }}
                         />
                     </div>
 
@@ -434,11 +422,11 @@ export default function LandingPage() {
                                 display: 'flex', alignItems: 'center', gap: '13px',
                             }}
                         >
-                            <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: `1px solid ${GOLD}50`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <span style={{ color: GOLD, fontSize: '15px', fontFamily: "'Cinzel',serif", fontWeight: 700 }}>T</span>
+                            <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: `1px solid ${PRIMARY}50`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <span style={{ color: PRIMARY, fontSize: '15px', fontFamily: "'Cinzel',serif", fontWeight: 700 }}>V</span>
                             </div>
-                            <span style={{ color: `${GOLD}85`, fontSize: '10px', letterSpacing: '0.36em', fontFamily: "'Cinzel',serif", textTransform: 'uppercase' }}>
-                                TRENDORRA
+                            <span style={{ color: PRIMARY, fontSize: '10px', letterSpacing: '0.36em', fontFamily: "'Cinzel',serif", textTransform: 'uppercase', fontWeight: 600 }}>
+                                VIDESTORE
                             </span>
                         </motion.div>
 
@@ -456,9 +444,9 @@ export default function LandingPage() {
                                     initial={{ width: 0 }}
                                     animate={{ width: '36px' }}
                                     transition={{ duration: 0.6, delay: 0.1 }}
-                                    style={{ height: '1px', background: `linear-gradient(to right, ${GOLD}, transparent)` }}
+                                    style={{ height: '1px', background: `linear-gradient(to right, ${PRIMARY}, transparent)` }}
                                 />
-                                <span style={{ fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase', color: GOLD, fontFamily: "'Cinzel',serif", fontWeight: 600 }}>
+                                <span style={{ fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase', color: PRIMARY, fontFamily: "'Cinzel',serif", fontWeight: 600 }}>
                                     {S.sub}
                                 </span>
                             </motion.div>
@@ -476,19 +464,19 @@ export default function LandingPage() {
                                                 exit={{ y: '-35%', opacity: 0 }}
                                                 transition={{ duration: 0.62, delay: wi * 0.065, ease: [0.25, 0.46, 0.45, 0.94] }}
                                             >
-                                                <span style={{
+                                                <span className="serif" style={{
                                                     display: 'block',
-                                                    fontSize: 'clamp(2.4rem,6.5vw,6.2rem)', fontWeight: 900,
-                                                    fontFamily: "'Cinzel',Georgia,serif",
-                                                    letterSpacing: '-0.025em',
-                                                    lineHeight: 0.90,
-                                                    paddingBottom: '0.06em',
+                                                    fontSize: 'clamp(2.4rem,6.8vw,7.2rem)', fontWeight: 400,
+                                                    letterSpacing: '-0.03em',
+                                                    lineHeight: 0.95,
+                                                    paddingBottom: '0.1em',
                                                     ...(wi === 2 ? {
-                                                        background: `linear-gradient(135deg, ${GOLD_DARK} 0%, ${GOLD} 35%, ${GOLD_LIGHT} 65%, ${GOLD_MID} 100%)`,
+                                                        background: 'linear-gradient(135deg, var(--p), var(--pd))',
                                                         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                                                        fontStyle: 'italic',
                                                     } : {
-                                                        color: '#ffffff',
-                                                        textShadow: '0 2px 50px rgba(0,0,0,0.7)',
+                                                        color: '#F5F3EE',
+                                                        textShadow: '0 10px 40px rgba(0,0,0,0.8)',
                                                     }),
                                                 }}>
                                                     {w}
@@ -561,10 +549,10 @@ export default function LandingPage() {
                         <motion.div
                             animate={{ x: [0, 9, 0] }}
                             transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-                            style={{ width: '26px', height: '1px', background: `${GOLD}45` }}
+                            style={{ width: '26px', height: '1px', background: `${PRIMARY}45` }}
                         />
-                        <span style={{ fontSize: '8px', letterSpacing: '0.26em', color: `${GOLD}45`, textTransform: 'uppercase', fontFamily: "'Cinzel',serif" }}>
-                            Swipe
+                        <span style={{ fontSize: '8px', letterSpacing: '0.26em', color: `${PRIMARY}45`, textTransform: 'uppercase', fontFamily: "'Cinzel',serif" }}>
+                            Explore
                         </span>
                     </motion.div>
                 </motion.div>

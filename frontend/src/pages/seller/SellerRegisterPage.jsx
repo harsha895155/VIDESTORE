@@ -6,13 +6,13 @@ import {
   FiArrowLeft, FiArrowRight, FiCheck, FiShoppingBag,
   FiUser, FiMail, FiPhone, FiMapPin, FiFileText,
   FiEye, FiEyeOff, FiShield, FiTrendingUp, FiPackage,
-  FiAlertCircle, FiCreditCard,
+  FiAlertCircle, FiCreditCard, FiPieChart
 } from 'react-icons/fi';
 
-const GOLD = '#C9A84C';
-const BG = '#0a0a0a';
-const CARD = '#111111';
-const BORDER = 'rgba(255,255,255,0.08)';
+const GOLD = 'var(--p)';
+const BG = 'var(--bg)';
+const CARD = 'var(--card)';
+const BORDER = 'var(--b)';
 
 const STEPS = [
   { label: 'Account', icon: FiUser },
@@ -22,11 +22,17 @@ const STEPS = [
   { label: 'Confirm', icon: FiShield },
 ];
 
+const TIERS = {
+  silver: { name: 'Silver', color: '#94a3b8', limit: 5, commission: 15, price: 'Free' },
+  gold: { name: 'Gold', color: '#fbbf24', limit: 50, commission: 10, price: '₹999/mo' },
+  diamond: { name: 'Diamond', color: '#c084fc', limit: 9999, commission: 5, price: '₹2499/mo' },
+};
+
 const BENEFITS = [
   { icon: FiTrendingUp, title: 'Grow Your Business', desc: 'Reach thousands of customers across India' },
   { icon: FiPackage, title: 'Easy Inventory', desc: 'Manage products, stock & orders in one place' },
   { icon: FiShield, title: 'Secure Payments', desc: 'Fast settlements directly to your bank account' },
-  { icon: FiTrendingUp, title: 'Analytics Dashboard', desc: 'Track sales, revenue & performance in real time' },
+  { icon: FiPieChart, title: 'Analytics Dashboard', desc: 'Track sales, revenue & performance in real time' },
 ];
 
 // ── Reusable Field ────────────────────────────────────────────────
@@ -36,9 +42,9 @@ function Field({ label, icon: Icon, error, hint, ...props }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <label style={{
-        display: 'block', color: 'rgba(255,255,255,0.45)', fontSize: '11px',
-        letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '7px',
-        fontFamily: 'inherit',
+        display: 'block', color: 'var(--tm)', fontSize: '10px',
+        letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '8px',
+        fontWeight: '700', fontFamily: 'inherit',
       }}>
         {label}
       </label>
@@ -55,15 +61,15 @@ function Field({ label, icon: Icon, error, hint, ...props }) {
           type={isPass && show ? 'text' : props.type}
           style={{
             width: '100%', boxSizing: 'border-box',
-            backgroundColor: '#0d0d0d',
-            border: `1px solid ${error ? '#f87171' : 'rgba(255,255,255,0.1)'}`,
-            borderRadius: '6px',
-            padding: `11px ${isPass ? '40px' : '14px'} 11px ${Icon ? '38px' : '14px'}`,
-            color: '#fff', fontSize: '14px', outline: 'none',
-            fontFamily: 'inherit', transition: 'border-color 0.2s',
+            backgroundColor: 'var(--bg-alt)',
+            border: `1px solid ${error ? 'var(--d)' : 'var(--b)'}`,
+            borderRadius: '12px',
+            padding: `12px ${isPass ? '44px' : '16px'} 12px ${Icon ? '40px' : '16px'}`,
+            color: 'var(--t)', fontSize: '14px', outline: 'none',
+            fontFamily: 'inherit', transition: 'all 0.3s',
           }}
           onFocus={e => e.target.style.borderColor = GOLD}
-          onBlur={e => e.target.style.borderColor = error ? '#f87171' : 'rgba(255,255,255,0.1)'}
+          onBlur={e => e.target.style.borderColor = error ? 'var(--d)' : 'var(--b)'}
         />
         {isPass && (
           <button
@@ -91,9 +97,9 @@ function SelectField({ label, icon: Icon, children, error, ...props }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <label style={{
-        display: 'block', color: 'rgba(255,255,255,0.45)', fontSize: '11px',
-        letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '7px',
-        fontFamily: 'inherit',
+        display: 'block', color: 'var(--tm)', fontSize: '10px',
+        letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '8px',
+        fontWeight: '700', fontFamily: 'inherit',
       }}>
         {label}
       </label>
@@ -109,16 +115,17 @@ function SelectField({ label, icon: Icon, children, error, ...props }) {
           {...props}
           style={{
             width: '100%', boxSizing: 'border-box',
-            backgroundColor: '#0d0d0d',
-            border: `1px solid ${error ? '#f87171' : 'rgba(255,255,255,0.1)'}`,
-            borderRadius: '6px',
-            padding: `11px 14px 11px ${Icon ? '38px' : '14px'}`,
-            color: props.value ? '#fff' : 'rgba(255,255,255,0.3)',
+            backgroundColor: 'var(--bg-alt)',
+            border: `1px solid ${error ? 'var(--d)' : 'var(--b)'}`,
+            borderRadius: '12px',
+            padding: `12px 16px 12px ${Icon ? '40px' : '16px'}`,
+            color: props.value ? 'var(--t)' : 'var(--tm)',
             fontSize: '14px', outline: 'none',
             fontFamily: 'inherit', appearance: 'none', cursor: 'pointer',
+            transition: 'all 0.3s',
           }}
           onFocus={e => e.target.style.borderColor = GOLD}
-          onBlur={e => e.target.style.borderColor = error ? '#f87171' : 'rgba(255,255,255,0.1)'}
+          onBlur={e => e.target.style.borderColor = error ? 'var(--d)' : 'var(--b)'}
         >
           {children}
         </select>
@@ -180,10 +187,12 @@ export default function SellerRegisterPage() {
     // Step 1
     businessName: '', businessType: '', gstin: '', category: '',
     // Step 2
-    addressLine: '', city: '', state: '', pincode: '',
+    tier: 'silver',
     // Step 3
-    bankAccount: '', confirmBankAccount: '', ifsc: '', accountName: '', bankName: '',
+    addressLine: '', city: '', state: '', pincode: '',
     // Step 4
+    bankAccount: '', confirmBankAccount: '', ifsc: '', accountName: '', bankName: '',
+    // Step 5
     agreed: false,
   });
 
@@ -322,12 +331,14 @@ export default function SellerRegisterPage() {
             name: form.accountName,
             bankName: form.bankName,
           },
+          tier: form.tier,
+          listingLimit: TIERS[form.tier]?.limit || 5,
         },
       });
 
       // Log them in immediately
-      localStorage.setItem('trendora_token', res.token);
-      localStorage.setItem('trendora_user', JSON.stringify(res.user));
+      localStorage.setItem('videstore_token', res.token);
+      localStorage.setItem('videstore_user', JSON.stringify(res.user));
 
       const isUpgrade = res.message?.toLowerCase().includes('upgraded');
       toast.success(
@@ -344,11 +355,11 @@ export default function SellerRegisterPage() {
 
       if (msg.includes('Enter your existing account password')) {
         toast.error(
-          'This email is already registered. Enter your existing Trendorra password to upgrade your account.',
+          'This email is already registered. Enter your existing VideStore password to upgrade your account.',
           { duration: 6000 }
         );
         setStep(0);
-        setErrors({ password: 'Enter your existing Trendorra account password to upgrade' });
+        setErrors({ password: 'Enter your existing VideStore account password to upgrade' });
       } else if (msg.includes('already registered as a seller')) {
         toast.error('This email is already a seller account. Redirecting to login…', { duration: 4000 });
         setTimeout(() => navigate('/login'), 2000);
@@ -371,7 +382,8 @@ export default function SellerRegisterPage() {
     { label: 'Business Type', value: form.businessType },
     { label: 'Category', value: form.category },
     { label: 'GSTIN', value: form.gstin || 'Not provided' },
-    { label: 'Pickup Address', value: `${form.addressLine}, ${form.city}, ${form.state} – ${form.pincode}` },
+    { label: 'Pincode', value: form.pincode },
+    { label: 'Selected Plan', value: TIERS[form.tier]?.name },
     { label: 'Bank', value: form.bankName },
     { label: 'Account Holder', value: form.accountName },
     { label: 'Account Number', value: form.bankAccount ? `****${form.bankAccount.slice(-4)}` : '' },
@@ -466,7 +478,7 @@ export default function SellerRegisterPage() {
           className="hidden lg:flex"
           style={{
             width: '360px', flexShrink: 0,
-            backgroundColor: '#0d0d0d',
+            backgroundColor: 'var(--bg-alt)',
             borderRight: `1px solid ${BORDER}`,
             padding: '44px 36px',
             flexDirection: 'column',
@@ -475,7 +487,7 @@ export default function SellerRegisterPage() {
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '44px', textDecoration: 'none' }}>
             <FiArrowLeft size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
             <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', fontFamily: 'inherit', letterSpacing: '0.08em' }}>
-              Back to Trendorra
+              Back to VideStore
             </span>
           </Link>
 
@@ -483,7 +495,7 @@ export default function SellerRegisterPage() {
             Seller Program
           </p>
           <h2 style={{ color: '#fff', fontFamily: 'Cinzel, serif', fontSize: '22px', letterSpacing: '0.08em', lineHeight: '1.35', marginBottom: '14px' }}>
-            Grow Your Business with Trendorra
+            Grow Your Business with VideStore
           </h2>
           <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', lineHeight: '1.7', fontFamily: 'inherit', marginBottom: '32px' }}>
             Join thousands of sellers already growing their fashion business on India's premium marketplace.
@@ -514,7 +526,7 @@ export default function SellerRegisterPage() {
             backgroundColor: `${GOLD}08`, border: `1px solid ${GOLD}22`, borderRadius: '8px',
           }}>
             <p style={{ color: GOLD, fontSize: '11px', fontWeight: '600', marginBottom: '5px', fontFamily: 'inherit' }}>
-              Already have a Trendorra account?
+              Already have a VideStore account?
             </p>
             <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: '11px', lineHeight: '1.6', fontFamily: 'inherit', margin: 0 }}>
               Use the same email & your existing password — your account will be upgraded to a seller account automatically. Your orders and profile stay intact.
@@ -565,7 +577,7 @@ export default function SellerRegisterPage() {
                 color: GOLD, fontSize: '13px', fontFamily: 'Cinzel, serif',
                 letterSpacing: '0.12em', textTransform: 'uppercase',
               }}>
-                Trendorra
+                VideStore
               </span>
 
               {/* Placeholder to keep brand centred */}
@@ -597,31 +609,32 @@ export default function SellerRegisterPage() {
             </div>
 
             {/* ── Step progress bar ── */}
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '32px' }}>
               {STEPS.map((s, i) => (
                 <div key={s.label} style={{ display: 'flex', alignItems: 'center', flex: i < STEPS.length - 1 ? 1 : 'none' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
                     <div
                       className="step-circle"
                       style={{
-                        width: '32px', height: '32px', borderRadius: '50%',
-                        backgroundColor: i < step ? GOLD : i === step ? `${GOLD}22` : 'rgba(255,255,255,0.05)',
+                        width: '36px', height: '36px', borderRadius: '50%',
+                        backgroundColor: i < step ? GOLD : i === step ? 'transparent' : 'transparent',
                         border: `2px solid ${i <= step ? GOLD : 'rgba(255,255,255,0.1)'}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         transition: 'all 0.3s',
+                        boxShadow: i === step ? `0 0 15px ${GOLD}33` : 'none',
                       }}
                     >
                       {i < step
-                        ? <FiCheck size={13} style={{ color: '#fff' }} />
-                        : <s.icon size={13} style={{ color: i === step ? GOLD : 'rgba(255,255,255,0.25)' }} />
+                        ? <FiCheck size={14} style={{ color: '#fff' }} />
+                        : <s.icon size={14} style={{ color: i === step ? GOLD : 'rgba(255,255,255,0.25)' }} />
                       }
                     </div>
                     <span
                       className="step-label"
                       style={{
-                        fontSize: '9px', color: i <= step ? GOLD : 'rgba(255,255,255,0.2)',
-                        letterSpacing: '0.08em', textTransform: 'uppercase',
-                        fontFamily: 'inherit', whiteSpace: 'nowrap',
+                        fontSize: '8px', color: i <= step ? GOLD : 'rgba(255,255,255,0.2)',
+                        letterSpacing: '0.12em', textTransform: 'uppercase',
+                        fontWeight: '800', fontFamily: 'inherit', whiteSpace: 'nowrap',
                       }}
                     >
                       {s.label}
@@ -629,9 +642,9 @@ export default function SellerRegisterPage() {
                   </div>
                   {i < STEPS.length - 1 && (
                     <div style={{
-                      flex: 1, height: '2px',
+                      flex: 1, height: '1px',
                       backgroundColor: i < step ? GOLD : 'rgba(255,255,255,0.07)',
-                      marginBottom: '20px', marginLeft: '6px', marginRight: '6px',
+                      marginBottom: '22px', marginLeft: '4px', marginRight: '4px',
                       transition: 'background-color 0.3s',
                     }} />
                   )}
@@ -642,7 +655,7 @@ export default function SellerRegisterPage() {
             {/* ── Form card ── */}
             <div
               className="form-card"
-              style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '12px', padding: '32px' }}
+              style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '24px', padding: '32px', boxShadow: 'var(--shadow-premium)' }}
             >
 
               {/* ════ STEP 0 — Account ════ */}
@@ -656,7 +669,7 @@ export default function SellerRegisterPage() {
                   </p>
 
                   <InfoBox>
-                    💡 <strong style={{ color: 'rgba(255,255,255,0.6)' }}>Already have a Trendorra account?</strong> Enter your existing email and password below — your account will be upgraded to a seller account automatically.
+                    💡 <strong style={{ color: 'rgba(255,255,255,0.6)' }}>Already have a VideStore account?</strong> Enter your existing email and password below — your account will be upgraded to a seller account automatically.
                   </InfoBox>
 
                   <Field
@@ -673,13 +686,12 @@ export default function SellerRegisterPage() {
                     label="Mobile Number" icon={FiPhone} type="tel"
                     value={form.phone} onChange={e => set('phone', e.target.value)}
                     error={errors.phone} placeholder="10-digit mobile number"
-                    hint="Must be a unique number not linked to any other account"
                   />
                   <Field
                     label="Password" type="password"
                     value={form.password} onChange={e => set('password', e.target.value)}
                     error={errors.password}
-                    placeholder="Min 8 characters  (or your existing Trendorra password)"
+                    placeholder="Min 8 characters"
                   />
                   <Field
                     label="Confirm Password" type="password"
@@ -688,14 +700,13 @@ export default function SellerRegisterPage() {
                   />
                 </>
               )}
-
-              {/* ════ STEP 1 — Business ════ */}
+                       {/* ════ STEP 1 — Business Information ════ */}
               {step === 1 && (
                 <>
-                  <h3 style={{ color: '#fff', fontFamily: 'Cinzel, serif', fontSize: '17px', letterSpacing: '0.08em', marginBottom: '5px' }}>
+                  <h3 style={{ color: '#fff', fontFamily: 'Cinzel, serif', fontSize: '18px', letterSpacing: '0.08em', marginBottom: '6px' }}>
                     Business Information
                   </h3>
-                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px', marginBottom: '22px', fontFamily: 'inherit' }}>
+                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', marginBottom: '24px', fontFamily: 'inherit' }}>
                     Tell us about your business to set up your seller profile.
                   </p>
 
@@ -734,21 +745,59 @@ export default function SellerRegisterPage() {
                     placeholder="e.g. 22AAAAA0000A1Z5"
                     hint="Leave blank if annual turnover is below ₹20 lakhs — you can add it later from your seller dashboard."
                   />
+
+                  {/* Plan Selection Integrated Here */}
+                  <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: `1px solid ${BORDER}` }}>
+                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.45)', fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '12px', fontWeight: '700' }}>
+                      Choose Your Account Plan
+                    </label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {Object.entries(TIERS).map(([key, tier]) => (
+                        <div 
+                          key={key} 
+                          onClick={() => set('tier', key)}
+                          style={{ 
+                            backgroundColor: '#0d0d0d', 
+                            border: `1px solid ${form.tier === key ? tier.color : 'rgba(255,255,255,0.1)'}`, 
+                            borderRadius: '10px', 
+                            padding: '14px', 
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            position: 'relative'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <FiShield size={14} style={{ color: tier.color }} />
+                              <span style={{ color: '#fff', fontSize: '13px', fontWeight: '700' }}>{tier.name}</span>
+                            </div>
+                            <span style={{ color: tier.color, fontSize: '13px', fontWeight: '800' }}>{tier.price}</span>
+                          </div>
+                          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', margin: 0 }}>
+                            Up to <strong>{tier.limit === 9999 ? 'Unlimited' : tier.limit}</strong> products • <strong>{tier.commission}%</strong> commission
+                          </p>
+                          {form.tier === key && (
+                            <div style={{ position: 'absolute', top: '10px', right: '10px', width: '5px', height: '5px', borderRadius: '50%', backgroundColor: tier.color }} />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </>
               )}
 
               {/* ════ STEP 2 — Pickup Address ════ */}
               {step === 2 && (
                 <>
-                  <h3 style={{ color: '#fff', fontFamily: 'Cinzel, serif', fontSize: '17px', letterSpacing: '0.08em', marginBottom: '5px' }}>
+                  <h3 style={{ color: '#fff', fontFamily: 'Cinzel, serif', fontSize: '18px', letterSpacing: '0.08em', marginBottom: '6px' }}>
                     Pickup Address
                   </h3>
-                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px', marginBottom: '22px', fontFamily: 'inherit' }}>
+                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', marginBottom: '24px', fontFamily: 'inherit' }}>
                     Our logistics partner will pick up orders from this address.
                   </p>
 
                   <InfoBox>
-                    📦 This address is used for <strong style={{ color: 'rgba(255,255,255,0.6)' }}>order pickups</strong> by our delivery partner. Make sure someone is available at this location during business hours (9 AM – 7 PM).
+                    📦 This address is used for <strong style={{ color: 'rgba(255,255,255,0.6)' }}>order pickups</strong> by our delivery partner.
                   </InfoBox>
 
                   <Field
@@ -757,16 +806,14 @@ export default function SellerRegisterPage() {
                     error={errors.addressLine} placeholder="e.g. 12, Gandhi Road, Opp. City Mall"
                   />
 
-                  {/* City + Pincode grid — stacks on mobile */}
                   <div className="pin-grid">
                     <Field
                       label="City" type="text"
                       value={form.city} onChange={e => set('city', e.target.value)}
                       error={errors.city} placeholder="City"
                     />
-                    {/* Pincode — India Post + Shiprocket live verification */}
                     <div style={{ marginBottom: '12px' }}>
-                      <label style={{ display: 'block', color: 'rgba(255,255,255,0.45)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '7px', fontFamily: 'inherit' }}>
+                      <label style={{ display: 'block', color: 'rgba(255,255,255,0.45)', fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '8px', fontWeight: '700' }}>
                         Pincode
                       </label>
                       <div style={{ position: 'relative' }}>
@@ -781,8 +828,6 @@ export default function SellerRegisterPage() {
                             borderRadius: '6px', padding: '11px 40px 11px 14px',
                             color: '#fff', fontSize: '14px', outline: 'none', fontFamily: 'inherit',
                           }}
-                          onFocus={e => e.target.style.borderColor = '#C9A84C'}
-                          onBlur={e => e.target.style.borderColor = errors.pincode ? '#f87171' : pinValid === true ? '#4ade80' : pinValid === false ? '#f87171' : 'rgba(255,255,255,0.1)'}
                         />
                         <div style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
                           {pinChecking && (
@@ -792,17 +837,8 @@ export default function SellerRegisterPage() {
                           {!pinChecking && pinValid === false && <span style={{ color: '#f87171', fontSize: '16px', lineHeight: '1' }}>&#10007;</span>}
                         </div>
                       </div>
-                      {pinChecking && !errors.pincode && (
-                        <p style={{ color: '#C9A84C', fontSize: '11px', marginTop: '5px', fontFamily: 'inherit' }}>
-                          Verifying pincode with India Post &amp; Shiprocket...
-                        </p>
-                      )}
-                      {!pinChecking && pinMsg && !errors.pincode && (
-                        <p style={{ color: pinValid ? '#4ade80' : '#f87171', fontSize: '11px', marginTop: '5px', fontFamily: 'inherit' }}>{pinMsg}</p>
-                      )}
-                      {errors.pincode && (
-                        <p style={{ color: '#f87171', fontSize: '11px', marginTop: '5px', fontFamily: 'inherit' }}>{errors.pincode}</p>
-                      )}
+                      {pinMsg && !errors.pincode && <p style={{ color: pinValid ? '#4ade80' : '#f87171', fontSize: '10px', marginTop: '5px' }}>{pinMsg}</p>}
+                      {errors.pincode && <p style={{ color: '#f87171', fontSize: '10px', marginTop: '5px' }}>{errors.pincode}</p>}
                     </div>
                   </div>
 
@@ -820,16 +856,12 @@ export default function SellerRegisterPage() {
               {/* ════ STEP 3 — Bank Details ════ */}
               {step === 3 && (
                 <>
-                  <h3 style={{ color: '#fff', fontFamily: 'Cinzel, serif', fontSize: '17px', letterSpacing: '0.08em', marginBottom: '5px' }}>
+                  <h3 style={{ color: '#fff', fontFamily: 'Cinzel, serif', fontSize: '18px', letterSpacing: '0.08em', marginBottom: '6px' }}>
                     Bank Account Details
                   </h3>
-                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px', marginBottom: '22px', fontFamily: 'inherit' }}>
-                    All payments for delivered orders will be settled to this account.
+                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', marginBottom: '24px', fontFamily: 'inherit' }}>
+                    All payments will be settled to this account.
                   </p>
-
-                  <InfoBox color="#4ade80">
-                    🔒 Your bank details are <strong style={{ color: 'rgba(255,255,255,0.6)' }}>encrypted and stored securely</strong>. Payouts are processed within <strong style={{ color: 'rgba(255,255,255,0.6)' }}>7 business days</strong> of order delivery.
-                  </InfoBox>
 
                   <Field
                     label="Account Holder Name" icon={FiUser} type="text"
@@ -839,7 +871,7 @@ export default function SellerRegisterPage() {
                   <Field
                     label="Bank Name" icon={FiCreditCard} type="text"
                     value={form.bankName} onChange={e => set('bankName', e.target.value)}
-                    error={errors.bankName} placeholder="e.g. State Bank of India, HDFC Bank"
+                    error={errors.bankName} placeholder="e.g. State Bank of India"
                   />
                   <Field
                     label="Account Number" icon={FiCreditCard} type="text"
@@ -849,97 +881,65 @@ export default function SellerRegisterPage() {
                   <Field
                     label="Confirm Account Number" icon={FiCreditCard} type="password"
                     value={form.confirmBankAccount} onChange={e => set('confirmBankAccount', e.target.value)}
-                    error={errors.confirmBankAccount} placeholder="Re-enter account number to confirm"
+                    error={errors.confirmBankAccount} placeholder="Re-enter to confirm"
                   />
                   <Field
                     label="IFSC Code" icon={FiFileText} type="text"
                     value={form.ifsc} onChange={e => set('ifsc', e.target.value.toUpperCase())}
                     error={errors.ifsc} placeholder="e.g. SBIN0001234"
-                    hint="11-character code printed on your cheque book or passbook"
                   />
-
-                  <div style={{
-                    backgroundColor: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.2)',
-                    borderRadius: '8px', padding: '12px 14px',
-                    display: 'flex', gap: '10px', alignItems: 'flex-start',
-                  }}>
-                    <FiAlertCircle size={15} style={{ color: '#fbbf24', flexShrink: 0, marginTop: '1px' }} />
-                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', lineHeight: '1.6', fontFamily: 'inherit', margin: 0 }}>
-                      Enter a <strong style={{ color: 'rgba(255,255,255,0.6)' }}>savings or current account</strong> in your own name or business name. Incorrect details may cause payment delays.
-                    </p>
-                  </div>
                 </>
               )}
 
               {/* ════ STEP 4 — Review & Agree ════ */}
               {step === 4 && (
                 <>
-                  <h3 style={{ color: '#fff', fontFamily: 'Cinzel, serif', fontSize: '17px', letterSpacing: '0.08em', marginBottom: '5px' }}>
+                  <h3 style={{ color: '#fff', fontFamily: 'Cinzel, serif', fontSize: '18px', letterSpacing: '0.08em', marginBottom: '6px' }}>
                     Review & Agree
                   </h3>
-                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '13px', marginBottom: '20px', fontFamily: 'inherit' }}>
-                    Check your details before submitting your seller application.
+                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', marginBottom: '20px', fontFamily: 'inherit' }}>
+                    Check your details before submitting your application.
                   </p>
 
-                  {/* Summary table */}
-                  <div style={{ backgroundColor: '#0d0d0d', border: `1px solid ${BORDER}`, borderRadius: '8px', overflow: 'hidden', marginBottom: '20px' }}>
+                  <div style={{ backgroundColor: '#0d0d0d', border: `1px solid ${BORDER}`, borderRadius: '10px', overflow: 'hidden', marginBottom: '20px' }}>
                     {summaryRows.map(({ label, value }, i) => (
                       <div
                         key={label}
                         className="summary-row"
                         style={{
                           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                          padding: '10px 14px',
+                          padding: '11px 16px',
                           borderBottom: i < summaryRows.length - 1 ? `1px solid ${BORDER}` : 'none',
                         }}
                       >
-                        <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', fontFamily: 'inherit', flexShrink: 0, marginRight: '12px' }}>
+                        <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', fontFamily: 'inherit', fontWeight: '700', textTransform: 'uppercase' }}>
                           {label}
                         </span>
-                        <span className="summary-row-value" style={{ color: '#fff', fontSize: '12px', fontFamily: 'inherit', fontWeight: '500' }}>
+                        <span className="summary-row-value" style={{ color: '#fff', fontSize: '12px', fontFamily: 'inherit', fontWeight: '600' }}>
                           {value}
                         </span>
                       </div>
                     ))}
                   </div>
 
-                  <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '11px', marginBottom: '20px', fontFamily: 'inherit' }}>
-                    Need to change something? Hit <strong style={{ color: 'rgba(255,255,255,0.4)' }}>Back</strong> to edit any step.
-                  </p>
-
-                  {/* Terms scroll box */}
-                  <div style={{
-                    backgroundColor: 'rgba(255,255,255,0.03)', border: `1px solid ${BORDER}`,
-                    borderRadius: '8px', padding: '14px 16px', marginBottom: '20px',
-                    maxHeight: '130px', overflowY: 'auto',
-                  }}>
-                    <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', lineHeight: '1.8', fontFamily: 'inherit', margin: 0 }}>
-                      <strong style={{ color: 'rgba(255,255,255,0.6)' }}>Seller Terms & Conditions</strong><br /><br />
-                      By creating a seller account you agree to: maintain accurate product listings; ship orders within the committed timeframe; maintain a minimum seller rating of 3.5 stars; comply with all applicable laws and Trendorra's seller policies; not list counterfeit or prohibited goods. Trendorra reserves the right to suspend accounts that violate these terms. Commission rates apply as per the category slab shared in the seller onboarding kit. Payouts are processed within 7 business days of confirmed delivery.
-                    </p>
-                  </div>
-
-                  {/* Agreement checkbox */}
-                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer', marginBottom: '4px' }}>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer', marginBottom: '10px' }}>
                     <div
                       onClick={() => set('agreed', !form.agreed)}
                       style={{
-                        width: '18px', height: '18px', borderRadius: '4px', flexShrink: 0, marginTop: '2px',
+                        width: '20px', height: '20px', borderRadius: '5px', flexShrink: 0, marginTop: '2px',
                         backgroundColor: form.agreed ? GOLD : 'transparent',
                         border: `2px solid ${form.agreed ? GOLD : 'rgba(255,255,255,0.2)'}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', transition: 'all 0.2s',
+                        transition: 'all 0.2s',
                       }}
                     >
-                      {form.agreed && <FiCheck size={11} style={{ color: '#fff' }} />}
+                      {form.agreed && <FiCheck size={12} style={{ color: '#000' }} />}
                     </div>
-                    <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', lineHeight: '1.6', fontFamily: 'inherit' }}>
-                      I have read and agree to Trendorra's Seller Terms & Conditions and Privacy Policy.
+                    <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', lineHeight: '1.6' }}>
+                      I agree to the Seller Terms & Conditions and Privacy Policy.
                     </span>
                   </label>
-                  {errors.agreed && (
-                    <p style={{ color: '#f87171', fontSize: '11px', marginTop: '6px', fontFamily: 'inherit' }}>{errors.agreed}</p>
-                  )}
+                  {errors.agreed && <p style={{ color: '#f87171', fontSize: '11px' }}>{errors.agreed}</p>}
                 </>
               )}
 
@@ -970,17 +970,18 @@ export default function SellerRegisterPage() {
                     onClick={next}
                     style={{
                       flex: 1, padding: '12px', backgroundColor: GOLD,
-                      border: 'none', borderRadius: '6px',
-                      color: '#fff', fontSize: '14px', fontWeight: '600',
-                      cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '0.04em',
+                      border: 'none', borderRadius: '10px',
+                      color: '#000', fontSize: '14px', fontWeight: '800',
+                      cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                      transition: 'background-color 0.2s',
-                      minHeight: '48px',
+                      transition: 'all 0.2s',
+                      minHeight: '52px',
                     }}
-                    onMouseOver={e => e.currentTarget.style.backgroundColor = '#b8933f'}
-                    onMouseOut={e => e.currentTarget.style.backgroundColor = GOLD}
+                    onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                    onMouseOut={e => e.currentTarget.style.transform = 'none'}
                   >
-                    Continue <FiArrowRight size={14} />
+                    Continue <FiArrowRight size={16} />
                   </button>
                 ) : (
                   <button
@@ -989,18 +990,19 @@ export default function SellerRegisterPage() {
                     style={{
                       flex: 1, padding: '12px',
                       backgroundColor: loading ? `${GOLD}80` : GOLD,
-                      border: 'none', borderRadius: '6px',
-                      color: '#fff', fontSize: '14px', fontWeight: '600',
+                      border: 'none', borderRadius: '10px',
+                      color: '#000', fontSize: '14px', fontWeight: '800',
                       cursor: loading ? 'not-allowed' : 'pointer',
-                      fontFamily: 'inherit', letterSpacing: '0.04em',
+                      fontFamily: 'inherit', letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                      minHeight: '48px',
+                      minHeight: '52px',
+                      transition: 'all 0.2s',
                     }}
+                    onMouseOver={e => !loading && (e.currentTarget.style.transform = 'translateY(-2px)')}
+                    onMouseOut={e => e.currentTarget.style.transform = 'none'}
                   >
-                    {loading
-                      ? 'Submitting…'
-                      : <><FiCheck size={14} /> Submit Application</>
-                    }
+                    {loading ? 'Submitting…' : 'Submit Application'}
                   </button>
                 )}
               </div>

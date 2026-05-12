@@ -11,18 +11,18 @@ const heroSlides = [
   {
     image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1600&q=90',
     tag: 'New Collection', title: 'Autumn\nWinter\n2026',
-    subtitle: 'Redefine your wardrobe with timeless pieces crafted for the modern individual.',
+    subtitle: 'Upgrade your wardrobe with timeless pieces made for everyone.',
     cta: 'Explore Collection', link: '/shop',
   },
   {
-    image: womenStylish, tag: 'Trendorra Fusion', title: 'Modern\nTraditional\nFusion',
-    subtitle: 'Where heritage meets contemporary style. Discover the art of modern ethnic wear.',
+    image: womenStylish, tag: 'VideStore Fusion', title: 'Modern\nTraditional\nFusion',
+    subtitle: 'Where tradition meets modern style. Discover our unique collection.',
     cta: 'Shop Fusion', link: '/shop/women',
   },
   {
     image: 'https://images.unsplash.com/photo-1618331835717-801e976710b2?w=1600&q=90',
     tag: 'Trending Now', title: 'Street\nHeritage\nSharp.',
-    subtitle: 'High-end tailoring reimagined for the bold, style-conscious generation.',
+    subtitle: 'Quality tailoring reimagined for a bold, stylish generation.',
     cta: 'Shop Trends', link: '/shop/men',
   },
 ];
@@ -44,87 +44,90 @@ const injectHomeStyles = () => {
     /* ── Product grids ── */
     .product-grid-home {
       display: grid;
-      gap: 10px;
+      gap: 16px;
       grid-template-columns: repeat(2, 1fr);
     }
     @media (min-width: 640px) {
-      .product-grid-home { gap: 12px; }
+      .product-grid-home { gap: 20px; }
     }
     @media (min-width: 768px) {
-      .product-grid-home { gap: 16px; grid-template-columns: repeat(4, 1fr); }
-    }
-    @media (min-width: 1024px) {
-      .product-grid-home { gap: 18px; }
+      .product-grid-home { gap: 24px; grid-template-columns: repeat(4, 1fr); }
     }
 
-    /* ── Category grid ──
-       Mobile:  2 cols, aspect 3/4
-       Desktop: 4 cols, FIXED height — no more giant images */
+    /* ── Category grid ── */
     .cat-grid {
       display: grid;
-      gap: 10px;
+      gap: 20px;
       grid-template-columns: repeat(2, 1fr);
     }
     @media (min-width: 768px) {
-      .cat-grid { gap: 14px; grid-template-columns: repeat(4, 1fr); }
+      .cat-grid { grid-template-columns: repeat(4, 1fr); }
     }
 
     .cat-card {
       position: relative;
       overflow: hidden;
-      border-radius: 12px;
+      border-radius: 20px;
       display: block;
-      /* Mobile: portrait */
-      padding-top: 130%;
+      aspect-ratio: 1;
       text-decoration: none;
+      background: var(--card);
+      border: 1px solid var(--b);
+      box-shadow: var(--shadow);
+      transition: all 0.4s ease;
     }
-    /* Desktop: fixed shorter height so they don't tower */
-    @media (min-width: 768px) {
-      .cat-card { padding-top: 0; height: 300px; }
-    }
-    @media (min-width: 1024px) {
-      .cat-card { height: 340px; }
+
+    .cat-card:hover {
+      box-shadow: var(--shadow-premium);
+      transform: translateY(-4px);
+      border-color: #0EA5E9;
     }
 
     .cat-card img {
-      position: absolute;
-      inset: 0; width: 100%; height: 100%;
-      object-fit: cover; object-position: center top;
-      transition: transform 0.7s ease;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0.95;
     }
-    .cat-card:hover img { transform: scale(1.06); }
+
+    .cat-card:hover img {
+      transform: scale(1.08);
+    }
 
     .cat-card-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
     }
+
     .cat-card-text {
-      position: absolute; bottom: 0; left: 0;
-      padding: 14px 16px;
-    }
-    @media (min-width: 768px) {
-      .cat-card-text { padding: 18px 20px; }
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      padding: 24px;
     }
 
     /* ── Skeleton ── */
     .home-skel-card {
-      border-radius: 16px; overflow: hidden;
-      background: rgba(22,16,10,0.80);
-      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--b);
     }
     .home-skel-img {
-      width: 100%; padding-top: 118%;
-      background: rgba(30,22,12,0.55);
+      width: 100%;
+      aspect-ratio: 1;
+      background: var(--bg-alt);
       animation: homeSk 1.4s ease-in-out infinite;
-    }
-    @media (min-width: 1024px) {
-      .home-skel-img { padding-top: 100%; }
     }
     .home-skel-line {
-      height: 10px; border-radius: 6px;
+      height: 10px;
+      border-radius: 6px;
+      background: var(--b-inner);
       animation: homeSk 1.4s ease-in-out infinite;
     }
-    @keyframes homeSk { 0%,100%{opacity:0.45} 50%{opacity:0.9} }
+    @keyframes homeSk { 0%,100%{opacity:0.6} 50%{opacity:1} }
   `;
   document.head.appendChild(s);
 };
@@ -132,17 +135,14 @@ const injectHomeStyles = () => {
 /* ─── Sub-components ────────────────────────────────────────────── */
 function SectionHeader({ sup, title, link, linkLabel = 'View All' }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ width: '3px', height: '26px', borderRadius: '2px', backgroundColor: '#C9A84C', flexShrink: 0 }} />
-        <div>
-          <p style={{ fontSize: '9px', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#C9A84C', margin: '0 0 2px', fontFamily: 'Jost,sans-serif' }}>{sup}</p>
-          <h2 className="font-display font-light text-white" style={{ fontSize: 'clamp(1.1rem,3.2vw,1.65rem)', margin: 0, lineHeight: 1.1 }}>{title}</h2>
-        </div>
+    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '16px' }}>
+      <div>
+        <p style={{ fontSize: '8px', fontWeight: 900, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--p)', marginBottom: '6px' }}>{sup}</p>
+        <h2 className="serif" style={{ fontSize: 'clamp(20px, 3vw, 32px)', fontWeight: 900, color: 'var(--t)', margin: 0, lineHeight: 1.1 }}>{title}</h2>
       </div>
-      <Link to={link} style={{ color: '#C9A84C', textDecoration: 'none', fontSize: '11px', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: '5px', opacity: 0.82 }}
-        className="hover:opacity-100 transition-opacity">
-        {linkLabel} <FiArrowRight size={12} />
+      <Link to={link} style={{ color: 'var(--p)', textDecoration: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '8px', borderBottom: '2px solid var(--p)' }}
+        className="hover:gap-3 transition-all">
+        {linkLabel} <FiArrowRight size={14} />
       </Link>
     </div>
   );
@@ -154,10 +154,10 @@ function SkeletonGrid({ count = 4 }) {
       {[...Array(count)].map((_, i) => (
         <div key={i} className="home-skel-card">
           <div className="home-skel-img" />
-          <div style={{ padding: '9px 11px 12px', display: 'flex', flexDirection: 'column', gap: '7px' }}>
-            <div className="home-skel-line" style={{ width: '55%', background: 'rgba(30,22,12,0.7)' }} />
-            <div className="home-skel-line" style={{ width: '80%', background: 'rgba(30,22,12,0.5)' }} />
-            <div className="home-skel-line" style={{ width: '38%', background: 'rgba(30,22,12,0.38)' }} />
+          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="home-skel-line" style={{ width: '40%' }} />
+            <div className="home-skel-line" style={{ width: '70%' }} />
+            <div className="home-skel-line" style={{ width: '30%' }} />
           </div>
         </div>
       ))}
@@ -175,7 +175,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const t = setInterval(() => setCurrentSlide(s => (s + 1) % heroSlides.length), 5000);
+    const t = setInterval(() => setCurrentSlide(s => (s + 1) % heroSlides.length), 6000);
     return () => clearInterval(t);
   }, []);
 
@@ -189,80 +189,92 @@ export default function HomePage() {
   const slide = heroSlides[currentSlide];
 
   return (
-    <div style={{ backgroundColor: '#0d0d0d', overflow: 'hidden' }}>
+    <div style={{ backgroundColor: 'var(--bg)', color: 'var(--t)' }}>
 
       {/* ── Hero ── */}
-      <section style={{ padding: '14px 14px 0', backgroundColor: '#0d0d0d' }} className="sm:px-6 md:px-8">
-        <div className="relative overflow-hidden"
-          style={{ borderRadius: '18px', height: 'clamp(240px, 50vw, 580px)', maxHeight: '580px' }}>
+      <section className="sm:px-6 md:px-8" style={{ padding: '20px 20px 0', backgroundColor: 'var(--bg)' }}>
+        <div style={{ borderRadius: '24px', height: 'clamp(500px, 80vh, 900px)', background: 'var(--card-alt)', overflow: 'hidden', position: 'relative', border: '1px solid var(--b)', boxShadow: 'var(--shadow-lg)' }}>
           {heroSlides.map((s, i) => (
             <div key={i} className={`absolute inset-0 transition-opacity duration-1000 ${i === currentSlide ? 'opacity-100' : 'opacity-0'}`}>
               <img src={s.image} alt={s.title} className="w-full h-full object-cover object-top" />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(110deg,rgba(0,0,0,0.76) 0%,rgba(0,0,0,0.34) 55%,rgba(0,0,0,0.04) 100%)' }} />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }} />
             </div>
           ))}
-          <div className="absolute inset-0 flex items-end pb-7 sm:items-center sm:pb-0">
-            <div className="px-5 sm:px-10 w-full max-w-lg">
-              <motion.div key={currentSlide} initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: 'easeOut' }}>
-                <div className="inline-flex items-center gap-2 mb-3"
-                  style={{ backgroundColor: 'rgba(201,168,76,0.18)', border: '1px solid rgba(201,168,76,0.38)', borderRadius: '20px', padding: '4px 12px' }}>
-                  <span style={{ color: '#C9A84C', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: 'Jost,sans-serif' }}>{slide.tag}</span>
+          <div className="absolute inset-0 flex items-center">
+            <div style={{ padding: '0 48px', width: '100%', maxWidth: '800px' }}>
+              <motion.div key={currentSlide} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: 'easeOut' }}>
+                <div style={{ background: 'var(--p)', padding: '5px 14px', borderRadius: '100px', fontSize: '9px', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '16px', display: 'inline-block', color: '#fff' }}>
+                  {slide.tag}
                 </div>
-                <h1 className="font-display font-light text-white leading-none whitespace-pre-line"
-                  style={{ fontSize: 'clamp(24px, 6.5vw, 68px)', marginBottom: '10px', textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}>
-                  {slide.title}
+                <h1 className="serif text-white font-bold" style={{ fontSize: 'clamp(36px, 7vw, 72px)', lineHeight: 0.95, marginBottom: '20px' }}>
+                  {slide.title.split('\n').map((line, li) => (
+                    <span key={li} style={{ display: 'block' }}>{line}</span>
+                  ))}
                 </h1>
-                <p className="font-body text-sm leading-relaxed hidden sm:block"
-                  style={{ color: 'rgba(255,255,255,0.68)', marginBottom: '22px', maxWidth: '320px' }}>
+                <p className="text-white/80 hidden sm:block" style={{ fontSize: '16px', lineHeight: 1.6, marginBottom: '28px', maxWidth: '500px' }}>
                   {slide.subtitle}
                 </p>
-                <Link to={slide.link}
-                  className="inline-flex items-center gap-2 font-body text-xs sm:text-sm tracking-[0.14em] uppercase text-white"
-                  style={{ backgroundColor: '#C9A84C', padding: '9px 18px', borderRadius: '7px', textDecoration: 'none' }}>
-                  {slide.cta} <FiArrowRight size={13} />
+                <Link
+                  to={slide.link}
+                  className="btn-primary px-8 py-4"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '12px',
+                    fontWeight: 800, fontSize: '11px',
+                    letterSpacing: '0.15em', textTransform: 'uppercase',
+                    borderRadius: '100px', textDecoration: 'none',
+                    border: 'none',
+                  }}
+                >
+                  {slide.cta} <FiArrowRight size={16} />
                 </Link>
               </motion.div>
             </div>
           </div>
-          {/* Indicators */}
-          <div className="absolute bottom-3 right-4 flex gap-1.5">
+          {/* Slide Indicators */}
+          <div style={{ position: 'absolute', bottom: '40px', left: '48px', display: 'flex', gap: '12px' }}>
             {heroSlides.map((_, i) => (
-              <button key={i} onClick={() => setCurrentSlide(i)} style={{ width: i === currentSlide ? '22px' : '7px', height: '3.5px', borderRadius: '2px', backgroundColor: i === currentSlide ? '#C9A84C' : 'rgba(255,255,255,0.38)', border: 'none', cursor: 'pointer', transition: 'all 0.3s' }} />
+              <button key={i} onClick={() => setCurrentSlide(i)}
+                style={{
+                  width: i === currentSlide ? '48px' : '8px',
+                  height: '4px', borderRadius: '100px',
+                  backgroundColor: i === currentSlide ? 'var(--p)' : 'rgba(255,255,255,0.3)',
+                  border: 'none', cursor: 'pointer', transition: 'all 0.5s ease',
+                }}
+              />
             ))}
-          </div>
-          <div className="absolute top-3 right-4 font-body text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
-            {currentSlide + 1}/{heroSlides.length}
           </div>
         </div>
       </section>
 
       {/* ── Marquee ── */}
-      <div className="py-2.5 overflow-hidden" style={{ backgroundColor: '#C9A84C', marginTop: '14px' }}>
+      <div className="py-8 overflow-hidden border-y" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--b)' }}>
         <div className="marquee-track flex whitespace-nowrap">
-          {['New Arrivals', 'Premium Quality', 'Free Shipping Above ₹999', 'Exclusive Designs',
-            'New Arrivals', 'Premium Quality', 'Free Shipping Above ₹999', 'Exclusive Designs'].map((t, i) => (
-              <span key={i} className="font-body text-xs tracking-[0.24em] uppercase text-white mx-6 flex-shrink-0">{t} &nbsp;•</span>
+            {['ELEGANCE REIMAGINED', 'ARTISANAL QUALITY', 'FREE GLOBAL SHIPPING', 'NEW ARRIVALS EVERY WEEK',
+            'SECURE PAYMENTS', 'EXCLUSIVE OFFERS', 'CURATED FOR YOU', 'THE LUXURY STANDARD'].map((t, i) => (
+              <span key={i} className="font-black text-[11px] tracking-[0.5em] uppercase mx-12 flex-shrink-0 flex items-center gap-4" style={{ color: 'var(--tm)', opacity: 0.4 }}>
+                {t} <span className="w-1.5 h-1.5 rounded-full bg-[var(--p)]" />
+              </span>
             ))}
         </div>
       </div>
 
-      {/* ── Categories — FIXED desktop height ── */}
-      <section style={{ backgroundColor: '#111111' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '40px 16px' }} className="sm:px-6">
-          <SectionHeader sup="Collections" title="Shop by Category" link="/shop" linkLabel="All" />
+      {/* ── Categories ── */}
+      <section style={{ backgroundColor: 'var(--bg)' }}>
+        <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '16px 24px' }} className="sm:px-6">
+          <SectionHeader sup="Shop by" title="Collections" link="/shop" linkLabel="View All" />
           <div className="cat-grid">
             {categories.map((cat, i) => (
               <motion.div key={cat.name}
-                initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.4 }}>
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.6 }}>
                 <Link to={cat.link} className="cat-card group">
                   <img src={cat.image} alt={cat.name} loading="lazy" />
                   <div className="cat-card-overlay" />
                   <div className="cat-card-text">
-                    <h3 className="font-display font-light text-white" style={{ fontSize: 'clamp(0.95rem,3vw,1.35rem)', marginBottom: '4px' }}>{cat.name}</h3>
-                    <span className="flex items-center gap-1.5 group-hover:gap-3 transition-all font-body"
-                      style={{ color: '#C9A84C', fontSize: '9.5px', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-                      Shop Now <FiArrowRight size={9} />
+                    <h3 className="serif text-white font-bold" style={{ fontSize: '28px', marginBottom: '8px' }}>{cat.name}</h3>
+                    <span className="flex items-center gap-2 font-bold text-white/80 tracking-[0.2em] uppercase"
+                      style={{ fontSize: '10px' }}>
+                      Shop Now <FiArrowRight size={14} />
                     </span>
                   </div>
                 </Link>
@@ -274,12 +286,12 @@ export default function HomePage() {
 
       {/* ── New Arrivals ── */}
       {(newArrivals.length > 0 || loading) && (
-        <section className="py-12" style={{ backgroundColor: '#0a0a0a' }}>
-          <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px' }} className="sm:px-6">
-            <SectionHeader sup="Just Landed" title="New Arrivals" link="/shop?newArrival=true" />
+        <section className="py-16" style={{ backgroundColor: 'var(--bg-alt)', borderTop: '1px solid var(--b)', borderBottom: '1px solid var(--b)' }}>
+          <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 24px' }} className="sm:px-6">
+            <SectionHeader sup="Latest" title="New Arrivals" link="/shop?newArrival=true" />
             {loading ? <SkeletonGrid count={4} /> : (
               <div className="product-grid-home">
-                {newArrivals.slice(0, 4).map((p, i) => <ProductCard key={p._id} product={p} index={i} />)}
+                {newArrivals.slice(0, 8).map((p, i) => <ProductCard key={p._id} product={p} index={i} />)}
               </div>
             )}
           </div>
@@ -287,17 +299,17 @@ export default function HomePage() {
       )}
 
       {/* ── Banner ── */}
-      <section className="relative overflow-hidden" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+      <section className="relative overflow-hidden py-32">
         <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1600&q=90" alt="Campaign"
           className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.65)' }} />
-        <div className="relative text-center text-white" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 16px' }}>
-          <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <p className="section-subtitle text-gold">Limited Time</p>
-            <h2 className="font-display font-light mb-5" style={{ fontSize: 'clamp(2rem,7vw,4.5rem)' }}>The Season Sale</h2>
-            <p className="font-body text-gray-300 mb-8" style={{ fontSize: 'clamp(0.82rem,1.8vw,1rem)' }}>Up to 50% off on selected styles</p>
-            <Link to="/shop?sale=true" className="btn-gold-filled inline-flex items-center gap-3">
-              Shop the Sale <FiArrowRight size={15} />
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="relative text-center text-white max-w-4xl mx-auto px-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <p style={{ fontWeight: 800, letterSpacing: '0.4em', textTransform: 'uppercase', fontSize: '11px', marginBottom: '20px' }}>Special Offer</p>
+            <h2 className="serif font-bold mb-8" style={{ fontSize: 'clamp(36px, 7vw, 72px)', lineHeight: 1 }}>Summer Sale</h2>
+              Upgrade your summer wardrobe with our curated selection of quality pieces.
+            <Link to="/shop?sale=true" className="btn-primary px-12 py-5 bg-[#C8A646] text-black hover:bg-[#B88D2D]" style={{ border: 'none' }}>
+              Shop the Collection <FiArrowRight size={20} />
             </Link>
           </motion.div>
         </div>
@@ -305,12 +317,12 @@ export default function HomePage() {
 
       {/* ── Best Sellers ── */}
       {(bestSellers.length > 0 || loading) && (
-        <section className="py-12" style={{ backgroundColor: '#111111' }}>
-          <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px' }} className="sm:px-6">
-            <SectionHeader sup="Customer Favourites" title="Best Sellers" link="/shop?bestSeller=true" />
+        <section className="py-16" style={{ backgroundColor: 'var(--bg)' }}>
+          <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 24px' }} className="sm:px-6">
+            <SectionHeader sup="Top Picks" title="Best Sellers" link="/shop?bestSeller=true" />
             {loading ? <SkeletonGrid count={4} /> : (
               <div className="product-grid-home">
-                {bestSellers.slice(0, 4).map((p, i) => <ProductCard key={p._id} product={p} index={i} />)}
+                {bestSellers.slice(0, 8).map((p, i) => <ProductCard key={p._id} product={p} index={i} />)}
               </div>
             )}
           </div>
@@ -318,21 +330,33 @@ export default function HomePage() {
       )}
 
       {/* ── Features ── */}
-      <section className="py-12" style={{ backgroundColor: '#0a0a0a' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px' }} className="sm:px-6">
-          <div style={{ display: 'grid', gap: '20px', gridTemplateColumns: 'repeat(2,1fr)' }} className="md:grid-cols-4">
-            {[
-              { icon: '🚚', title: 'Free Shipping', desc: 'Orders above ₹999' },
-              { icon: '↩️', title: 'Easy Returns', desc: '30-day return policy' },
-              { icon: '🔒', title: 'Secure Payment', desc: '100% encrypted checkout' },
-              { icon: '⭐', title: 'Premium Quality', desc: 'Curated fashion pieces' },
-            ].map(f => (
-              <div key={f.title} className="text-white text-center">
-                <div style={{ fontSize: '26px', marginBottom: '8px' }}>{f.icon}</div>
-                <h4 className="font-body font-medium text-sm tracking-[0.1em] uppercase mb-1">{f.title}</h4>
-                <p className="font-body text-xs text-gray-400">{f.desc}</p>
-              </div>
-            ))}
+      <section className="py-16 border-t" style={{ backgroundColor: 'var(--card-alt)', borderColor: 'var(--b)' }}>
+        <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 24px' }} className="sm:px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {
+              [
+                { icon: '🚚', title: 'Free Shipping', desc: 'On all orders above ₹999' },
+                { icon: '↩️', title: '30-Day Returns', desc: 'Easy returns' },
+                { icon: '🔒', title: 'Secure Payment', desc: '100% encrypted' },
+                { icon: '✨', title: 'Premium Quality', desc: 'Crafted with care' },
+              ].map(f => (
+                <div key={f.title} className="p-8 rounded-[1.5rem] border transition-all hover:shadow-2xl hover:-translate-y-2 group" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--b)' }}>
+                  <div style={{ 
+                    fontSize: '28px', 
+                    marginBottom: '20px', 
+                    background: 'var(--bg-alt)',
+                    width: '60px', height: '60px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    borderRadius: '16px',
+                    border: '1px solid var(--b)'
+                  }} className="group-hover:scale-110 transition-transform">
+                    {f.icon}
+                  </div>
+                  <h4 className="font-black text-sm tracking-tight mb-2" style={{ color: 'var(--t)' }}>{f.title}</h4>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--tm)' }}>{f.desc}</p>
+                </div>
+              ))
+            }
           </div>
         </div>
       </section>

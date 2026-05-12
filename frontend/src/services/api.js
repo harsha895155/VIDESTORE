@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE = import.meta.env.VITE_API_URL || "https://trendorra.onrender.com";
+const BASE = import.meta.env.VITE_API_URL || "https://videstore.onrender.com";
 
 const API = axios.create({
   baseURL: BASE + "/api",
@@ -10,7 +10,7 @@ const API = axios.create({
 // ── Request interceptor ───────────────────────────────────────────
 API.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("trendora_token");
+    const token = localStorage.getItem("videstore_token");
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
@@ -22,11 +22,11 @@ API.interceptors.response.use(
   (response) => response.data,   // ← all API calls return data directly
   (error) => {
     if (error.response?.status === 401) {
-      const token = localStorage.getItem("trendora_token");
+      const token = localStorage.getItem("videstore_token");
       const isLoginReq = error.config?.url?.includes("/auth/login");
       if (token && !isLoginReq) {
-        localStorage.removeItem("trendora_token");
-        localStorage.removeItem("trendora_user");
+        localStorage.removeItem("videstore_token");
+        localStorage.removeItem("videstore_user");
         window.location.href = "/login";
       }
     }
@@ -46,6 +46,7 @@ export const authAPI = {
   forgotPassword: (data) => API.post("/auth/forgot-password", data),
   resetPassword: (data) => API.post("/auth/reset-password", data),
   updateSellerInfo: (data) => API.put("/auth/seller-info", data),
+  upgradeTier: (tier) => API.put("/auth/upgrade-tier", { tier }),
   googleLogin: () => { window.location.href = `${BASE}/api/auth/google`; },
 };
 
@@ -139,8 +140,12 @@ export const userAPI = {
   update: (id, data) => API.put(`/users/${id}`, data),
   delete: (id) => API.delete(`/users/${id}`),
   getDashboardStats: (params) => API.get("/users/dashboard-stats", { params }),
+  getAnalytics: (params) => API.get("/users/dashboard-stats", { params }),
   deleteAllOrders: () => API.delete("/orders/admin/delete-all-orders"),
   resetRevenueData: () => API.put("/orders/admin/reset-revenue"),
+  purgeOrders: () => API.delete("/orders/admin/delete-all-orders"),
+  purgeReturns: () => API.delete("/orders/admin/delete-all-returns"),
+  purgeUsers: () => API.delete("/users/admin/purge"),
   processPayout: (id, data) => API.post(`/users/${id}/payout`, data),
   clearPayoutHistory: (id) => API.delete(`/users/${id}/payout-history`),
   toggleNoReturnsApproval: (id, approved) => API.patch(`/users/${id}/no-returns-approval`, { approved }),

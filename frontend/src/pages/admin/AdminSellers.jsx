@@ -6,14 +6,8 @@ import {
   FiArrowLeft, FiShoppingBag, FiDollarSign, FiCheck, FiX,
   FiRefreshCw, FiEye, FiCopy, FiTrendingUp, FiPlay, FiLock,
   FiTrash2, FiAlertTriangle, FiClock, FiTruck, FiUser, FiShield,
-  FiRotateCcw,
+  FiRotateCcw, FiActivity, FiInfo, FiCreditCard, FiExternalLink, FiPercent, FiUsers
 } from 'react-icons/fi';
-
-const BG     = '#080808';
-const CARD   = '#111111';
-const CARD2  = '#161616';
-const BORDER = 'rgba(255,255,255,0.07)';
-const GOLD   = '#C9A84C';
 
 // ✅ Dynamic: fetched from DB — defaults to 0 until admin sets them
 let _commRate  = 0;
@@ -31,37 +25,26 @@ const calcEarnings = (price, deliveryCharge = 0) => {
 const PAYOUT_LOCK_DAYS = 7;
 const daysSince = (date) => date ? Math.floor((Date.now() - new Date(date)) / (1000*60*60*24)) : null;
 
-// ✅ FIXED: properly resolve seller ID whether item.seller is object or string
-const resolveId = (val) => val?._id || val;
-const matchSeller = (item, sellerId) => {
-  if (!item.seller) return false;
-  return String(resolveId(item.seller)) === String(sellerId);
-};
-
 const sellerStatusStyle = {
-  pending:   { color: '#fbbf24', bg: 'rgba(251,191,36,0.12)'  },
-  approved:  { color: '#4ade80', bg: 'rgba(74,222,128,0.12)'  },
-  suspended: { color: '#f87171', bg: 'rgba(248,113,113,0.12)' },
+  pending:   { color: 'var(--w)', bg: 'rgba(245, 158, 11, 0.05)', border: 'rgba(245, 158, 11, 0.1)' },
+  approved:  { color: 'var(--s)', bg: 'rgba(16, 185, 129, 0.05)', border: 'rgba(16, 185, 129, 0.1)' },
+  suspended: { color: 'var(--d)', bg: 'rgba(239, 68, 68, 0.05)', border: 'rgba(239, 68, 68, 0.1)' },
 };
-const sStyle = (s) => ({
-  Processing:         { color: '#fbbf24', bg: 'rgba(251,191,36,0.12)'  },
-  Confirmed:          { color: '#60a5fa', bg: 'rgba(96,165,250,0.12)'  },
-  Shipped:            { color: '#a78bfa', bg: 'rgba(167,139,250,0.12)' },
-  'Out for Delivery': { color: '#fb923c', bg: 'rgba(251,146,60,0.12)'  },
-  Delivered:          { color: '#4ade80', bg: 'rgba(74,222,128,0.12)'  },
-  Cancelled:          { color: '#f87171', bg: 'rgba(248,113,113,0.12)' },
-}[s] || { color: 'rgba(255,255,255,0.3)', bg: 'rgba(255,255,255,0.05)' });
 
-const thS = { color: 'rgba(255,255,255,0.3)', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '10px 12px', textAlign: 'left', borderBottom: `1px solid ${BORDER}`, backgroundColor: '#050505', whiteSpace: 'nowrap' };
-const tdS = { padding: '10px 12px', borderBottom: `1px solid ${BORDER}`, verticalAlign: 'middle' };
+const sStyle = (s) => ({
+  Processing:         { color: 'var(--w)', bg: 'rgba(245, 158, 11, 0.05)', border: 'rgba(245, 158, 11, 0.1)' },
+  Confirmed:          { color: 'var(--p)', bg: 'rgba(200, 166, 70, 0.05)', border: 'rgba(200, 166, 70, 0.1)' },
+  Shipped:            { color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.05)', border: 'rgba(139, 92, 246, 0.1)' },
+  'Out for Delivery': { color: '#f97316', bg: 'rgba(249, 115, 22, 0.05)', border: 'rgba(249, 115, 22, 0.1)' },
+  Delivered:          { color: 'var(--s)', bg: 'rgba(16, 185, 129, 0.05)', border: 'rgba(16, 185, 129, 0.1)' },
+  Cancelled:          { color: 'var(--d)', bg: 'rgba(239, 68, 68, 0.05)', border: 'rgba(239, 68, 68, 0.1)' },
+}[s] || { color: 'var(--tm)', bg: 'var(--bg-alt)', border: 'var(--b)' });
 
 // ── Copy Button ───────────────────────────────────────────────────
 function CopyBtn({ value, label }) {
   return (
     <button onClick={() => { navigator.clipboard.writeText(value); toast.success(`${label} copied!`); }}
-      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', padding: '2px', marginLeft: '4px' }}
-      onMouseOver={e => e.currentTarget.style.color = GOLD}
-      onMouseOut={e  => e.currentTarget.style.color = 'rgba(255,255,255,0.3)'}>
+      className="bg-transparent border-none cursor-pointer text-[var(--tl)] hover:text-[var(--p)] transition-colors p-1 ml-1">
       <FiCopy size={11} />
     </button>
   );
@@ -69,10 +52,10 @@ function CopyBtn({ value, label }) {
 
 function InfoRow({ label, value, highlight, copy }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${BORDER}` }}>
-      <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', flexShrink: 0, marginRight: '10px' }}>{label}</span>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <span style={{ color: highlight ? GOLD : '#fff', fontSize: '13px', fontWeight: highlight ? '600' : '400', wordBreak: 'break-all' }}>{value || '—'}</span>
+    <div className="flex justify-between items-center py-3 border-b border-[var(--b)] last:border-0">
+      <span className="text-[10px] font-black text-[var(--tl)] uppercase tracking-widest opacity-60">{label}</span>
+      <div className="flex items-center">
+        <span className={`text-xs font-bold ${highlight ? 'text-[var(--p)]' : 'text-[var(--t)]'}`}>{value || '—'}</span>
         {copy && value && <CopyBtn value={value} label={label} />}
       </div>
     </div>
@@ -81,45 +64,50 @@ function InfoRow({ label, value, highlight, copy }) {
 
 function Tile({ label, value, color, sub }) {
   return (
-    <div style={{ backgroundColor: '#0a0a0a', borderRadius: '8px', padding: '12px 14px', border: `1px solid ${color}18` }}>
-      <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 4px' }}>{label}</p>
-      <p style={{ color, fontSize: '17px', fontWeight: '700', margin: 0 }}>{value}</p>
-      {sub && <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '10px', margin: '2px 0 0' }}>{sub}</p>}
+    <div className="bg-[var(--bg-alt)] border border-[var(--b)] rounded-[20px] p-4 transition-all hover:border-[var(--p)]/20 shadow-inner">
+      <p className="text-[9px] font-black text-[var(--tl)] uppercase tracking-widest mb-2 opacity-60">{label}</p>
+      <p className="text-xl font-black m-0 leading-none tracking-tight serif" style={{ color }}>{value}</p>
+      {sub && <p className="text-[10px] font-bold text-[var(--tl)] mt-2 m-0 opacity-40 uppercase tracking-tighter">{sub}</p>}
     </div>
   );
 }
 
 // ── Danger Modal ──────────────────────────────────────────────────
-function DangerModal({ open, onClose, onConfirm, loading, title, subtitle, lines, accentColor = '#f87171' }) {
+function DangerModal({ open, onClose, onConfirm, loading, title, subtitle, lines }) {
   const [typed, setTyped] = useState('');
   useEffect(() => { if (!open) setTyped(''); }, [open]);
   if (!open) return null;
   const ready = typed === 'DELETE' && !loading;
   return (
     <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-      style={{ position: 'fixed', inset: 0, zIndex: 10001, backgroundColor: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-      <div style={{ backgroundColor: '#141414', border: `1px solid ${accentColor}44`, borderRadius: '14px', padding: '28px', maxWidth: '440px', width: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: `${accentColor}15`, border: `1px solid ${accentColor}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <FiAlertTriangle size={18} style={{ color: accentColor }} />
+      className="fixed inset-0 z-[10001] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
+      <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl p-8 max-w-[440px] w-full shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="flex items-center gap-5 mb-6">
+          <div className="w-14 h-14 rounded-[14px] bg-red-500/5 flex items-center justify-center text-red-500 border border-red-500/10">
+            <FiAlertTriangle size={24} />
           </div>
           <div>
-            <p style={{ color: accentColor, fontFamily: 'Cinzel, serif', fontSize: '14px', letterSpacing: '0.1em', margin: '0 0 2px' }}>{title}</p>
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', margin: 0 }}>{subtitle}</p>
+            <h3 className="text-xl font-black text-[var(--t)] m-0 uppercase tracking-tight">{title}</h3>
+            <p className="text-[10px] font-black text-[var(--tl)] m-0 uppercase tracking-widest mt-1 opacity-60">{subtitle}</p>
           </div>
         </div>
-        <div style={{ backgroundColor: `${accentColor}0a`, border: `1px solid ${accentColor}22`, borderRadius: '8px', padding: '14px', marginBottom: '16px' }}>
-          {lines.map((l, i) => <p key={i} style={{ color: i === 0 ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.4)', fontSize: '12px', lineHeight: '1.7', marginTop: i > 0 ? '6px' : 0 }}>{l}</p>)}
-          <p style={{ color: accentColor, fontSize: '11px', fontWeight: '600', marginTop: '10px', paddingTop: '10px', borderTop: `1px solid ${accentColor}20` }}>🚫 Cannot be undone.</p>
+        <div className="bg-red-500/5 border border-red-500/10 rounded-[18px] p-6 mb-6">
+          {lines.map((l, i) => (
+            <p key={i} className={`m-0 leading-relaxed ${i === 0 ? 'text-red-500 font-black text-sm uppercase' : 'text-red-400 text-xs mt-3 font-bold opacity-80'}`}>{l}</p>
+          ))}
+          <p className="text-red-500 text-[10px] font-black uppercase tracking-widest mt-4 pt-4 border-t border-red-500/10">🚫 Irreversible Operation</p>
         </div>
-        <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', marginBottom: '7px' }}>Type <strong style={{ color: accentColor }}>DELETE</strong> to confirm</p>
-        <input autoFocus type="text" value={typed} onChange={e => setTyped(e.target.value)} placeholder="Type DELETE here…"
-          style={{ width: '100%', backgroundColor: '#0a0a0a', border: `1px solid ${typed === 'DELETE' ? accentColor : 'rgba(255,255,255,0.1)'}`, borderRadius: '6px', padding: '10px 14px', color: '#fff', fontSize: '13px', outline: 'none', fontFamily: 'monospace', boxSizing: 'border-box', marginBottom: '14px' }} />
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={onClose} style={{ flex: 1, padding: '10px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'rgba(255,255,255,0.4)', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+        <div className="mb-6">
+          <label className="block text-[10px] font-black text-[var(--tl)] uppercase tracking-widest mb-2 px-1 opacity-60">Type <span className="text-red-500">DELETE</span> to confirm</label>
+          <input autoFocus type="text" value={typed} onChange={e => setTyped(e.target.value)} placeholder="Authorization sequence..."
+            className="w-full bg-[var(--bg-alt)] border-2 border-[var(--b)] rounded-[14px] px-4 py-3 text-sm font-black text-[var(--t)] focus:border-red-500 outline-none transition-all font-mono" />
+        </div>
+        <div className="flex gap-4">
+          <button onClick={onClose} className="flex-1 py-4 px-6 bg-[var(--bg-alt)] border border-[var(--b)] text-[var(--tl)] font-black text-[10px] uppercase tracking-widest rounded-[14px] hover:bg-[var(--card-alt)] transition-all">Cancel</button>
           <button onClick={() => ready && onConfirm()} disabled={!ready}
-            style={{ flex: 1, padding: '10px', backgroundColor: ready ? accentColor : `${accentColor}12`, border: `1px solid ${ready ? accentColor : `${accentColor}22`}`, borderRadius: '6px', color: ready ? '#fff' : `${accentColor}44`, fontSize: '13px', fontWeight: '700', cursor: ready ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-            {loading ? <><FiRefreshCw size={12} style={{ animation: 'spin 1s linear infinite' }} /> Processing…</> : <><FiTrash2 size={12} /> Confirm</>}
+            className={`flex-1 py-4 px-6 rounded-[14px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${ready ? 'bg-red-600 text-white shadow-xl shadow-red-500/20' : 'bg-red-500/5 text-red-500 opacity-20 cursor-not-allowed'}`}>
+            {loading ? <FiRefreshCw className="animate-spin" /> : <FiTrash2 />}
+            {loading ? 'Processing...' : 'Confirm Purge'}
           </button>
         </div>
       </div>
@@ -134,15 +122,15 @@ function PayoutTimeline({ order }) {
   const pct  = Math.min(100, Math.round((days / PAYOUT_LOCK_DAYS) * 100));
   const daysLeft = Math.max(0, PAYOUT_LOCK_DAYS - days);
   return (
-    <div style={{ marginTop: '5px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
-        <span style={{ color: days < PAYOUT_LOCK_DAYS ? '#fbbf24' : '#4ade80', fontSize: '10px', fontWeight: '600' }}>
-          {days < PAYOUT_LOCK_DAYS ? `🔒 ${daysLeft}d left` : '🔓 Ready'}
+    <div className="mt-2">
+      <div className="flex justify-between mb-1.5 px-0.5">
+        <span className={`text-[9px] font-black uppercase tracking-widest ${days < PAYOUT_LOCK_DAYS ? 'text-[var(--w)]' : 'text-emerald-500'}`}>
+          {days < PAYOUT_LOCK_DAYS ? `🔒 ${daysLeft}d Hold` : '🔓 Released'}
         </span>
-        <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '10px' }}>{days}d ago</span>
+        <span className="text-[9px] font-bold text-[var(--tl)] opacity-40">{days}d Progress</span>
       </div>
-      <div style={{ height: '3px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '2px' }}>
-        <div style={{ height: '100%', width: `${pct}%`, backgroundColor: days < PAYOUT_LOCK_DAYS ? '#fbbf24' : '#4ade80', borderRadius: '2px' }} />
+      <div className="h-1 bg-[var(--bg-alt)] rounded-full overflow-hidden border border-[var(--b)] shadow-inner">
+        <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${pct}%`, backgroundColor: days < PAYOUT_LOCK_DAYS ? 'var(--w)' : 'var(--s)' }} />
       </div>
     </div>
   );
@@ -185,227 +173,210 @@ function SellerModal({ seller, orders, onClose, onStatusChange, onPayout, onSimu
       {showReset && (
         <DangerModal open onClose={() => setShowReset(false)}
           onConfirm={async () => { setResetting(true); try { await onResetPayout(seller._id); setShowReset(false); } finally { setResetting(false); } }}
-          loading={resetting} title="Reset Payout History" subtitle={seller.sellerInfo?.businessName || seller.name}
-          lines={[`Clear all payout history for ${seller.name} and reset totalPaidOut to ₹0.`, 'All previous payout records will be permanently deleted.']} />
+          loading={resetting} title="Reset Yield History" subtitle={seller.sellerInfo?.businessName || seller.name}
+          lines={[`Initiating full reset of payout historical data for ${seller.name}.`, 'This will zero out totalPaidOut and purge associated transaction logs.']} />
       )}
       <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-        style={{ position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-        <div style={{ backgroundColor: '#111', border: `1px solid ${GOLD}25`, borderRadius: '16px', padding: '26px', maxWidth: '800px', width: '100%', maxHeight: '92vh', overflowY: 'auto' }}>
+        className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
+        <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl p-8 max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-300 scrollbar-hide">
 
           {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: `${GOLD}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span style={{ color: GOLD, fontWeight: '700', fontSize: '16px' }}>{seller.name?.charAt(0).toUpperCase()}</span>
+          <div className="flex justify-between items-start mb-8">
+            <div className="flex items-center gap-5">
+              <div className="w-14 h-14 rounded-[14px] bg-[var(--p)]/5 flex items-center justify-center text-[var(--p)] border border-[var(--p)]/10 shadow-inner">
+                <FiUser size={24} />
               </div>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <h3 style={{ color: GOLD, fontFamily: 'Cinzel, serif', fontSize: '15px', letterSpacing: '0.08em', margin: 0 }}>{seller.sellerInfo?.businessName || seller.name}</h3>
-                  <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '20px', color: st.color, backgroundColor: st.bg }}>{seller.sellerInfo?.status || 'pending'}</span>
+                <div className="flex items-center gap-3">
+                  <h3 className="text-xl font-black text-[var(--t)] m-0 tracking-tight uppercase serif">{seller.sellerInfo?.businessName || seller.name}</h3>
+                  <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md border" 
+                    style={{ color: st.color, backgroundColor: st.bg, borderColor: st.border }}>{seller.sellerInfo?.status || 'pending'}</span>
                 </div>
-                <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '11px', margin: '2px 0 0' }}>{seller.email}</p>
+                <p className="text-xs font-bold text-[var(--tl)] m-0 mt-1 uppercase tracking-tighter opacity-60">{seller.email}</p>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="flex gap-3">
               <button onClick={() => setShowReset(true)}
-                style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 11px', backgroundColor: 'rgba(248,113,113,0.07)', border: '1px solid rgba(248,113,113,0.22)', borderRadius: '6px', color: '#f87171', fontSize: '11px', cursor: 'pointer' }}>
-                <FiTrash2 size={11} /> Reset Payout
+                className="flex items-center gap-2 px-4 py-2.5 bg-red-500/5 border border-red-500/10 rounded-[12px] text-red-500 font-black text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
+                <FiTrash2 size={12} /> Purge Yield
               </button>
-              <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: '22px', lineHeight: 1 }}>×</button>
+              <button onClick={onClose} className="w-10 h-10 bg-[var(--bg-alt)] border border-[var(--b)] rounded-[12px] text-[var(--tl)] flex items-center justify-center hover:bg-[var(--card-alt)] hover:text-[var(--t)] transition-all text-lg">×</button>
             </div>
           </div>
 
-          {/* Revenue tiles */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '8px', marginBottom: '14px' }}>
-            <Tile label="Gross Revenue"     value={`₹${gross.toLocaleString()}`}       color="#fff"     sub={`${valid.length} orders`} />
-            <Tile label="−Delivery (Courier)" value={`₹${totalDC.toLocaleString()}`}  color="#60a5fa"  sub="To courier" />
-            <Tile label="−Commission 10%"   value={`₹${totalComm.toLocaleString()}`}   color="#f87171"  sub="Platform fee" />
-            <Tile label="−Fixed Fees"       value={`₹${totalFixed.toLocaleString()}`}  color="#fbbf24"  sub="Per order" />
+          {/* Revenue Matrix */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <Tile label="Gross Network Volume" value={`₹${gross.toLocaleString()}`} color="var(--t)" sub={`${valid.length} cycles`} />
+            <Tile label="Logistics Deduction" value={`₹${totalDC.toLocaleString()}`} color="var(--p)" sub="Courier disbursements" />
+            <Tile label="Platform Fee" value={`₹${totalComm.toLocaleString()}`} color="var(--d)" sub="Infrastructure maintenance" />
+            <Tile label="Fixed Overhead" value={`₹${totalFixed.toLocaleString()}`} color="var(--w)" sub="Order processing cost" />
           </div>
 
-          {/* Payout box */}
-          <div style={{ backgroundColor: `${GOLD}07`, border: `1px solid ${GOLD}22`, borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
-            <p style={{ color: GOLD, fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', margin: '0 0 12px', fontWeight: '600' }}>
-              Payout Status — {PAYOUT_LOCK_DAYS}-Day Lock Policy
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '8px', marginBottom: '12px' }}>
-              <Tile label="Net Earnings"           value={`₹${totalEarn.toLocaleString()}`}   color="#4ade80" sub="All valid orders" />
-              <Tile label={`🔓 Unlocked (${PAYOUT_LOCK_DAYS}d+)`} value={`₹${unlockEarn.toLocaleString()}`} color="#4ade80" sub={`${unlocked.length} orders`} />
-              <Tile label="🔒 In Hold (<7d)"       value={`₹${locked.toLocaleString()}`}       color="#fbbf24" sub="After 7d releases" />
-              <Tile label="Paid Out"               value={`₹${paidOut.toLocaleString()}`}       color="#60a5fa" sub="Transferred" />
+          {/* Yield Disposition */}
+          <div className="bg-[var(--bg-alt)] border border-[var(--b)] rounded-2xl p-8 mb-8 shadow-inner">
+            <div className="flex items-center gap-3 mb-6">
+              <FiShield className="text-[var(--p)]" size={16} />
+              <h4 className="text-[10px] font-black text-[var(--tl)] uppercase tracking-[0.25em] m-0">Economic Yield Matrix — 7-Day Protection</h4>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: canPayout ? `${GOLD}10` : 'rgba(255,255,255,0.03)', border: `1px solid ${canPayout ? `${GOLD}30` : BORDER}`, borderRadius: '8px', padding: '12px 16px' }}>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <Tile label="Theoretical Yield" value={`₹${totalEarn.toLocaleString()}`} color="var(--s)" sub="All validated cycles" />
+              <Tile label="Released Capital" value={`₹${unlockEarn.toLocaleString()}`} color="var(--s)" sub={`${unlocked.length} unlocked`} />
+              <Tile label="Hold Protection" value={`₹${locked.toLocaleString()}`} color="var(--w)" sub="Return window hold" />
+              <Tile label="Disbursed Capital" value={`₹${paidOut.toLocaleString()}`} color="var(--p)" sub="Historical payouts" />
+            </div>
+
+            <div className={`flex justify-between items-center p-6 rounded-xl border transition-all ${canPayout ? 'bg-[var(--p)]/5 border-[var(--p)]/20 shadow-xl shadow-gold/5' : 'bg-[var(--card)] border-[var(--b)]'}`}>
               <div>
-                <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', textTransform: 'uppercase', margin: '0 0 3px' }}>
-                  {canPayout ? '⚠️ Pending Payout' : locked > 0 ? '🔒 Locked' : '✅ Fully Paid'}
+                <p className="text-[9px] font-black uppercase tracking-widest text-[var(--tl)] mb-2 opacity-60">
+                  {canPayout ? '⚠️ Deployment Required' : locked > 0 ? '🔒 Cycle Hold' : '✅ Balanced Matrix'}
                 </p>
-                <p style={{ color: canPayout ? GOLD : locked > 0 ? '#fbbf24' : '#4ade80', fontSize: '24px', fontWeight: '700', margin: 0 }}>₹{pending.toLocaleString()}</p>
+                <p className={`text-4xl font-black m-0 tracking-tighter serif ${canPayout ? 'text-[var(--p)]' : locked > 0 ? 'text-[var(--w)]' : 'text-emerald-500'}`}>
+                  ₹{pending.toLocaleString()}
+                </p>
               </div>
-              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', textAlign: 'right', lineHeight: '1.7' }}>
-                Formula: (Total − Delivery) × 90% − Fixed<br />
-                <span style={{ color: '#4ade80' }}>e.g. ₹1,000 − ₹60 = ₹940 → ₹940×90% − ₹30 = ₹816</span>
+              <div className="text-right">
+                <p className="text-[10px] font-bold text-[var(--tl)] leading-relaxed m-0 uppercase opacity-40">
+                  Matrix Formula: (Gross − Logistics) × 0.9 − Overhead<br />
+                  <span className="text-emerald-500 font-black">Optimization: ₹1k Assets → ₹816 Net Yield</span>
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Orders table */}
+          {/* Transaction Register */}
           {orders.length > 0 && (
-            <div style={{ backgroundColor: '#0a0a0a', border: `1px solid ${BORDER}`, borderRadius: '10px', overflow: 'hidden', marginBottom: '16px' }}>
-              <div style={{ padding: '10px 14px', borderBottom: `1px solid ${BORDER}`, backgroundColor: '#050505', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', margin: 0 }}>
-                  Orders & Payout Breakdown ({orders.length})
-                </p>
-                <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '10px', color: deliveryMode === 'live' ? '#4ade80' : '#fbbf24', backgroundColor: deliveryMode === 'live' ? 'rgba(74,222,128,0.1)' : 'rgba(251,191,36,0.1)' }}>
-                  {deliveryMode === 'live' ? '🟢 Shiprocket Live' : '🟡 Prototype'}
-                </span>
+            <div className="border border-[var(--b)] rounded-2xl overflow-hidden mb-8 shadow-sm">
+              <div className="bg-[var(--bg-alt)]/50 px-6 py-4 border-b border-[var(--b)] flex justify-between items-center">
+                <h4 className="text-[10px] font-black text-[var(--tl)] uppercase tracking-widest m-0 flex items-center gap-2 uppercase">
+                  <FiActivity size={12} className="text-[var(--p)]" /> Cycle Register ({orders.length})
+                </h4>
+                <div className="flex items-center gap-2 px-3 py-1 bg-[var(--card)] border border-[var(--b)] rounded-lg shadow-sm">
+                  <div className={`w-1.5 h-1.5 rounded-full ${deliveryMode === 'live' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                  <span className="text-[9px] font-black uppercase tracking-widest text-[var(--tl)] opacity-60">
+                    {deliveryMode === 'live' ? 'Synchronized' : 'Simulation'}
+                  </span>
+                </div>
               </div>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '820px' }}>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
                   <thead>
-                    <tr>{['Order', 'Sale Total', '−Delivery', 'Product Val', '−10% Comm', '−Fixed', 'Earns', 'Status', 'Payout Lock', 'Action'].map(h => (
-                      <th key={h} style={{ ...thS, padding: '8px 10px', fontSize: '9px' }}>{h}</th>
-                    ))}</tr>
+                    <tr className="bg-[var(--bg-alt)]/30">
+                      {['Cycle', 'Volume', 'Logistics', 'Net Yield', 'State', 'Protection', 'Operations'].map(h => (
+                        <th key={h} className="text-[9px] font-black text-[var(--tl)] uppercase tracking-widest px-6 py-4 text-left border-b border-[var(--b)]">{h}</th>
+                      ))}
+                    </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-[var(--b)]">
                     {enriched.map(order => {
                       const { commission, fixed, deliveryCharge: dc, productVal, earnings } = order.calc;
                       const cancelled = order.orderStatus === 'Cancelled';
                       const s = sStyle(order.orderStatus);
                       const canSim = !cancelled && !order.isDelivered && deliveryMode !== 'live';
                       return (
-                        <tr key={order._id} style={{ opacity: cancelled ? 0.4 : 1 }}
-                          onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'}
-                          onMouseOut={e  => e.currentTarget.style.backgroundColor = 'transparent'}>
-                          <td style={{ ...tdS, padding: '8px 10px' }}>
-                            <span style={{ color: GOLD, fontSize: '11px', fontFamily: 'monospace', display: 'block' }}>#{order._id.slice(-6).toUpperCase()}</span>
-                            <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '9px' }}>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
+                        <tr key={order._id} className={`${cancelled ? 'opacity-40 grayscale' : 'hover:bg-[var(--bg-alt)]/30'} transition-all`}>
+                          <td className="px-6 py-5">
+                            <span className="text-[10px] font-black text-[var(--p)] block mb-1 serif">#{order._id.slice(-6).toUpperCase()}</span>
+                            <span className="text-[9px] font-bold text-[var(--tl)] block uppercase opacity-40">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
                           </td>
-                          <td style={{ ...tdS, padding: '8px 10px' }}><span style={{ color: '#fff', fontSize: '12px', fontWeight: '600' }}>₹{(order.totalPrice || 0).toLocaleString()}</span></td>
-                          <td style={{ ...tdS, padding: '8px 10px' }}><span style={{ color: '#60a5fa', fontSize: '11px' }}>−₹{dc}</span></td>
-                          <td style={{ ...tdS, padding: '8px 10px' }}><span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px' }}>₹{productVal.toLocaleString()}</span></td>
-                          <td style={{ ...tdS, padding: '8px 10px' }}><span style={{ color: '#f87171', fontSize: '11px' }}>−₹{commission}</span></td>
-                          <td style={{ ...tdS, padding: '8px 10px' }}><span style={{ color: '#fbbf24', fontSize: '11px' }}>−₹{fixed}</span></td>
-                          <td style={{ ...tdS, padding: '8px 10px' }}>
-                            <span style={{ color: cancelled ? '#f87171' : '#4ade80', fontSize: '12px', fontWeight: '700' }}>{cancelled ? '—' : `₹${earnings}`}</span>
+                          <td className="px-6 py-5 text-xs font-black text-[var(--t)] serif">₹{(order.totalPrice || 0).toLocaleString()}</td>
+                          <td className="px-6 py-5 text-xs font-bold text-[var(--p)] opacity-80">−₹{dc}</td>
+                          <td className="px-6 py-5">
+                            <span className={`text-xs font-black serif ${cancelled ? 'text-red-500' : 'text-emerald-500'}`}>{cancelled ? 'VOID' : `₹${earnings}`}</span>
                           </td>
-                          <td style={{ ...tdS, padding: '8px 10px' }}>
-                            <span style={{ fontSize: '9px', padding: '3px 7px', borderRadius: '20px', color: s.color, backgroundColor: s.bg, whiteSpace: 'nowrap' }}>{order.orderStatus}</span>
+                          <td className="px-6 py-5">
+                            <span className="text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-md border" 
+                              style={{ color: s.color, backgroundColor: s.bg, borderColor: s.border }}>{order.orderStatus}</span>
                           </td>
-                          <td style={{ ...tdS, padding: '8px 10px', minWidth: '110px' }}>
-                            {cancelled ? <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '10px' }}>—</span>
-                            : !order.isDelivered ? <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '10px' }}>Awaiting delivery</span>
-                            : order.unlocked ? <span style={{ color: '#4ade80', fontSize: '10px', fontWeight: '600' }}>🔓 Ready ({order.daysAfter}d)</span>
-                            : <div><span style={{ color: '#fbbf24', fontSize: '10px', fontWeight: '600' }}>🔒 {PAYOUT_LOCK_DAYS - order.daysAfter}d left</span><PayoutTimeline order={order} /></div>}
+                          <td className="px-6 py-5 min-w-[140px]">
+                            {cancelled ? <span className="text-[9px] font-black text-[var(--tl)] uppercase opacity-20">Voided</span>
+                            : !order.isDelivered ? <span className="text-[9px] font-black text-[var(--tl)] uppercase tracking-widest flex items-center gap-1.5 opacity-40"><FiClock size={10}/> Pending Fulfillment</span>
+                            : order.unlocked ? <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-1.5"><FiCheck size={10}/> Ready ({order.daysAfter}d)</span>
+                            : <PayoutTimeline order={order} />}
                           </td>
-                          <td style={{ ...tdS, padding: '8px 10px' }}>
+                          <td className="px-6 py-5">
                             {canSim ? (
                               <button onClick={() => onSimulate(order._id)} disabled={simulating === order._id}
-                                style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(96,165,250,0.1)', border: '1px solid rgba(96,165,250,0.25)', borderRadius: '5px', color: '#60a5fa', fontSize: '10px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                                {simulating === order._id ? <FiRefreshCw size={9} style={{ animation: 'spin 1s linear infinite' }} /> : <FiPlay size={9} />}
-                                {simulating === order._id ? '…' : 'Next Step'}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-[var(--p)]/5 border border-[var(--p)]/10 rounded-[8px] text-[var(--p)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--p)] hover:text-[#040404] transition-all">
+                                {simulating === order._id ? <FiRefreshCw size={10} className="animate-spin" /> : <FiPlay size={10} />}
+                                {simulating === order._id ? 'Syncing' : 'Simulate State'}
                               </button>
                             ) : order.isDelivered ? (
-                              <span style={{ color: '#4ade80', fontSize: '10px' }}>✅ Done</span>
-                            ) : <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: '10px' }}>—</span>}
+                              <FiCheck className="text-emerald-500" />
+                            ) : <span className="text-[var(--tl)] opacity-20 text-xs">—</span>}
                           </td>
                         </tr>
                       );
                     })}
                   </tbody>
-                  {valid.length > 0 && (
-                    <tfoot>
-                      <tr style={{ backgroundColor: `${GOLD}05` }}>
-                        <td style={{ padding: '8px 10px', borderTop: `1px solid ${BORDER}` }}><span style={{ color: GOLD, fontSize: '10px', fontWeight: '700' }}>TOTAL</span></td>
-                        <td style={{ padding: '8px 10px', borderTop: `1px solid ${BORDER}` }}><span style={{ color: '#fff', fontWeight: '700', fontSize: '12px' }}>₹{gross.toLocaleString()}</span></td>
-                        <td style={{ padding: '8px 10px', borderTop: `1px solid ${BORDER}` }}><span style={{ color: '#60a5fa', fontSize: '11px' }}>−₹{totalDC.toLocaleString()}</span></td>
-                        <td style={{ padding: '8px 10px', borderTop: `1px solid ${BORDER}` }}><span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px' }}>₹{(gross - totalDC).toLocaleString()}</span></td>
-                        <td style={{ padding: '8px 10px', borderTop: `1px solid ${BORDER}` }}><span style={{ color: '#f87171', fontSize: '11px' }}>−₹{totalComm.toLocaleString()}</span></td>
-                        <td style={{ padding: '8px 10px', borderTop: `1px solid ${BORDER}` }}><span style={{ color: '#fbbf24', fontSize: '11px' }}>−₹{totalFixed.toLocaleString()}</span></td>
-                        <td style={{ padding: '8px 10px', borderTop: `1px solid ${BORDER}` }}><span style={{ color: '#4ade80', fontWeight: '700', fontSize: '13px' }}>₹{totalEarn.toLocaleString()}</span></td>
-                        <td colSpan="3" style={{ padding: '8px 10px', borderTop: `1px solid ${BORDER}` }} />
-                      </tr>
-                    </tfoot>
-                  )}
                 </table>
               </div>
-              <div style={{ padding: '8px 14px', borderTop: `1px solid ${BORDER}`, backgroundColor: '#050505' }}>
-                <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '11px', margin: 0 }}>
-                  <FiClock size={10} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                  Payout unlocks <strong style={{ color: '#fff' }}>{PAYOUT_LOCK_DAYS} days</strong> after delivery. Delivery charges excluded from commission base.
-                </p>
+            </div>
+          )}
+
+          {/* Infrastructure: Financial Node */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div className="bg-[var(--bg-alt)] border border-[var(--b)] rounded-2xl p-6 shadow-inner">
+              <h4 className="text-[10px] font-black text-[var(--tl)] uppercase tracking-widest mb-4 flex items-center gap-2 uppercase opacity-60"><FiCreditCard size={14} className="text-[var(--p)]"/> Destination Account</h4>
+              <InfoRow label="Protocol Holder" value={seller.sellerInfo?.bank?.name} highlight />
+              <InfoRow label="Institutional Node" value={seller.sellerInfo?.bank?.bankName} />
+              <InfoRow label="Account Parameter" value={seller.sellerInfo?.bank?.account} copy highlight />
+              <InfoRow label="Routing Identifier" value={seller.sellerInfo?.bank?.ifsc} copy highlight />
+            </div>
+
+            <div className="bg-[var(--p)]/5 border border-[var(--p)]/10 rounded-2xl p-6 shadow-inner flex flex-col">
+              <h4 className="text-[10px] font-black text-[var(--p)] uppercase tracking-widest mb-4 flex items-center gap-2 uppercase opacity-60"><FiExternalLink size={14}/> Resolution Protocol</h4>
+              <p className="text-[11px] font-bold text-[var(--tl)] leading-relaxed flex-1 opacity-80">
+                Authorized yields should be disbursed via external financial channels. Document the UTR/Reference parameter within the platform to finalize reconciliation.
+              </p>
+              <div className="mt-4 p-3 bg-[var(--card)] border border-[var(--p)]/20 rounded-xl flex items-center justify-between shadow-sm">
+                <span className="text-[10px] font-black text-[var(--p)] uppercase tracking-widest">Active Resolution</span>
+                <span className="text-sm font-black text-[var(--t)] serif">₹{pending.toLocaleString()}</span>
               </div>
             </div>
-          )}
-
-          {/* Bank details */}
-          <div style={{ backgroundColor: `${GOLD}06`, border: `1px solid ${GOLD}18`, borderRadius: '10px', padding: '14px 16px', marginBottom: '14px' }}>
-            <p style={{ color: GOLD, fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', margin: '0 0 10px', fontWeight: '600' }}>Bank Account</p>
-            <InfoRow label="Account Holder" value={seller.sellerInfo?.bank?.name}     highlight />
-            <InfoRow label="Bank"           value={seller.sellerInfo?.bank?.bankName} />
-            <InfoRow label="Account No."    value={seller.sellerInfo?.bank?.account}  copy highlight />
-            <InfoRow label="IFSC"           value={seller.sellerInfo?.bank?.ifsc}     copy highlight />
           </div>
 
-          {canPayout && (
-            <div style={{ backgroundColor: 'rgba(74,222,128,0.04)', border: '1px solid rgba(74,222,128,0.18)', borderRadius: '10px', padding: '14px 16px', marginBottom: '14px' }}>
-              <p style={{ color: '#4ade80', fontSize: '12px', fontWeight: '600', margin: '0 0 8px' }}>How to pay</p>
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', lineHeight: '1.8', margin: 0 }}>
-                1. Open bank app → NEFT/IMPS/UPI<br />
-                2. A/C: <strong style={{ color: '#fff' }}>{seller.sellerInfo?.bank?.account || 'N/A'}</strong> · IFSC: <strong style={{ color: '#fff' }}>{seller.sellerInfo?.bank?.ifsc || 'N/A'}</strong><br />
-                3. Name: <strong style={{ color: '#fff' }}>{seller.sellerInfo?.bank?.name || 'N/A'}</strong> · Amount: <strong style={{ color: GOLD }}>₹{pending.toLocaleString()}</strong><br />
-                4. After transfer → click Pay → enter UTR
-              </p>
-            </div>
-          )}
-
-          {/* Action buttons */}
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          {/* Operations */}
+          <div className="flex gap-4">
             {seller.sellerInfo?.status !== 'approved' && (
               <button onClick={() => onStatusChange(seller._id, 'approved')}
-                style={{ flex: 1, padding: '11px', backgroundColor: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', borderRadius: '8px', color: '#4ade80', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                <FiCheck size={13} /> Approve
+                className="flex-1 py-4 px-6 bg-emerald-600 text-white font-bold text-[11px] uppercase tracking-wider rounded-xl hover:bg-emerald-700 transition-all flex items-center justify-center gap-3 shadow-lg shadow-emerald-500/20">
+                <FiCheck /> Authorize Node
               </button>
             )}
             {seller.sellerInfo?.status !== 'suspended' && (
               <button onClick={() => onStatusChange(seller._id, 'suspended')}
-                style={{ flex: 1, padding: '11px', backgroundColor: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.22)', borderRadius: '8px', color: '#f87171', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                <FiX size={13} /> Suspend
+                className="flex-1 py-4 px-6 bg-red-500/5 text-red-500 border border-red-500/10 font-bold text-[11px] uppercase tracking-wider rounded-xl hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-3">
+                <FiX /> Suspend Node
               </button>
             )}
             <button onClick={() => canPayout && onPayout(seller, pending)} disabled={!canPayout}
-              style={{ flex: 1, padding: '11px', backgroundColor: canPayout ? `${GOLD}18` : 'rgba(255,255,255,0.03)', border: `1px solid ${canPayout ? `${GOLD}40` : BORDER}`, borderRadius: '8px', color: canPayout ? GOLD : 'rgba(255,255,255,0.2)', fontSize: '13px', fontWeight: '600', cursor: canPayout ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-              {canPayout ? <><FiDollarSign size={13} /> Pay ₹{pending.toLocaleString()}</> : <><FiLock size={13} /> {locked > 0 ? `₹${locked.toLocaleString()} Locked` : 'Payout Locked'}</>}
+              className={`flex-[1.5] py-4 px-6 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-3 ${canPayout ? 'bg-[var(--p)] text-[#040404] shadow-lg shadow-gold/20' : 'bg-[var(--bg-alt)] text-[var(--tl)] opacity-20 cursor-not-allowed border-none'}`}>
+              {canPayout ? <><FiDollarSign /> Disburse ₹{pending.toLocaleString()}</> : <><FiLock /> {locked > 0 ? `₹${locked.toLocaleString()} Hold` : 'Capital Balanced'}</>}
             </button>
           </div>
 
-          {/* No-Returns Permission Toggle */}
-          <div style={{ marginTop: '10px', backgroundColor: seller.sellerInfo?.noReturnsApproved ? 'rgba(248,113,113,0.05)' : 'rgba(255,255,255,0.03)', border: `1px solid ${seller.sellerInfo?.noReturnsApproved ? 'rgba(248,113,113,0.22)' : BORDER}`, borderRadius: '10px', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <FiRotateCcw size={15} style={{ color: seller.sellerInfo?.noReturnsApproved ? '#f87171' : 'rgba(255,255,255,0.3)', flexShrink: 0 }} />
+          {/* Policy: Returns */}
+          <div className={`mt-8 p-6 rounded-2xl border flex items-center justify-between gap-6 transition-all ${seller.sellerInfo?.noReturnsApproved ? 'bg-red-500/5 border-red-500/10' : 'bg-[var(--bg-alt)] border-[var(--b)]'}`}>
+            <div className="flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center border transition-all ${seller.sellerInfo?.noReturnsApproved ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-[var(--card)] border-[var(--b)] text-[var(--tl)] opacity-40'}`}>
+                <FiRotateCcw size={18} />
+              </div>
               <div>
-                <p style={{ color: '#fff', fontSize: '13px', fontWeight: '600', margin: '0 0 2px' }}>No Returns Permission</p>
-                <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '11px', margin: 0 }}>
+                <h4 className="text-sm font-black text-[var(--t)] mb-1 m-0 uppercase tracking-tight serif">Protocol: "No Returns" Privilege</h4>
+                <p className="text-[10px] font-bold text-[var(--tl)] m-0 uppercase opacity-60">
                   {seller.sellerInfo?.noReturnsApproved
-                    ? seller.sellerInfo?.noReturnsEnabled ? '🔴 Active — Seller has enabled no-returns' : '✅ Approved — Seller has not enabled it yet'
-                    : 'Not granted — seller follows standard return policy'}
+                    ? seller.sellerInfo?.noReturnsEnabled ? '🔴 ACTIVE PROTOCOL — Consumer return rights restricted.' : '✅ AUTHORIZED — Protocol permission granted, node activation pending.'
+                    : 'STANDARD — This node is governed by global consumer protection protocols.'}
                 </p>
               </div>
             </div>
             <button
               onClick={() => onToggleNoReturns(seller._id, !seller.sellerInfo?.noReturnsApproved)}
-              style={{ padding: '7px 14px', backgroundColor: seller.sellerInfo?.noReturnsApproved ? 'rgba(248,113,113,0.12)' : 'rgba(251,191,36,0.1)', border: `1px solid ${seller.sellerInfo?.noReturnsApproved ? 'rgba(248,113,113,0.3)' : 'rgba(251,191,36,0.25)'}`, borderRadius: '7px', color: seller.sellerInfo?.noReturnsApproved ? '#f87171' : '#fbbf24', fontSize: '12px', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-              {seller.sellerInfo?.noReturnsApproved ? 'Revoke Permission' : 'Grant Permission'}
+              className={`px-5 py-2.5 rounded-[12px] text-[10px] font-black uppercase tracking-widest transition-all border ${seller.sellerInfo?.noReturnsApproved ? 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-600 hover:text-white' : 'bg-[var(--p)]/5 border-[var(--p)]/20 text-[var(--p)] hover:bg-[var(--p)] hover:text-[#040404]'}`}>
+              {seller.sellerInfo?.noReturnsApproved ? 'Revoke Protocol' : 'Grant Privilege'}
             </button>
           </div>
-          {!canPayout && (locked > 0 || delivered.length === 0) && (
-            <div style={{ backgroundColor: 'rgba(251,191,36,0.04)', border: '1px solid rgba(251,191,36,0.14)', borderRadius: '7px', padding: '9px 13px', marginTop: '9px', display: 'flex', gap: '8px' }}>
-              <FiClock size={13} style={{ color: '#fbbf24', flexShrink: 0, marginTop: '1px' }} />
-              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '11px', lineHeight: '1.6', margin: 0 }}>
-                {delivered.length === 0 ? 'Payout unlocks after delivery + 7-day hold period.'
-                  : `₹${locked.toLocaleString()} held for ${PAYOUT_LOCK_DAYS}-day return protection period.`}
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </>
@@ -419,24 +390,33 @@ function PayoutModal({ seller, amount, onClose, onConfirm }) {
   const go = async () => { setProc(true); try { await onConfirm(amount, note); onClose(); } finally { setProc(false); } };
   return (
     <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-      style={{ position: 'fixed', inset: 0, zIndex: 10000, backgroundColor: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-      <div style={{ backgroundColor: '#111', border: `1px solid ${GOLD}40`, borderRadius: '16px', padding: '28px', maxWidth: '420px', width: '100%' }}>
-        <h3 style={{ color: GOLD, fontFamily: 'Cinzel, serif', fontSize: '15px', letterSpacing: '0.1em', marginBottom: '6px' }}>Confirm Payout</h3>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', marginBottom: '18px' }}>To: <strong style={{ color: '#fff' }}>{seller.sellerInfo?.bank?.name}</strong> · {seller.sellerInfo?.bank?.bankName}</p>
-        <div style={{ backgroundColor: `${GOLD}08`, border: `1px solid ${GOLD}20`, borderRadius: '10px', padding: '14px', marginBottom: '16px', textAlign: 'center' }}>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', margin: '0 0 6px' }}>Payout Amount</p>
-          <p style={{ color: GOLD, fontSize: '32px', fontWeight: '700', margin: 0 }}>₹{amount.toLocaleString()}</p>
+      className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
+      <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl p-8 max-w-[420px] w-full shadow-2xl animate-in zoom-in-95 duration-300">
+        <h3 className="text-xl font-black text-[var(--t)] mb-2 m-0 tracking-tight uppercase serif">Confirm Disbursement</h3>
+        <p className="text-[10px] font-black text-[var(--tl)] mb-8 uppercase tracking-widest opacity-60">Target Node: <span className="text-[var(--p)] serif">{seller.sellerInfo?.bank?.name}</span></p>
+        
+        <div className="bg-[var(--p)]/5 border border-[var(--p)]/10 rounded-[24px] p-8 mb-8 text-center shadow-inner">
+          <p className="text-[10px] font-black text-[var(--p)] uppercase tracking-widest mb-3 opacity-60">Disbursement Volume</p>
+          <p className="text-5xl font-black text-[var(--p)] m-0 tracking-tighter serif">₹{amount.toLocaleString()}</p>
         </div>
-        <label style={{ display: 'block', color: 'rgba(255,255,255,0.35)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>UTR / Reference</label>
-        <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="e.g. UTR123456789"
-          style={{ width: '100%', boxSizing: 'border-box', backgroundColor: '#0a0a0a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '7px', padding: '10px 14px', color: '#fff', fontSize: '13px', outline: 'none', marginBottom: '12px' }}
-          onFocus={e => e.target.style.borderColor = GOLD} onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'} />
-        <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', lineHeight: '1.6', marginBottom: '16px' }}>Transfer to seller's bank first, then click Confirm.</p>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={onClose} style={{ flex: 1, padding: '10px', backgroundColor: 'transparent', border: `1px solid ${BORDER}`, borderRadius: '7px', color: 'rgba(255,255,255,0.4)', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+
+        <div className="mb-6">
+          <label className="block text-[10px] font-black text-[var(--tl)] uppercase tracking-widest mb-2 px-1 opacity-60">Reference (UTR)</label>
+          <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="Enter transaction ID..."
+            className="w-full bg-[var(--bg-alt)] border-2 border-[var(--b)] rounded-[14px] px-4 py-3 text-sm font-black text-[var(--t)] focus:border-[var(--p)] outline-none transition-all" />
+        </div>
+
+        <div className="bg-amber-500/5 border border-amber-500/10 rounded-[14px] p-4 mb-8 flex gap-3">
+          <FiInfo className="text-amber-500 flex-shrink-0 mt-0.5" size={14} />
+          <p className="text-[10px] font-bold text-amber-500/80 leading-relaxed m-0 uppercase tracking-tight">Validate external transfer before authorizing platform reconciliation.</p>
+        </div>
+
+        <div className="flex gap-4">
+          <button onClick={onClose} className="flex-1 py-4 px-6 bg-[var(--bg-alt)] border border-[var(--b)] text-[var(--tl)] font-black text-[10px] uppercase tracking-widest rounded-[14px] hover:bg-[var(--card-alt)] transition-all">Cancel</button>
           <button onClick={go} disabled={processing}
-            style={{ flex: 1, padding: '10px', backgroundColor: processing ? `${GOLD}80` : GOLD, border: 'none', borderRadius: '7px', color: '#000', fontSize: '13px', fontWeight: '700', cursor: processing ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-            {processing ? <><FiRefreshCw size={12} style={{ animation: 'spin 1s linear infinite' }} /> Processing…</> : <><FiDollarSign size={12} /> Confirm Payout</>}
+            className={`flex-[1.5] py-4 px-6 rounded-[14px] font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 ${processing ? 'bg-[var(--bg-alt)] text-[var(--tl)] opacity-20 cursor-not-allowed' : 'bg-[var(--p)] text-[#040404] shadow-xl shadow-gold/20'}`}>
+            {processing ? <FiRefreshCw className="animate-spin" /> : <FiDollarSign />}
+            {processing ? 'Processing...' : 'Confirm'}
           </button>
         </div>
       </div>
@@ -457,7 +437,6 @@ export default function AdminSellers() {
   useEffect(() => {
     fetchData();
     deliveryAPI.getMode().then(r => setDeliveryMode(r.mode)).catch(() => setDeliveryMode('prototype'));
-    // Load platform commission settings
     settingsAPI.get().then(res => {
       _commRate    = res.settings?.commissionRate ?? 0;
       _fixedCharge = res.settings?.fixedCharge   ?? 0;
@@ -477,7 +456,6 @@ export default function AdminSellers() {
     finally { setLoading(false); }
   };
 
-  // ✅ FIXED: handles both populated object {_id, name} and raw string ID
   const getSellerOrders = (sellerId) =>
     allOrders.filter(o =>
       o.orderItems?.some(item => {
@@ -493,205 +471,215 @@ export default function AdminSellers() {
     const delivered = orders.filter(o => o.orderStatus === 'Delivered');
     const unlocked  = delivered.filter(o => o.deliveredAt && daysSince(o.deliveredAt) >= PAYOUT_LOCK_DAYS);
 
-    // ✅ FIXED: subtract deliveryCharge from commission base
     const gross    = valid.reduce((s, o) => s + (o.totalPrice || 0), 0);
     const comm     = valid.reduce((s, o) => s + calcEarnings(o.totalPrice || 0, o.deliveryCharge || 0).commission, 0);
-    const fixed    = valid.reduce((s, o) => s + calcEarnings(o.totalPrice || 0, o.deliveryCharge || 0).fixed, 0);
     const earn     = valid.reduce((s, o) => s + calcEarnings(o.totalPrice || 0, o.deliveryCharge || 0).earnings, 0);
     const unlEarn  = unlocked.reduce((s, o) => s + calcEarnings(o.totalPrice || 0, o.deliveryCharge || 0).earnings, 0);
     const paidOut  = seller.sellerInfo?.totalPaidOut || 0;
     const pending  = Math.max(0, unlEarn - paidOut);
-    return { orders: orders.length, gross, comm, fixed, earn, paidOut, pending, deliveredCount: delivered.length, unlockedCount: unlocked.length };
+    return { orders: orders.length, gross, comm, earn, paidOut, pending, deliveredCount: delivered.length, unlockedCount: unlocked.length };
   };
 
   const handleStatusChange = async (sellerId, newStatus) => {
     try {
       await userAPI.update(sellerId, { 'sellerInfo.status': newStatus });
-      toast.success(`Seller ${newStatus}`);
+      toast.success(`Node state: ${newStatus}`);
       fetchData();
       if (selected?._id === sellerId) setSelected(s => ({ ...s, sellerInfo: { ...s.sellerInfo, status: newStatus } }));
-    } catch { toast.error('Failed'); }
+    } catch { toast.error('Synchronization failed'); }
   };
 
   const handlePayout = async (amount, note) => {
     try {
       await userAPI.processPayout(payoutData.seller._id, { amount, note });
-      toast.success(`✅ ₹${amount} payout recorded`);
+      toast.success(`✅ Disbursement recorded: ₹${amount}`);
       fetchData(); setSelected(null);
-    } catch (e) { toast.error(e?.message || 'Payout failed'); throw e; }
+    } catch (e) { toast.error(e?.message || 'Transaction failed'); throw e; }
   };
 
   const handleResetPayout = async (sellerId) => {
-    try { await userAPI.clearPayoutHistory(sellerId); toast.success('Payout history cleared'); fetchData(); }
-    catch (e) { toast.error(e?.message || 'Reset failed'); throw e; }
+    try { await userAPI.clearPayoutHistory(sellerId); toast.success('Yield history purged'); fetchData(); }
+    catch (e) { toast.error(e?.message || 'Purge failed'); throw e; }
   };
 
   const handleSimulate = async (orderId) => {
     setSimulating(orderId);
     try {
       const res = await deliveryAPI.simulate(orderId);
-      toast.success(`📦 ${res.newStatus}${res.payoutEligible ? ' · 💰 Payout unlocked!' : ''}`);
+      toast.success(`📦 Cycle: ${res.newStatus}${res.payoutEligible ? ' · 💰 Yield unlocked!' : ''}`);
       fetchData();
-    } catch (e) { toast.error(e?.message || 'Failed'); }
+    } catch (e) { toast.error(e?.message || 'Simulation failed'); }
     finally { setSimulating(null); }
   };
 
   const handleNoReturnsApproval = async (sellerId, approve) => {
     try {
       const res = await userAPI.toggleNoReturnsApproval(sellerId, approve);
-      toast.success(approve ? '✅ No-returns permission granted' : '🚫 No-returns permission revoked');
+      toast.success(approve ? '✅ Protocol permission granted' : '🚫 Protocol revoked');
       fetchData();
       if (selected?._id === sellerId) setSelected(s => ({ ...s, sellerInfo: { ...s.sellerInfo, noReturnsApproved: approve, ...(!approve && { noReturnsEnabled: false }) } }));
-    } catch { toast.error('Failed to update no-returns permission'); }
+    } catch { toast.error('Permission update failed'); }
   };
 
   const totComm    = sellers.reduce((s, x) => s + getStats(x).comm, 0);
   const totPending = sellers.reduce((s, x) => s + getStats(x).pending, 0);
-  const approved   = sellers.filter(s => s.sellerInfo?.status === 'approved').length;
+  const approvedCount = sellers.filter(s => s.sellerInfo?.status === 'approved').length;
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#080808' }}>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
       {selected && <SellerModal seller={selected} orders={getSellerOrders(selected._id)} onClose={() => setSelected(null)} onStatusChange={handleStatusChange} simulating={simulating} onSimulate={handleSimulate} onPayout={(seller, amt) => { setSelected(null); setPayoutData({ seller, amount: amt }); }} onResetPayout={handleResetPayout} deliveryMode={deliveryMode} onToggleNoReturns={handleNoReturnsApproval} />}
       {payoutData && <PayoutModal seller={payoutData.seller} amount={payoutData.amount} onClose={() => setPayoutData(null)} onConfirm={handlePayout} />}
 
       {/* Header */}
-      <div style={{ backgroundColor: '#050505', borderBottom: `1px solid ${BORDER}`, padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="px-8 py-6 flex items-center justify-between sticky top-0 z-10" 
+        style={{ backgroundColor: 'var(--glass)', borderBottom: `1px solid var(--b)`, backdropFilter: 'blur(32px)' }}>
         <div>
-          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 4px' }}>Admin Panel</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 style={{ color: GOLD, fontFamily: 'Cinzel, serif', fontSize: '18px', letterSpacing: '0.15em', margin: 0 }}>Sellers</h1>
+          <div className="flex items-center gap-2 mb-1">
+            <FiUser size={14} style={{ color: 'var(--p)' }} />
+            <p className="font-black text-[10px] tracking-[0.2em] uppercase" style={{ color: 'var(--tl)' }}>Vendor Control</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <h1 className="font-body text-2xl font-bold tracking-tighter uppercase" style={{ color: 'var(--t)' }}>Seller Infrastructure</h1>
             {deliveryMode && (
-              <span style={{ fontSize: '11px', padding: '3px 10px', borderRadius: '20px', color: deliveryMode === 'live' ? '#4ade80' : '#fbbf24', backgroundColor: deliveryMode === 'live' ? 'rgba(74,222,128,0.1)' : 'rgba(251,191,36,0.1)' }}>
-                {deliveryMode === 'live' ? '🟢 Shiprocket Live' : '🟡 Prototype Mode'}
+              <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-[8px] border ${deliveryMode === 'live' ? 'bg-emerald-500/5 border-emerald-500/10 text-emerald-500' : 'bg-amber-500/5 border-amber-500/10 text-amber-500'}`}>
+                {deliveryMode === 'live' ? 'Live Grid' : 'Prototype'}
               </span>
             )}
           </div>
         </div>
-        <Link to="/admin" style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'rgba(255,255,255,0.35)', fontSize: '12px', textDecoration: 'none' }}>
-          <FiArrowLeft size={13} /> Dashboard
+        <Link to="/admin" className="font-bold text-[11px] uppercase tracking-wider px-6 py-3 bg-[var(--bg-alt)] border border-[var(--b)] rounded-xl text-[var(--tm)] hover:bg-[var(--card-alt)] transition-all flex items-center gap-2 shadow-sm" style={{ textDecoration: 'none' }}>
+          <FiArrowLeft size={16} /> Dashboard
         </Link>
       </div>
 
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '28px 24px' }}>
+      <div className="max-w-7xl mx-auto px-8 py-4">
 
-        {/* Mode banner */}
-        {deliveryMode === 'live' ? (
-          <div style={{ backgroundColor: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: '10px', padding: '13px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#4ade80', flexShrink: 0 }} />
-            <div>
-              <p style={{ color: '#4ade80', fontSize: '12px', fontWeight: '600', margin: '0 0 2px' }}>Shiprocket Live — Connected</p>
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', margin: 0 }}>Real AWB generation, automatic status updates, live delivery rates active.</p>
-            </div>
+        {/* Global Protocol Banner */}
+        <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl p-8 mb-8 flex flex-col md:flex-row items-center gap-8 shadow-sm">
+          <div className="w-20 h-20 bg-[var(--p)]/5 rounded-[24px] flex items-center justify-center text-[var(--p)] shadow-inner border border-[var(--p)]/10">
+            <FiShield size={40} />
           </div>
-        ) : (
-          <div style={{ backgroundColor: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.18)', borderRadius: '10px', padding: '13px 18px', marginBottom: '20px' }}>
-            <p style={{ color: '#fbbf24', fontSize: '12px', fontWeight: '600', margin: '0 0 4px' }}>Prototype Mode — Shiprocket not connected</p>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', lineHeight: '1.7', margin: 0 }}>
-              Use "Next Step" in seller modal to simulate delivery. Payout unlocks <strong style={{ color: '#fff' }}>{PAYOUT_LOCK_DAYS} days</strong> after delivery.
-              Set <code style={{ color: GOLD, backgroundColor: 'rgba(201,168,76,0.1)', padding: '1px 6px', borderRadius: '3px' }}>PROTOTYPE_MODE=false</code> to go live.
+          <div className="flex-1 text-center md:text-left">
+            <h3 className="text-lg font-black text-[var(--t)] mb-2 m-0 tracking-tight uppercase">Seller Payment Protection</h3>
+            <p className="text-xs font-bold text-[var(--tl)] leading-relaxed m-0 opacity-60 uppercase tracking-widest">
+              Payments are held for {PAYOUT_LOCK_DAYS} days after delivery to handle potential returns. Final earnings are shown after fees and logistics.
             </p>
           </div>
-        )}
-
-        {/* 7-day policy */}
-        <div style={{ backgroundColor: 'rgba(96,165,250,0.04)', border: '1px solid rgba(96,165,250,0.14)', borderRadius: '10px', padding: '11px 16px', marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <FiClock size={13} style={{ color: '#60a5fa', flexShrink: 0 }} />
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', margin: 0 }}>
-            <strong style={{ color: '#60a5fa' }}>{PAYOUT_LOCK_DAYS}-Day Payout Policy:</strong> Payouts locked for {PAYOUT_LOCK_DAYS} days after delivery for return protection. Unlocks automatically.
-          </p>
+          <div className="flex gap-3">
+             <button onClick={fetchData} className="px-6 py-4 bg-[var(--bg-alt)] border border-[var(--b)] rounded-[14px] text-[10px] font-black uppercase tracking-widest text-[var(--tm)] hover:bg-[var(--card-alt)] transition-all flex items-center gap-2 shadow-sm">
+               <FiRefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Sync Records
+             </button>
+          </div>
         </div>
 
-        {/* Summary cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '24px' }}>
+        {/* Summary Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {[
-            { label: 'Total Sellers',       value: sellers.length,                        color: GOLD,      Icon: FiShoppingBag },
-            { label: 'Platform Commission', value: `₹${totComm.toLocaleString()}`,        color: '#4ade80', Icon: FiTrendingUp  },
-            { label: 'Pending Payouts',     value: `₹${totPending.toLocaleString()}`,     color: GOLD,      Icon: FiDollarSign  },
-            { label: 'Approved',            value: approved,                              color: '#4ade80', Icon: FiCheck       },
-          ].map(({ label, value, color, Icon }) => (
-            <div key={label} style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '12px', padding: '18px', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
-                <Icon size={15} style={{ color }} />
+            { label: 'Total Sellers', value: sellers.length, color: 'var(--p)', Icon: FiUsers, sub: `${approvedCount} active` },
+            { label: 'Total Platform Fees', value: `₹${totComm.toLocaleString()}`, color: 'var(--s)', Icon: FiTrendingUp, sub: 'Your commission' },
+            { label: 'Pending Payouts', value: `₹${totPending.toLocaleString()}`, color: 'var(--w)', Icon: FiDollarSign, sub: 'Waiting to be paid' },
+            { label: 'Active Access', value: approvedCount, color: '#8b5cf6', Icon: FiCheck, sub: 'Verified sellers' },
+          ].map(({ label, value, color, Icon, sub }) => (
+            <div key={label} className="bg-[var(--card)] border border-[var(--b)] rounded-2xl p-6 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-300">
+              <div className="flex justify-between items-start mb-6">
+                <div className="w-12 h-12 rounded-[14px] flex items-center justify-center border transition-transform group-hover:scale-110 duration-500 shadow-inner"
+                  style={{ backgroundColor: `${color}05`, borderColor: `${color}10`, color }}>
+                  <Icon size={22} />
+                </div>
+                <span className="text-[10px] font-black text-[var(--tl)] uppercase tracking-widest opacity-60">{label}</span>
               </div>
-              <p style={{ color: '#fff', fontSize: '21px', fontWeight: '700', margin: '0 0 3px' }}>{value}</p>
-              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>{label}</p>
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', backgroundColor: color, opacity: 0.35 }} />
+              <h3 className="text-3xl font-black text-[var(--t)] mb-1 m-0 tracking-tight serif">{value}</h3>
+              <p className="text-[11px] font-bold text-[var(--tl)] m-0 uppercase tracking-tighter opacity-40">{sub}</p>
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 opacity-20" style={{ backgroundColor: color }} />
             </div>
           ))}
         </div>
 
-        {/* Sellers table */}
-        <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '12px', overflow: 'hidden' }}>
-          <div style={{ padding: '13px 18px', borderBottom: `1px solid ${BORDER}`, backgroundColor: '#0a0a0a' }}>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', margin: 0 }}>All Sellers ({sellers.length})</p>
+        {/* Seller Registry */}
+        <div className="bg-[var(--card)] border border-[var(--b)] rounded-3xl overflow-hidden shadow-sm">
+          <div className="bg-[var(--bg-alt)]/50 px-8 py-5 border-b border-[var(--b)]">
+            <h3 className="text-[10px] font-black text-[var(--tl)] uppercase tracking-widest m-0 flex items-center gap-2 uppercase opacity-60">
+              <FiActivity size={12} className="text-[var(--p)]" /> Active Node Registry
+            </h3>
           </div>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse min-w-[1100px]">
               <thead>
-                <tr>{['Seller', 'Business', 'Status', 'Orders', 'Gross', 'Commission', 'Earns', 'Paid Out', 'Pending', 'Lock', 'Actions'].map(h => (
-                  <th key={h} style={thS}>{h}</th>
-                ))}</tr>
+                <tr className="bg-[var(--bg-alt)]/30">
+                  {['Institutional Node', 'State', 'Cycles', 'Volume', 'Net Yield', 'Disbursed', 'Disposition', 'Operations'].map(h => (
+                    <th key={h} className="text-[9px] font-black text-[var(--tl)] uppercase tracking-[0.3em] px-8 py-5 text-left border-b border-[var(--b)]">{h}</th>
+                  ))}
+                </tr>
               </thead>
-              <tbody>
-                {loading
-                  ? [...Array(3)].map((_, i) => <tr key={i}>{[...Array(11)].map((_, j) => <td key={j} style={tdS}><div style={{ height: '13px', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: '4px' }} /></td>)}</tr>)
-                  : sellers.length === 0
-                  ? <tr><td colSpan="11" style={{ padding: '48px', textAlign: 'center', color: 'rgba(255,255,255,0.2)' }}>No sellers yet.</td></tr>
-                  : sellers.map(seller => {
-                      const st    = sellerStatusStyle[seller.sellerInfo?.status || 'pending'];
-                      const stats = getStats(seller);
-                      return (
-                        <tr key={seller._id}
-                          onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'}
-                          onMouseOut={e  => e.currentTarget.style.backgroundColor = 'transparent'}>
-                          <td style={tdS}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: `${GOLD}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <span style={{ color: GOLD, fontSize: '11px', fontWeight: '700' }}>{seller.name?.charAt(0).toUpperCase()}</span>
-                              </div>
-                              <div>
-                                <p style={{ color: '#fff', fontSize: '12px', fontWeight: '500', margin: '0 0 1px' }}>{seller.name}</p>
-                                <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '10px', margin: 0 }}>{seller.email}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td style={tdS}><span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px' }}>{seller.sellerInfo?.businessName || '—'}</span></td>
-                          <td style={tdS}><span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '20px', color: st.color, backgroundColor: st.bg }}>{seller.sellerInfo?.status || 'pending'}</span></td>
-                          <td style={tdS}><span style={{ color: '#fff', fontSize: '12px' }}>{stats.orders}</span></td>
-                          <td style={tdS}><span style={{ color: '#fff', fontSize: '12px' }}>₹{stats.gross.toLocaleString()}</span></td>
-                          <td style={tdS}><span style={{ color: '#4ade80', fontSize: '12px' }}>₹{stats.comm.toLocaleString()}</span></td>
-                          <td style={tdS}><span style={{ color: '#60a5fa', fontSize: '12px' }}>₹{stats.earn.toLocaleString()}</span></td>
-                          <td style={tdS}><span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>₹{stats.paidOut.toLocaleString()}</span></td>
-                          <td style={tdS}>
-                            {stats.pending > 0
-                              ? <span style={{ color: GOLD, fontSize: '13px', fontWeight: '700' }}>₹{stats.pending.toLocaleString()}</span>
-                              : <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '3px' }}><FiLock size={9}/> —</span>}
-                          </td>
-                          <td style={tdS}>
-                            {stats.unlockedCount > 0 ? <span style={{ color: '#4ade80', fontSize: '11px' }}>🔓 {stats.unlockedCount}</span>
-                            : stats.deliveredCount > 0 ? <span style={{ color: '#fbbf24', fontSize: '11px' }}>🔒 {stats.deliveredCount}</span>
-                            : <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: '11px' }}>—</span>}
-                          </td>
-                          <td style={tdS}>
-                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                              <button onClick={() => setSelected(seller)} style={{ color: '#60a5fa', fontSize: '11px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                <FiEye size={11}/> View
-                              </button>
-                              {stats.pending > 0
-                                ? <button onClick={() => setPayoutData({ seller, amount: stats.pending })} style={{ color: GOLD, fontSize: '11px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}><FiDollarSign size={11}/> Pay</button>
-                                : <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '3px' }}><FiLock size={9}/> Pay</span>}
-                              {seller.sellerInfo?.status !== 'approved' && (
-                                <button onClick={() => handleStatusChange(seller._id, 'approved')} style={{ color: '#4ade80', fontSize: '11px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}><FiCheck size={11}/> OK</button>
-                              )}
-                              {seller.sellerInfo?.status !== 'suspended' && (
-                                <button onClick={() => handleStatusChange(seller._id, 'suspended')} style={{ color: '#f87171', fontSize: '11px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}><FiX size={11}/> Ban</button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                }
+              <tbody className="divide-y divide-[var(--b)]">
+                {loading ? (
+                  [...Array(5)].map((_, i) => (
+                    <tr key={i}><td colSpan="8" className="px-8 py-6"><div className="skeleton h-10 w-full rounded-xl" /></td></tr>
+                  ))
+                ) : sellers.length === 0 ? (
+                  <tr><td colSpan="8" className="px-8 py-20 text-center text-[var(--tl)] text-sm font-black uppercase tracking-widest opacity-20">Null node registry</td></tr>
+                ) : sellers.map(seller => {
+                  const st    = sellerStatusStyle[seller.sellerInfo?.status || 'pending'];
+                  const stats = getStats(seller);
+                  return (
+                    <tr key={seller._id} className="hover:bg-[var(--bg-alt)] transition-colors group">
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-[12px] bg-[var(--bg-alt)] border border-[var(--b)] flex items-center justify-center text-[var(--tl)] group-hover:scale-110 group-hover:text-[var(--p)] transition-all duration-500 shadow-inner">
+                            <FiUser size={16} className="text-[var(--p)]" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-black text-[var(--t)] m-0 serif uppercase tracking-tight">{seller.sellerInfo?.businessName || seller.name}</p>
+                            <p className="text-[10px] font-bold text-[var(--tl)] m-0 uppercase tracking-tighter opacity-40">{seller.email}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <span className="text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border shadow-sm" 
+                          style={{ color: st.color, backgroundColor: st.bg, borderColor: st.border }}>{seller.sellerInfo?.status || 'pending'}</span>
+                      </td>
+                      <td className="px-8 py-6 text-sm font-black text-[var(--t)] serif">{stats.orders}</td>
+                      <td className="px-8 py-6 text-sm font-black text-[var(--t)] serif">₹{stats.gross.toLocaleString()}</td>
+                      <td className="px-8 py-6">
+                        <span className="text-sm font-black text-emerald-500 serif">₹{stats.earn.toLocaleString()}</span>
+                      </td>
+                      <td className="px-8 py-6 text-xs font-bold text-[var(--tl)] opacity-40 serif">₹{stats.paidOut.toLocaleString()}</td>
+                      <td className="px-8 py-6">
+                        {stats.pending > 0 ? (
+                          <div className="flex flex-col">
+                            <span className="text-sm font-black text-[var(--p)] serif">₹{stats.pending.toLocaleString()}</span>
+                            <span className="text-[9px] font-black text-[var(--p)] uppercase tracking-tighter opacity-40">Ready</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 text-[var(--tl)] opacity-20">
+                            <FiLock size={12} />
+                            <span className="text-[9px] font-black uppercase tracking-widest">Balanced</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex gap-2">
+                          <button onClick={() => setSelected(seller)} title="View Node Details"
+                            className="w-9 h-9 rounded-[10px] bg-[var(--bg-alt)] text-[var(--tl)] border border-[var(--b)] hover:bg-[var(--p)] hover:text-[#040404] hover:border-[var(--p)] transition-all flex items-center justify-center shadow-sm">
+                            <FiEye size={16} />
+                          </button>
+                          {stats.pending > 0 && (
+                            <button onClick={() => setPayoutData({ seller, amount: stats.pending })} title="Disburse Yield"
+                              className="w-9 h-9 rounded-[10px] bg-emerald-500/5 text-emerald-500 border border-emerald-500/10 hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center shadow-sm">
+                              <FiDollarSign size={16} />
+                            </button>
+                          )}
+                          {seller.sellerInfo?.status !== 'approved' && (
+                            <button onClick={() => handleStatusChange(seller._id, 'approved')} title="Authorize Node"
+                              className="w-9 h-9 rounded-[10px] bg-[var(--bg-alt)] text-[var(--tl)] border border-[var(--b)] hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center shadow-sm">
+                              <FiCheck size={16} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

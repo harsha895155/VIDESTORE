@@ -20,7 +20,7 @@ messaging.onBackgroundMessage((payload) => {
   console.log('[SW] Background message received:', payload);
 
   const { title, body } = payload.notification || {};
-  const notifTitle = title || 'Trendorra';
+  const notifTitle = title || 'VideStore';
   const notifOptions = {
     body:    body || 'You have a new notification',
     icon:    payload.notification?.icon || '/logo.png',

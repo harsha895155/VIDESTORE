@@ -8,7 +8,7 @@ export default function RefundPolicy() {
       </InfoBox>
 
       <H2>1. Order Cancellation</H2>
-      <P>You can cancel your order within 24 hours of placing it by emailing hello@Trendorra.in or calling +91 98765 43210. Once the order is shipped, cancellation is not possible — you may instead initiate a return after delivery.</P>
+      <P>You can cancel your order within 24 hours of placing it by emailing vibestore2027@gmail.com or calling +91 98765 43210. Once the order is shipped, cancellation is not possible — you may instead initiate a return after delivery.</P>
       <UL items={[
         'Cancellations within 24 hours: full refund to original payment method',
         'Cancellations after 24 hours but before shipping: full refund minus ₹50 processing fee',
@@ -36,7 +36,7 @@ export default function RefundPolicy() {
       <H2>4. How to Initiate a Return</H2>
       <P>To initiate a return:</P>
       <UL items={[
-        'Step 1: Email hello@Trendorra.in with subject "Return Request – Order #XXXXX"',
+        'Step 1: Email vibestore2027@gmail.com with subject "Return Request – Order #XXXXX"',
         'Step 2: Include photos of the item and reason for return',
         'Step 3: Our team will respond within 24 business hours with return instructions',
         'Step 4: Pack the item securely and hand it to our pickup agent (free pickup for defective items)',
@@ -61,7 +61,7 @@ export default function RefundPolicy() {
       <P>Partial refunds may be issued in cases where: only part of the order is returned, the item shows signs of use, or original packaging is missing. Shipping charges are non-refundable unless the return is due to our error.</P>
 
       <H2>9. Contact for Returns & Refunds</H2>
-      <P>Email: hello@Trendorra.in | Phone: +91 98765 43210 | Response time: within 24 business hours (Mon–Sat, 9am–6pm IST)</P>
+      <P>Email: vibestore2027@gmail.com | Phone: +91 98765 43210 | Response time: within 24 business hours (Mon–Sat, 9am–6pm IST)</P>
     </LegalLayout>
   );
 }
