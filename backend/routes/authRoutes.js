@@ -20,12 +20,13 @@ const {
 } = require('../controllers/authController');
 
 // ── Google OAuth Strategy ─────────────────────────────────────────
-passport.use(new GoogleStrategy({
-  clientID:     process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL:  `${process.env.BASE_URL || ''}/api/auth/google/callback`,
-  proxy:        true,
-},
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(new GoogleStrategy({
+    clientID:     process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL:  (process.env.BASE_URL || 'http://localhost:5000').replace(/\/$/, '') + '/api/auth/google/callback',
+    proxy:        true,
+  },
 async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({ email: profile.emails[0].value });
@@ -50,6 +51,7 @@ async (accessToken, refreshToken, profile, done) => {
     return done(err, null);
   }
 }));
+}
 
 passport.serializeUser((user, done) => {
   done(null, user._id);
@@ -92,15 +94,22 @@ router.patch('/no-returns', protect, async (req, res) => {
 });
 
 // ── Google OAuth Routes ───────────────────────────────────────────
-router.get('/google',
-  passport.authenticate('google', { scope: ['profile', 'email'], session: false })
-);
+router.get('/google', (req, res, next) => {
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    return res.status(400).json({ success: false, message: 'Google Login is not configured on the server environment variables.' });
+  }
+  passport.authenticate('google', { scope: ['profile', 'email'], session: false })(req, res, next);
+});
 
-router.get('/google/callback',
+router.get('/google/callback', (req, res, next) => {
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    return res.status(400).json({ success: false, message: 'Google Login is not configured on the server environment variables.' });
+  }
   passport.authenticate('google', {
     failureRedirect: `${process.env.CLIENT_URL}/login?error=google_failed`,
     session: false,
-  }),
+  })(req, res, next);
+},
   (req, res) => {
     const token = generateToken(req.user._id);
     console.log('✅ Google login success:', req.user.email);
