@@ -16,6 +16,7 @@ const {
   resetPassword,
   registerSeller,
   updateSellerInfo,
+  upgradeTier,
 } = require('../controllers/authController');
 
 // ── Google OAuth Strategy ─────────────────────────────────────────
@@ -73,6 +74,7 @@ router.post('/address',         protect, addAddress);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password',  resetPassword);
 router.put('/seller-info',      protect, updateSellerInfo);
+router.put('/upgrade-tier',     protect, upgradeTier);
 
 // ── Seller: toggle their own no-returns policy (only if admin approved)
 router.patch('/no-returns', protect, async (req, res) => {

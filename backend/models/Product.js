@@ -26,7 +26,7 @@ const productSchema = new mongoose.Schema({
     enum: ['Men', 'Women', 'Streetwear', 'Accessories', 'Kids'],
   },
   subCategory: String,
-  brand: { type: String, default: 'Trendora' },
+  brand: { type: String, default: 'VideStore' },
   sizes: [{ type: String, enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'] }],
   colors: [{ name: String, hex: String }],
   stock: { type: Number, required: true, default: 0 },
@@ -40,6 +40,7 @@ const productSchema = new mongoose.Schema({
   material: String,
   careInstructions: String,
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  sellerId:  { type: mongoose.Schema.Types.ObjectId, ref: 'SellerAccount', index: true },
 
   // ── NEW: seller-customizable size guide ──────────────────────────────────
   // Mongoose Map: keys are size strings (e.g. 'S', 'M'), values are sizeRowSchema.

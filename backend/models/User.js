@@ -37,6 +37,14 @@ const sellerInfoSchema = new mongoose.Schema({
   },
   totalPaidOut: { type: Number, default: 0 },
 
+  // Account Tiers & Limits
+  tier: {
+    type: String,
+    enum: ['silver', 'gold', 'diamond'],
+    default: 'silver',
+  },
+  listingLimit: { type: Number, default: 5 }, // Silver: 5, Gold: 50, Diamond: 9999
+  
   // No-returns policy
   noReturnsApproved: { type: Boolean, default: false }, // admin grants permission
   noReturnsEnabled:  { type: Boolean, default: false }, // seller activates it (only if approved)
@@ -69,12 +77,19 @@ const userSchema = new mongoose.Schema({
   fcmToken: { type: String, default: null },
   avatar:   { type: String, default: '' },
 
-  // ── UPDATED: added 'seller' to role enum ──
+  // ── UPDATED: added 'seller' roles ──
   role: {
     type:    String,
-    enum:    ['user', 'seller', 'admin'],
+    enum:    ['user', 'seller_owner', 'seller_staff', 'admin', 'seller'], // 'seller' kept for compat
     default: 'user',
   },
+
+  // ── NEW: Link to SellerAccount ──
+  sellerAccountId: { type: mongoose.Schema.Types.ObjectId, ref: 'SellerAccount', default: null },
+  
+  // ── NEW: Granular Permissions ──
+  // Examples: ['manage_products', 'view_orders', 'manage_inventory', 'view_finance', 'manage_team']
+  permissions: [String],
 
   addresses:  [addressSchema],
   isActive:   { type: Boolean, default: true },
@@ -85,7 +100,7 @@ const userSchema = new mongoose.Schema({
   // Google OAuth
   googleId: { type: String, default: null },
 
-  // ── NEW: seller info (only populated when role === 'seller') ──
+  // ── DEPRECATED: legacy seller info (use sellerAccountId instead) ──
   sellerInfo: { type: sellerInfoSchema, default: () => ({}) },
   freeDelivery: { type: Boolean, default: false },
 

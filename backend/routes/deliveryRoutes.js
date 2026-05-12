@@ -906,11 +906,11 @@ router.get('/label/:orderId', async (req, res) => {
         <img
           class="logo-img"
           src="${logoUrl}"
-          alt="Trendorra Logo"
+          alt="VideStore Logo"
           onerror="this.style.display='none'"
         />
         <div class="logo-text-block">
-          <div class="brand-name">TRENDORRA</div>
+          <div class="brand-name">VIDESTORE</div>
           <div class="brand-tagline">Fashion Forward &amp; Premium Quality</div>
         </div>
       </div>
@@ -963,7 +963,7 @@ router.get('/label/:orderId', async (req, res) => {
         <div class="addr-section-label">
           <span>&#127978;</span> Return To (Dispatch From)
         </div>
-        <div class="addr-name">${sellerUser?.sellerInfo?.businessName || sellerUser?.name || 'Trendorra Seller'}</div>
+        <div class="addr-name">${sellerUser?.sellerInfo?.businessName || sellerUser?.name || 'VideStore Seller'}</div>
         <div class="addr-line">${sellerAddr.line || sellerAddr.addressLine1 || '—'}</div>
         <div class="addr-line">${sellerAddr.city || ''}, ${sellerAddr.state || ''}</div>
         <div class="addr-line">PIN: <strong>${sellerAddr.pincode || '—'}</strong></div>
@@ -1023,8 +1023,8 @@ router.get('/label/:orderId', async (req, res) => {
     <!-- ══ FOOTER ════════════════════════════════════════════════ -->
     <div class="footer">
       <div>
-        <div class="footer-brand">TRENDORRA</div>
-        <div class="footer-url">www.trendorra.onrender.com</div>
+        <div class="footer-brand">VIDESTORE</div>
+        <div class="footer-url">www.videstore.onrender.com</div>
       </div>
       <div>
         <div class="footer-care">Handled with care &#9825;</div>

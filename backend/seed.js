@@ -14,7 +14,7 @@ const sampleProducts = [
     price: 2499,
     discountPrice: 1999,
     category: 'Men',
-    brand: 'Trendorra',
+    brand: 'VideStore',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: [{ name: 'White', hex: '#FFFFFF' }, { name: 'Light Blue', hex: '#ADD8E6' }, { name: 'Navy', hex: '#000080' }],
     stock: 50,
@@ -35,7 +35,7 @@ const sampleProducts = [
     price: 3999,
     discountPrice: 2999,
     category: 'Women',
-    brand: 'Trendorra',
+    brand: 'VideStore',
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
     colors: [{ name: 'Light Wash', hex: '#B0C4DE' }, { name: 'Dark Wash', hex: '#1B2A4A' }, { name: 'Black', hex: '#000000' }],
     stock: 35,
@@ -51,10 +51,10 @@ const sampleProducts = [
   },
   {
     name: 'Oversized Graphic Streetwear Hoodie',
-    description: 'Statement oversized hoodie featuring exclusive Trendorra graphic print. Made from heavyweight fleece with a kangaroo pocket and adjustable drawstring hood.',
+    description: 'Statement oversized hoodie featuring exclusive VideStore graphic print. Made from heavyweight fleece with a kangaroo pocket and adjustable drawstring hood.',
     price: 3299,
     category: 'Streetwear',
-    brand: 'Trendorra',
+    brand: 'VideStore',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: [{ name: 'Black', hex: '#000000' }, { name: 'Off White', hex: '#FAF9F6' }, { name: 'Olive', hex: '#808000' }],
     stock: 60,
@@ -74,7 +74,7 @@ const sampleProducts = [
     price: 5999,
     discountPrice: 4999,
     category: 'Accessories',
-    brand: 'Trendorra',
+    brand: 'VideStore',
     sizes: ['Free Size'],
     colors: [{ name: 'Black', hex: '#000000' }, { name: 'Tan', hex: '#D2B48C' }, { name: 'White', hex: '#FFFFFF' }],
     stock: 20,
@@ -92,7 +92,7 @@ const sampleProducts = [
     description: 'Effortlessly chic linen trousers with a relaxed fit. Features an elasticated waistband with drawstring, side pockets, and a breathable linen blend fabric ideal for warm weather.',
     price: 2799,
     category: 'Women',
-    brand: 'Trendorra',
+    brand: 'VideStore',
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
     colors: [{ name: 'Cream', hex: '#FFFDD0' }, { name: 'Sage', hex: '#9CAD7F' }, { name: 'Sand', hex: '#C2B280' }],
     stock: 40,
@@ -111,7 +111,7 @@ const sampleProducts = [
     price: 4499,
     discountPrice: 3599,
     category: 'Men',
-    brand: 'Trendorra',
+    brand: 'VideStore',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: [{ name: 'Black', hex: '#000000' }, { name: 'Electric Blue', hex: '#007FFF' }, { name: 'Red', hex: '#FF0000' }],
     stock: 30,
@@ -130,7 +130,7 @@ const sampleProducts = [
     price: 1999,
     discountPrice: 1499,
     category: 'Accessories',
-    brand: 'Trendorra',
+    brand: 'VideStore',
     sizes: ['Free Size'],
     colors: [{ name: 'Gold', hex: '#C9A84C' }, { name: 'Silver', hex: '#C0C0C0' }],
     stock: 25,
@@ -149,7 +149,7 @@ const sampleProducts = [
     description: 'Utility-inspired cargo pants with a modern streetwear edge. Features multiple pockets, adjustable ankle cuffs, and a relaxed fit through the hip and thigh.',
     price: 3499,
     category: 'Streetwear',
-    brand: 'Trendorra',
+    brand: 'VideStore',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: [{ name: 'Khaki', hex: '#C3B091' }, { name: 'Black', hex: '#000000' }, { name: 'Camo', hex: '#78866B' }],
     stock: 45,
@@ -177,22 +177,22 @@ const seedDB = async () => {
     // Create admin user
     const adminUser = await User.create({
       name: 'Admin User',
-      email: 'admin@trendora.in',
-      password: 'Admin@123',
+      email: 'vibestore2027@gmail.com',
+      password: 'VideStore2027',
       role: 'admin',
       phone: '+91 9876543210',
     });
-    console.log('👑 Admin created: admin@trendora.in / Admin@123');
+    console.log('👑 Admin created: vibestore2027@gmail.com / VideStore2027');
 
     // Create test user
     await User.create({
       name: 'Test Customer',
-      email: 'user@trendora.in',
+      email: 'user@videstore.in',
       password: 'User@123',
       role: 'user',
       phone: '+91 9876543211',
     });
-    console.log('👤 Test user created: user@trendora.in / User@123');
+    console.log('👤 Test user created: user@videstore.in / User@123');
 
     // Create products
     const products = sampleProducts.map(p => ({ ...p, createdBy: adminUser._id }));
@@ -200,8 +200,8 @@ const seedDB = async () => {
     console.log(`✅ ${products.length} products seeded`);
 
     console.log('\n🎉 Database seeded successfully!');
-    console.log('📌 Admin Login: admin@trendora.in / Admin@123');
-    console.log('📌 User Login:  user@trendora.in / User@123');
+    console.log('📌 Admin Login: vibestore2027@gmail.com / VideStore2027');
+    console.log('📌 User Login:  user@videstore.in / User@123');
     process.exit(0);
   } catch (error) {
     console.error('❌ Seed error:', error);

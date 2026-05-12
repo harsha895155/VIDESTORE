@@ -1,7 +1,7 @@
 {
-  "name": "trendora",
+  "name": "videstore",
   "version": "1.0.0",
-  "description": "Trendora Premium Fashion E-commerce - Full Stack Project",
+  "description": "VideStore Premium Fashion E-commerce - Full Stack Project",
   "scripts": {
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "dev:backend": "cd backend && npm run dev",
@@ -12,5 +12,8 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
   }
 }

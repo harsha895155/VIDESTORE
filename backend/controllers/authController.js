@@ -2,6 +2,7 @@ const User = require('../models/User');
 const { generateToken } = require('../middleware/auth');
 const { sendWelcomeEmail } = require('../utils/emailService');
 const { sendWelcomePush } = require('../utils/pushNotificationService');
+const { saveNotificationToFirestore } = require('../utils/notifyUser');
 
 // @desc Register user
 // @route POST /api/auth/register
@@ -21,6 +22,15 @@ exports.register = async (req, res) => {
     console.log('🔔 Sending welcome push to:', user.fcmToken || 'no fcmToken');
     sendWelcomeEmail(user).catch(err => console.error('❌ Welcome email failed:', err.message));
     if (user.fcmToken) sendWelcomePush(user).catch(err => console.error('❌ Welcome push failed:', err.message));
+
+    // ── In-app notification: welcome message ──
+    saveNotificationToFirestore(
+      user._id,
+      '👋 Welcome to VideStore!',
+      `Hi ${user.name?.split(' ')[0]}! Your account has been created. Use code WELCOME10 for 10% OFF your first order.`,
+      'info'
+    ).catch(console.error);
+
     res.status(201).json({
       success: true,
       token,
@@ -42,6 +52,15 @@ exports.login = async (req, res) => {
     if (!isMatch) return res.status(401).json({ success: false, message: 'Incorrect password. Please try again.' });
     if (!user.isActive) return res.status(401).json({ success: false, message: 'Account deactivated' });
     const token = generateToken(user._id);
+
+    // ── In-app notification: login alert ──
+    saveNotificationToFirestore(
+      user._id,
+      '🔐 New Login',
+      `A new login to your VideStore account was detected. If this wasn't you, please change your password immediately.`,
+      'alert'
+    ).catch(console.error);
+
     res.json({
       success: true,
       token,
@@ -136,11 +155,11 @@ exports.forgotPassword = async (req, res) => {
       const { data, error } = await resend.emails.send({
         from: 'onboarding@resend.dev',
         to: user.email,
-        subject: '🔐 Password Reset OTP — Trendorra',
+        subject: '🔐 Password Reset OTP — VideStore',
         html: `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:20px 0">
 <div style="max-width:480px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #eee">
   <div style="background:#111;padding:24px;text-align:center">
-    <h1 style="color:#C9A84C;font-size:20px;letter-spacing:4px;margin:0;font-weight:300">TRENDORRA</h1>
+    <h1 style="color:#C9A84C;font-size:20px;letter-spacing:4px;margin:0;font-weight:300">VIDESTORE</h1>
   </div>
   <div style="padding:32px 40px;text-align:center">
     <p style="color:#666;font-size:14px;margin-bottom:24px">Hi ${user.name?.split(' ')[0]}, use this OTP to reset your password.</p>
@@ -323,6 +342,31 @@ exports.updateSellerInfo = async (req, res) => {
     res.json({ success: true, message: 'Seller profile updated successfully', user });
   } catch (error) {
     console.error('updateSellerInfo error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc Upgrade seller tier
+// @route PUT /api/auth/upgrade-tier
+exports.upgradeTier = async (req, res) => {
+  try {
+    const { tier } = req.body;
+    const user = await User.findById(req.user._id);
+    if (!user || user.role !== 'seller') {
+      return res.status(403).json({ success: false, message: 'Only sellers can upgrade tiers' });
+    }
+
+    const limits = { silver: 5, gold: 50, diamond: 9999 };
+    if (!limits[tier]) {
+      return res.status(400).json({ success: false, message: 'Invalid tier' });
+    }
+
+    user.sellerInfo.tier = tier;
+    user.sellerInfo.listingLimit = limits[tier];
+    await user.save();
+
+    res.json({ success: true, message: `Upgraded to ${tier.toUpperCase()} tier!`, user });
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };

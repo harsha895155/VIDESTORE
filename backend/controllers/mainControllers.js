@@ -18,21 +18,18 @@ const {
   sendOrderDeliveredPush,
 } = require('../utils/pushNotificationService');
 const deliveryService = require('../utils/deliveryService');
+const { saveNotificationToFirestore } = require('../utils/notifyUser');
 
 // ── helpers ───────────────────────────────────────────────────────
-const getSellerProductIds = async (sellerId) => {
-  const products = await Product.find({ createdBy: sellerId }).select('_id');
+const getSellerProductIds = async (sellerAccountId) => {
+  const products = await Product.find({ sellerId: sellerAccountId }).select('_id');
   return products.map(p => p._id.toString());
 };
 
-const buildSellerQuery = async (sellerId, extraQuery = {}) => {
-  const ids = await getSellerProductIds(sellerId);
+const buildSellerQuery = async (sellerAccountId, extraQuery = {}) => {
   return {
     ...extraQuery,
-    $or: [
-      { 'orderItems.seller': sellerId },
-      { 'orderItems.product': { $in: ids } },
-    ],
+    'orderItems.sellerId': sellerAccountId,
   };
 };
 
@@ -61,13 +58,13 @@ exports.createOrder = async (req, res) => {
 
       subtotal += product.price * item.quantity;
 
-      // Assign seller: null if admin-created product
-      const sellerId = (product.createdBy?.role === 'seller')
-        ? product.createdBy._id : null;
+      // Assign sellerId from product
+      const sellerAccountId = product.sellerId;
 
       enrichedItems.push({
         product:  item.product,
-        seller:   sellerId,
+        seller:   product.createdBy?._id, // Keep legacy ref
+        sellerId: sellerAccountId,
         name:     item.name  || product.name,
         image:    item.image || product.images?.[0]?.url || '',
         price:    product.price,
@@ -152,6 +149,14 @@ exports.createOrder = async (req, res) => {
     sendOrderConfirmedEmail(populated, req.user).catch(console.error);
     if (req.user.fcmToken) sendOrderConfirmedPush(populated, req.user).catch(console.error);
 
+    // ── In-app notification: customer order placed ──
+    saveNotificationToFirestore(
+      req.user._id,
+      '🛍️ Order Placed!',
+      `Your order #${order._id.toString().slice(-8).toUpperCase()} has been placed successfully. Total: ₹${totalPrice.toLocaleString()}`,
+      'order'
+    ).catch(console.error);
+
     res.status(201).json({ success: true, order: populated });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -166,40 +171,20 @@ exports.getMyOrders = async (req, res) => {
   try {
     let orders;
 
-    if (req.user.role === 'seller') {
-      const sellerProductIds = await getSellerProductIds(req.user._id);
+    if (req.user.role === 'seller' || req.user.role === 'seller_owner' || req.user.role === 'seller_staff') {
+      const sellerAccountId = req.user.sellerAccountId;
+      orders = await Order.find({ 'orderItems.sellerId': sellerAccountId })
+        .populate('user', 'name email phone')
+        .populate('orderItems.product', 'name images price')
+        .sort({ createdAt: -1 });
 
-      const [newOrders, oldOrders] = await Promise.all([
-        Order.find({ 'orderItems.seller': req.user._id })
-          .populate('user', 'name email phone')
-          .populate('orderItems.product', 'name images price')
-          .sort({ createdAt: -1 }),
-        Order.find({
-          'orderItems.seller': { $exists: false },
-          'orderItems.product': { $in: sellerProductIds },
-        })
-          .populate('user', 'name email phone')
-          .populate('orderItems.product', 'name images price')
-          .sort({ createdAt: -1 }),
-      ]);
-
-      // Merge + deduplicate
-      const map = new Map();
-      [...newOrders, ...oldOrders].forEach(o => map.set(o._id.toString(), o));
-
-      orders = Array.from(map.values())
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .map(order => {
-          const obj = order.toObject();
-          obj.orderItems = obj.orderItems.filter(item => {
-            if (item.seller)
-              return item.seller.toString() === req.user._id.toString();
-            const pid = item.product?._id?.toString() || item.product?.toString();
-            return sellerProductIds.includes(pid);
-          });
-          return obj;
-        })
-        .filter(o => o.orderItems.length > 0);
+      orders = orders.map(order => {
+        const obj = order.toObject();
+        obj.orderItems = obj.orderItems.filter(item => 
+          item.sellerId?.toString() === sellerAccountId?.toString()
+        );
+        return obj;
+      });
 
     } else {
       orders = await Order.find({ user: req.user._id })
@@ -231,13 +216,11 @@ exports.getOrder = async (req, res) => {
     const isAdmin = req.user.role === 'admin';
 
     let isSeller = false;
-    if (req.user.role === 'seller') {
-      const sellerProductIds = await getSellerProductIds(req.user._id);
-      isSeller = order.orderItems.some(item => {
-        if (item.seller) return item.seller._id?.toString() === req.user._id.toString();
-        const pid = item.product?._id?.toString() || item.product?.toString();
-        return sellerProductIds.includes(pid);
-      });
+    const sellerRoles = ['seller', 'seller_owner', 'seller_staff'];
+    if (sellerRoles.includes(req.user.role)) {
+      isSeller = order.orderItems.some(item => 
+        item.sellerId?.toString() === req.user.sellerAccountId?.toString()
+      );
     }
 
     if (!isOwner && !isAdmin && !isSeller)
@@ -245,13 +228,10 @@ exports.getOrder = async (req, res) => {
 
     // Seller sees only their items
     if (isSeller && !isAdmin) {
-      const sellerProductIds = await getSellerProductIds(req.user._id);
       const obj = order.toObject();
-      obj.orderItems = obj.orderItems.filter(item => {
-        if (item.seller) return item.seller._id?.toString() === req.user._id.toString();
-        const pid = item.product?._id?.toString() || item.product?.toString();
-        return sellerProductIds.includes(pid);
-      });
+      obj.orderItems = obj.orderItems.filter(item => 
+        item.sellerId?.toString() === req.user.sellerAccountId?.toString()
+      );
       return res.json({ success: true, order: obj });
     }
 
@@ -271,8 +251,9 @@ exports.getAllOrders = async (req, res) => {
     const statusFilter = status ? { orderStatus: status } : {};
 
     let query;
-    if (req.user.role === 'seller') {
-      query = await buildSellerQuery(req.user._id, statusFilter);
+    const sellerRoles = ['seller', 'seller_owner', 'seller_staff'];
+    if (sellerRoles.includes(req.user.role)) {
+      query = await buildSellerQuery(req.user.sellerAccountId, statusFilter);
     } else {
       query = statusFilter;
     }
@@ -300,11 +281,9 @@ exports.confirmOrder = async (req, res) => {
     if (!order)
       return res.status(404).json({ success: false, message: 'Order not found' });
 
-    const sellerProductIds = await getSellerProductIds(req.user._id);
-    const isSeller = order.orderItems.some(item => {
-      if (item.seller) return item.seller.toString() === req.user._id.toString();
-      return sellerProductIds.includes(item.product?.toString());
-    });
+    const isSeller = order.orderItems.some(item => 
+      item.sellerId?.toString() === req.user.sellerAccountId?.toString()
+    );
 
     if (!isSeller)
       return res.status(403).json({ success: false, message: 'Not authorized to confirm this order' });
@@ -320,6 +299,14 @@ exports.confirmOrder = async (req, res) => {
       timestamp: new Date(),
     });
     await order.save();
+
+    // ── In-app notification: customer's order confirmed ──
+    saveNotificationToFirestore(
+      order.user,
+      '✅ Order Confirmed!',
+      `Your order #${order._id.toString().slice(-8).toUpperCase()} has been confirmed by the seller and is being prepared.`,
+      'order'
+    ).catch(console.error);
 
     res.json({ success: true, message: 'Order confirmed successfully', order });
   } catch (error) {
@@ -338,12 +325,11 @@ exports.updateOrderStatus = async (req, res) => {
     if (!order)
       return res.status(404).json({ success: false, message: 'Order not found' });
 
-    if (req.user.role === 'seller') {
-      const sellerProductIds = await getSellerProductIds(req.user._id);
-      const isSeller = order.orderItems.some(item => {
-        if (item.seller) return item.seller.toString() === req.user._id.toString();
-        return sellerProductIds.includes(item.product?.toString());
-      });
+    const sellerRoles = ['seller', 'seller_owner', 'seller_staff'];
+    if (sellerRoles.includes(req.user.role)) {
+      const isSeller = order.orderItems.some(item => 
+        item.sellerId?.toString() === req.user.sellerAccountId?.toString()
+      );
       if (!isSeller)
         return res.status(403).json({ success: false, message: 'Not authorized' });
       const sellerAllowed = ['Confirmed', 'Shipped'];
@@ -397,13 +383,42 @@ exports.updateOrderStatus = async (req, res) => {
     try {
       const orderUser = await User.findById(order.user);
       if (orderUser) {
+        const shortId = order._id.toString().slice(-8).toUpperCase();
         if (orderStatus === 'Shipped') {
           sendOrderShippedEmail(order, orderUser).catch(console.error);
           if (orderUser.fcmToken) sendOrderShippedPush(order, orderUser).catch(console.error);
+          saveNotificationToFirestore(
+            order.user,
+            '🚚 Order Shipped!',
+            `Your order #${shortId} is on its way!${order.trackingId ? ` Tracking: ${order.trackingId}` : ''}`,
+            'order'
+          ).catch(console.error);
+        }
+        if (orderStatus === 'Out for Delivery') {
+          saveNotificationToFirestore(
+            order.user,
+            '📦 Out for Delivery!',
+            `Your order #${shortId} is out for delivery and will arrive today!`,
+            'order'
+          ).catch(console.error);
         }
         if (orderStatus === 'Delivered') {
           sendOrderDeliveredEmail(order, orderUser).catch(console.error);
           if (orderUser.fcmToken) sendOrderDeliveredPush(order, orderUser).catch(console.error);
+          saveNotificationToFirestore(
+            order.user,
+            '🎉 Order Delivered!',
+            `Your order #${shortId} has been delivered. Enjoy your purchase!`,
+            'order'
+          ).catch(console.error);
+        }
+        if (orderStatus === 'Cancelled') {
+          saveNotificationToFirestore(
+            order.user,
+            '❌ Order Cancelled',
+            `Your order #${shortId} has been cancelled.${order.refundAmount > 0 ? ` Refund of ₹${order.refundAmount} will be processed in 5-7 days.` : ''}`,
+            'order'
+          ).catch(console.error);
         }
       }
     } catch (e) { console.error('Notification error:', e.message); }
@@ -452,6 +467,16 @@ exports.cancelOrder = async (req, res) => {
       timestamp: new Date(),
     });
     await order.save();
+
+    // ── In-app notification: customer cancelled their order ──
+    saveNotificationToFirestore(
+      req.user._id,
+      '❌ Order Cancelled',
+      wasPaidOnline
+        ? `Your order #${order._id.toString().slice(-8).toUpperCase()} was cancelled. Refund of ₹${refundAmount} will be processed in 5-7 days.`
+        : `Your order #${order._id.toString().slice(-8).toUpperCase()} has been cancelled.`,
+      'order'
+    ).catch(console.error);
 
     res.json({
       success:         true,
@@ -561,7 +586,7 @@ exports.resetRevenueData = async (req, res) => {
 
 exports.deleteMyOrders = async (req, res) => {
   try {
-    const query  = await buildSellerQuery(req.user._id);
+    const query  = await buildSellerQuery(req.user.sellerAccountId);
     const result = await Order.deleteMany(query);
     res.json({ success: true, message: `${result.deletedCount} orders deleted.` });
   } catch (error) {
@@ -661,6 +686,18 @@ exports.toggleWishlist = async (req, res) => {
     if (idx >= 0) wishlist.products.splice(idx, 1);
     else wishlist.products.push(productId);
     await wishlist.save();
+
+    // ── In-app notification: wishlist action ──
+    if (action === 'added') {
+      const product = await Product.findById(productId).select('name');
+      saveNotificationToFirestore(
+        req.user._id,
+        '❤️ Added to Wishlist',
+        `"${product?.name || 'Item'}" was added to your wishlist.`,
+        'info'
+      ).catch(console.error);
+    }
+
     res.json({ success: true, action, wishlist });
   } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 };

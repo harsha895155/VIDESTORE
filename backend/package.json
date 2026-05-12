@@ -1,7 +1,7 @@
 {
-  "name": "trendora-backend",
+  "name": "videstore-backend",
   "version": "1.0.0",
-  "description": "Trendorra Fashion E-commerce Backend",
+  "description": "VideStore Fashion E-commerce Backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

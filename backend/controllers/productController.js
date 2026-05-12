@@ -115,7 +115,37 @@ exports.getProduct = async (req, res) => {
 // @route POST /api/products
 exports.createProduct = async (req, res) => {
   try {
-    const product = await Product.create({ ...req.body, createdBy: req.user._id });
+    const sellerRoles = ['seller', 'seller_owner', 'seller_staff'];
+    const isSeller = sellerRoles.includes(req.user.role);
+
+    // Seller Limit Check
+    if (isSeller) {
+      if (!req.user.sellerAccountId) {
+        return res.status(403).json({ success: false, message: 'Seller account not linked' });
+      }
+
+      const SellerAccount = require('../models/SellerAccount');
+      const account = await SellerAccount.findById(req.user.sellerAccountId);
+      if (!account) return res.status(404).json({ success: false, message: 'Seller account not found' });
+
+      const currentCount = await Product.countDocuments({ sellerId: req.user.sellerAccountId });
+      const limit = account.limits?.maxProducts || 100;
+      
+      if (currentCount >= limit) {
+        return res.status(403).json({ 
+          success: false, 
+          message: `Listing limit reached (${limit} products). Please upgrade your tier (${account.tier}).` 
+        });
+      }
+    }
+
+    const productData = {
+      ...req.body,
+      createdBy: req.user._id,
+      sellerId:  isSeller ? req.user.sellerAccountId : req.body.sellerId, // admin can set sellerId
+    };
+
+    const product = await Product.create(productData);
 
     // ── Fix 3: toPlain() converts sizeGuide Map → plain object in response ──
     res.status(201).json({ success: true, product: toPlain(product) });

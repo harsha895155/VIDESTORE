@@ -2,126 +2,113 @@
 // utils/pushNotificationService.js
 // Firebase Cloud Messaging — replaces Fast2SMS
 // ═══════════════════════════════════════════════════════════
+
 const admin = require('firebase-admin');
-const path  = require('path');
 
-// ── Init Firebase Admin (singleton) ─────────────────────────
-if (!admin.apps.length) {
-  let serviceAccount;
-  
-  if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
-    // 1. Used in Production (Render)
-    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+let firebaseInitialized = false;
+
+try {
+  if (
+    process.env.FIREBASE_PROJECT_ID &&
+    process.env.FIREBASE_CLIENT_EMAIL &&
+    process.env.FIREBASE_PRIVATE_KEY
+  ) {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      }),
+    });
+
+    firebaseInitialized = true;
+    console.log('🔥 Firebase initialized');
   } else {
-    // 2. Used in Local Development
-    serviceAccount = require(path.join(__dirname, '../firebase-service-account.json'));
+    console.log('⚠️ Firebase credentials not found. Push notifications disabled.');
   }
-
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+} catch (error) {
+  console.error('Firebase initialization error:', error.message);
 }
-
-const messaging = admin.messaging();
 
 // ── Core send function ───────────────────────────────────────
 const sendPush = async (fcmToken, { title, body, data = {} }) => {
-  if (!fcmToken) {
-    console.log(`🔔 [Push skipped] No FCM token`);
-    return { success: false, reason: 'No FCM token' };
+  if (!firebaseInitialized) {
+    console.log(`🔔 [Firebase Disabled] Would have sent: ${title}`);
+    return { success: false, message: 'Firebase not initialized' };
   }
-
+  
   try {
-    const result = await messaging.send({
-      token: fcmToken,
+    const message = {
       notification: { title, body },
-      data: { ...data },
-      webpush: {
-        notification: {
-          title,
-          body,
-          icon: '/logo.png',
-          badge: '/logo.png',
-          vibrate: [200, 100, 200],
-        },
-        fcmOptions: { link: data.url || 'https://trendorra.in' },
-      },
-    });
-    console.log(`🔔 ✅ Push sent: ${result}`);
-    return { success: true, messageId: result };
-  } catch (err) {
-    // Token expired/invalid — caller should clear it
-    if (err.code === 'messaging/registration-token-not-registered' ||
-        err.code === 'messaging/invalid-registration-token') {
-      console.log(`🔔 ❌ Invalid FCM token — should be cleared`);
-      return { success: false, reason: 'invalid-token' };
-    }
-    console.error(`🔔 ❌ Push error: ${err.message}`);
-    return { success: false, reason: err.message };
+      data: data,
+      token: fcmToken,
+    };
+    const response = await admin.messaging().send(message);
+    return { success: true, messageId: response };
+  } catch (error) {
+    console.error('Push error:', error.message);
+    return { success: false, error: error.message };
   }
 };
 
 // ── Bulk send (multicast) ────────────────────────────────────
 const sendBulkPush = async (fcmTokens, { title, body, imageUrl, data = {} }) => {
-  const validTokens = fcmTokens.filter(Boolean);
-  if (!validTokens.length) return { success: false, reason: 'No tokens' };
+  if (!firebaseInitialized || !fcmTokens.length) {
+    return { success: false, sent: 0 };
+  }
 
   try {
-    const result = await messaging.sendEachForMulticast({
-      tokens: validTokens,
-      notification: { title, body, ...(imageUrl && { image: imageUrl }) },
-      data: { ...data },
-      webpush: {
-        notification: {
-          title,
-          body,
-          icon: '/logo.png', // Fallback to relative so it works anywhere
-          ...(imageUrl && { image: imageUrl }),
-          badge: '/logo.png',
-        },
-        fcmOptions: { link: data.url || '/' },
-      },
-    });
-    console.log(`🔔 Bulk push: ${result.successCount}/${validTokens.length} sent`);
-    return { success: true, sent: result.successCount, total: validTokens.length };
-  } catch (err) {
-    console.error(`🔔 ❌ Bulk push error: ${err.message}`);
-    return { success: false, reason: err.message };
+    const message = {
+      notification: { title, body, imageUrl },
+      data: data,
+      tokens: fcmTokens,
+    };
+    const response = await admin.messaging().sendEachForMulticast(message);
+    return { 
+      success: true, 
+      sent: response.successCount, 
+      total: fcmTokens.length 
+    };
+  } catch (error) {
+    console.error('Bulk push error:', error.message);
+    return { success: false, error: error.message };
   }
 };
 
 // ── Notification Templates ───────────────────────────────────
 module.exports = {
-  sendOrderConfirmedPush: (order, user) => sendPush(user.fcmToken, {
+  admin,
+  firebaseInitialized,
+  sendPush,
+  sendBulkPush,
+
+  sendOrderConfirmedPush: (order, user) => sendPush(user?.fcmToken, {
     title: '✅ Order Confirmed!',
-    body: `Your Trendorra order #${order._id.toString().slice(-8).toUpperCase()} is confirmed. Total: ₹${order.totalPrice?.toLocaleString()}`,
+    body: `Your VideStore order #${order._id.toString().slice(-8).toUpperCase()} is confirmed. Total: ₹${order.totalPrice?.toLocaleString()}`,
     data: { url: '/orders', orderId: order._id.toString(), type: 'order_confirmed' },
   }),
 
-  sendOrderShippedPush: (order, user) => sendPush(user.fcmToken, {
+  sendOrderShippedPush: (order, user) => sendPush(user?.fcmToken, {
     title: '🚚 Order Shipped!',
-    body: `Trendorra order #${order._id.toString().slice(-8).toUpperCase()} is on its way!${order.trackingNumber ? ` Track: ${order.trackingNumber}` : ''}`,
+    body: `VideStore order #${order._id.toString().slice(-8).toUpperCase()} is on its way!${order.trackingNumber ? ` Track: ${order.trackingNumber}` : ''}`,
     data: { url: `/orders/${order._id}`, orderId: order._id.toString(), type: 'order_shipped' },
   }),
 
-  sendOrderDeliveredPush: (order, user) => sendPush(user.fcmToken, {
+  sendOrderDeliveredPush: (order, user) => sendPush(user?.fcmToken, {
     title: '🎉 Order Delivered!',
-    body: `Your Trendorra order #${order._id.toString().slice(-8).toUpperCase()} has been delivered! Hope you love it.`,
+    body: `Your VideStore order #${order._id.toString().slice(-8).toUpperCase()} has been delivered! Hope you love it.`,
     data: { url: `/orders/${order._id}`, orderId: order._id.toString(), type: 'order_delivered' },
   }),
 
-  sendOrderCancelledPush: (order, user) => sendPush(user.fcmToken, {
+  sendOrderCancelledPush: (order, user) => sendPush(user?.fcmToken, {
     title: '❌ Order Cancelled',
-    body: `Trendorra order #${order._id.toString().slice(-8).toUpperCase()} cancelled. Refund in 5-7 days if paid online.`,
+    body: `VideStore order #${order._id.toString().slice(-8).toUpperCase()} cancelled. Refund in 5-7 days if paid online.`,
     data: { url: '/orders', orderId: order._id.toString(), type: 'order_cancelled' },
   }),
 
-  sendWelcomePush: (user) => sendPush(user.fcmToken, {
-    title: '👋 Welcome to Trendorra!',
+  sendWelcomePush: (user) => sendPush(user?.fcmToken, {
+    title: '👋 Welcome to VideStore!',
     body: `Hey ${user.name?.split(' ')[0]}! Use code WELCOME10 for 10% OFF your first order.`,
     data: { url: '/shop', type: 'welcome' },
   }),
-
-  sendBulkPush,
-  sendPush,
-};
+};

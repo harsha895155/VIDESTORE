@@ -3,6 +3,18 @@ const router = express.Router();
 const { protect, admin } = require('../middleware/auth');
 const Coupon = require('../models/Coupon');
 
+// Public: Get active coupons for Offers page
+router.get('/active', async (req, res) => {
+  try {
+    const coupons = await Coupon.find({
+      isActive: true,
+      validTill: { $gt: new Date() },
+      validFrom: { $lt: new Date() }
+    }).select('code description discountType discountValue minOrderValue maxDiscount').sort({ createdAt: -1 });
+    res.json({ success: true, coupons });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
 // Apply coupon (customer)
 router.post('/apply', protect, async (req, res) => {
   try {

@@ -42,9 +42,9 @@ router.post('/bulk-email', protect, admin, async (req, res) => {
         try {
           const htmlContent = `
             <div style="font-family: Arial, sans-serif; padding: 20px; color: #111; border-top: 4px solid #C9A84C;">
-              <h1 style="color: #C9A84C; font-size: 20px; letter-spacing: 2px;">TRENDORRA</h1>
+              <h1 style="color: #C9A84C; font-size: 20px; letter-spacing: 2px;">VIDESTORE</h1>
               <div style="margin-top: 20px; font-size: 16px; line-height: 1.6;">${message}</div>
-              <p style="margin-top: 30px; font-size: 12px; color: #999;">Explore luxury at trendorra.in</p>
+              <p style="margin-top: 30px; font-size: 12px; color: #999;">Explore luxury at videstore.in</p>
             </div>
           `;
 
@@ -77,7 +77,7 @@ router.post('/bulk-email', protect, admin, async (req, res) => {
 // ── Send bulk push ───────────────────────────────────────────────────
 router.post('/bulk-sms', protect, admin, async (req, res) => {
   try {
-    const { message, title = 'TRENDORRA', targetAll = true, customerEmail = '', imageUrl } = req.body;
+    const { message, title = 'VIDESTORE', targetAll = true, customerEmail = '', imageUrl } = req.body;
 
     let targets = [];
     if (targetAll) {

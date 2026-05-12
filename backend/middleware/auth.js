@@ -26,14 +26,37 @@ const admin = (req, res, next) => {
 };
 
 // ── NEW: seller middleware ──
-// Allows both sellers and admins (admin can do everything a seller can)
+// Allows seller owners, staff, and admins (admin can do everything a seller can)
 const seller = (req, res, next) => {
-  if (req.user && (req.user.role === 'seller' || req.user.role === 'admin')) return next();
+  if (req.user && (
+    req.user.role === 'seller' || 
+    req.user.role === 'seller_owner' || 
+    req.user.role === 'seller_staff' || 
+    req.user.role === 'admin'
+  )) return next();
   res.status(403).json({ success: false, message: 'Not authorized as seller' });
+};
+
+// ── NEW: granular seller permission middleware ──
+const authorizeSeller = (permission) => {
+  return (req, res, next) => {
+    if (!req.user) return res.status(401).json({ success: false, message: 'Not authenticated' });
+    
+    // Admins bypass all permission checks
+    if (req.user.role === 'admin') return next();
+    
+    // Owner bypasses all seller-level permission checks
+    if (req.user.role === 'seller_owner' || req.user.role === 'seller') return next();
+    
+    // Staff check
+    if (req.user.role === 'seller_staff' && req.user.permissions.includes(permission)) return next();
+    
+    res.status(403).json({ success: false, message: `Access denied: missing ${permission} permission` });
+  };
 };
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '30d' });
 };
 
-module.exports = { protect, admin, seller, generateToken };
+module.exports = { protect, admin, seller, authorizeSeller, generateToken };

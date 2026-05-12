@@ -47,7 +47,7 @@ const uploadToCloudinary = (buffer) => {
   return new Promise((resolve, reject) => {
     const cloudinary = getCloudinary();
     const stream = cloudinary.uploader.upload_stream(
-      { folder: 'trendora/products', quality: 'auto', fetch_format: 'auto' },
+      { folder: 'videstore/products', quality: 'auto', fetch_format: 'auto' },
       (error, result) => {
         if (error) reject(error);
         else resolve(result);
@@ -62,7 +62,7 @@ const uploadVideoToCloudinary = (buffer) => {
     const cloudinary = getCloudinary();
     const stream = cloudinary.uploader.upload_stream(
       {
-        folder: 'trendora/products/videos',
+        folder: 'videstore/products/videos',
         resource_type: 'video',
         quality: 'auto',
         chunk_size: 6000000, // 6 MB chunks for large files

@@ -4,10 +4,22 @@ let _db = null;
 
 const getFirestore = () => {
   if (!admin.apps.length) {
-    const serviceAccount = require('../firebase-service-account.json');
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
+    if (
+      process.env.FIREBASE_PROJECT_ID &&
+      process.env.FIREBASE_CLIENT_EMAIL &&
+      process.env.FIREBASE_PRIVATE_KEY
+    ) {
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        }),
+      });
+      console.log('🔥 Firebase (Firestore) initialized');
+    } else {
+      console.log('⚠️ Firebase credentials not found for Firestore. Real-time updates disabled.');
+    }
   }
   if (!_db) {
     _db = admin.firestore();

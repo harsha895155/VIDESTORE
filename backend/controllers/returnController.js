@@ -72,23 +72,26 @@ const requestReturn = async (req, res) => {
         await order.save();
 
         const orderId = order._id.toString().slice(-8).toUpperCase();
-        const frontendUrl = process.env.FRONTEND_URL || 'https://trendorra.onrender.com';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://videstore.onrender.com';
         const photoHtml = uploadedImages.length > 0
             ? `<div style="margin-top:12px;">${uploadedImages.map(img => `<img src="${img.url}" style="width:80px;height:96px;object-fit:cover;border-radius:4px;margin-right:6px;" />`).join('')}</div>`
             : '';
 
         // Notify sellers
-        const sellerIds = [...new Set(order.orderItems.map(i => i.seller?.toString() || i.product?.createdBy?._id?.toString()).filter(Boolean))];
-        const sellers = await User.find({ _id: { $in: sellerIds } }).select('email name _id');
+        const sellerIds = [...new Set(order.orderItems.map(i => i.sellerId?.toString()).filter(Boolean))];
+        const SellerAccount = require('../models/SellerAccount');
+        const sellerAccounts = await SellerAccount.find({ _id: { $in: sellerIds } }).populate('ownerUserId', 'email name');
 
-        for (const seller of sellers) {
-            await createNotification({ recipient: seller._id, type: 'return_request', title: 'Return Request Received', message: `Order #${orderId} — Reason: ${reasonLabel || reason}`, orderId: order._id, isRead: false });
+        for (const account of sellerAccounts) {
+            const owner = account.ownerUserId;
+            if (!owner) continue;
+            await createNotification({ recipient: owner._id, type: 'return_request', title: 'Return Request Received', message: `Order #${orderId} — Reason: ${reasonLabel || reason}`, orderId: order._id, isRead: false });
             try {
                 await sendEmail({
-                    to: seller.email, subject: `Return Request: Order #${orderId} — Action Required`,
+                    to: owner.email, subject: `Return Request: Order #${orderId} — Action Required`,
                     html: `<div style="font-family:sans-serif;max-width:600px;margin:auto;background:#111;color:#fff;padding:32px;border-radius:8px;">
             <h2 style="color:#C9A84C;font-weight:300;">Return Request Received</h2>
-            <p style="color:rgba(255,255,255,0.6);font-size:14px;">Hi ${seller.name}, a customer has requested a return for order <strong style="color:#fff;">#${orderId}</strong>. Please respond within 48 hours.</p>
+            <p style="color:rgba(255,255,255,0.6);font-size:14px;">Hi ${owner.name}, a customer has requested a return for order <strong style="color:#fff;">#${orderId}</strong>. Please respond within 48 hours.</p>
             <div style="background:#0a0a0a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:20px;margin:20px 0;">
               <p style="color:#fff;font-size:14px;margin:4px 0;"><strong>Reason:</strong> ${reasonLabel || reason}</p>
               ${note ? `<p style="color:rgba(255,255,255,0.6);font-size:13px;margin:8px 0 0;"><strong>Customer Note:</strong> ${note}</p>` : ''}
@@ -168,7 +171,7 @@ const handleReturn = async (req, res) => {
         const newStatus = isApproved ? 'Return Approved' : 'Return Rejected';
         const refundAmount = isApproved ? order.totalPrice : 0;
         const orderId = order._id.toString().slice(-8).toUpperCase();
-        const frontendUrl = process.env.FRONTEND_URL || 'https://trendorra.onrender.com';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://videstore.onrender.com';
 
         order.orderStatus = newStatus;
         order.returnRequest.status = isApproved ? 'Approved' : 'Rejected';
@@ -222,7 +225,7 @@ const handleReturn = async (req, res) => {
             <h2 style="color:#f87171;font-weight:300;">Return Not Approved</h2>
             <p style="color:rgba(255,255,255,0.6);font-size:14px;">Hi ${order.user.name}, we reviewed your return for order <strong style="color:#fff;">#${orderId}</strong>. Unfortunately it was not approved.</p>
             ${note ? `<div style="background:#0a0a0a;border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:16px;margin:20px 0;"><p style="color:rgba(255,255,255,0.7);font-size:13px;margin:0;">${note}</p></div>` : ''}
-            <p style="color:rgba(255,255,255,0.4);font-size:13px;">For queries email <a href="mailto:hello@trendorra.in" style="color:#C9A84C;">hello@trendorra.in</a></p>
+            <p style="color:rgba(255,255,255,0.4);font-size:13px;">For queries email <a href="mailto:vibestore2027@gmail.com" style="color:#C9A84C;">vibestore2027@gmail.com</a></p>
             <a href="${frontendUrl}/orders/${order._id}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#C9A84C;color:#000;font-weight:600;text-decoration:none;border-radius:4px;font-size:13px;">View Order</a>
           </div>`,
                 });
@@ -248,7 +251,11 @@ const getAllReturns = async (req, res) => {
         const { status, page = 1, limit = 20 } = req.query;
         const query = { returnRequest: { $exists: true } };
         if (status) query['returnRequest.status'] = status;
-        if (req.user.role === 'seller') query['orderItems.seller'] = req.user._id;
+        
+        const sellerRoles = ['seller', 'seller_owner', 'seller_staff'];
+        if (sellerRoles.includes(req.user.role)) {
+            query['orderItems.sellerId'] = req.user.sellerAccountId;
+        }
 
         const skip = (Number(page) - 1) * Number(limit);
         const total = await Order.countDocuments(query);

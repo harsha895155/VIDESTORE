@@ -23,8 +23,8 @@ app.use(cors({
     const allowed = [
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://trendorra-black.vercel.app",
-      "https://trendorra.onrender.com"
+      "https://videstore-black.vercel.app",
+      "https://videstore.onrender.com"
     ];
     if (!origin || allowed.includes(origin)) {
       callback(null, true);
@@ -38,8 +38,8 @@ app.use(cors({
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5000, // Increased from 100 to prevent 429 errors in development/heavy usage
   message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api/', limiter);
@@ -65,10 +65,40 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/delivery', require('./routes/deliveryRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
+app.use('/api/contact', require('./routes/contactRoutes'));
+
+// Temporary route to create admin account easily via browser
+app.get('/api/setup-admin', async (req, res) => {
+  try {
+    const User = require('./models/User');
+    const bcrypt = require('bcryptjs');
+    const email = 'videstore2027@gmail.com';
+    const password = 'VideStore2027';
+    
+    let user = await User.findOne({ email });
+    if (user) {
+      user.role = 'admin';
+      user.password = password; // Will be hashed by pre-save hook
+      await user.save();
+      return res.send(`<h1>Admin account updated!</h1><p>Email: ${email}</p><p>Password: ${password}</p><a href="http://localhost:5173/login">Go to Login</a>`);
+    } else {
+      await User.create({
+        name: 'Admin',
+        email: email,
+        password: password,
+        role: 'admin',
+        isActive: true
+      });
+      return res.send(`<h1>Admin account created!</h1><p>Email: ${email}</p><p>Password: ${password}</p><a href="http://localhost:5173/login">Go to Login</a>`);
+    }
+  } catch (error) {
+    res.send(`Error: ${error.message}`);
+  }
+});
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ message: 'Trendorra API is running!', status: 'OK' });
+  res.json({ message: 'VideStore API is running!', status: 'OK' });
 });
 
 // Error handler
@@ -83,5 +113,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Trendorra server running on port ${PORT}`);
+  console.log(`🚀 VideStore server running on port ${PORT}`);
 });
