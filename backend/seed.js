@@ -177,12 +177,12 @@ const seedDB = async () => {
     // Create admin user
     const adminUser = await User.create({
       name: 'Admin User',
-      email: 'videstore2027@gmail.com',
+      email: 'vibestore2027@gmail.com',
       password: 'VideStore2027',
       role: 'admin',
       phone: '+91 9876543210',
     });
-    console.log('👑 Admin created: videstore2027@gmail.com / VideStore2027');
+    console.log('👑 Admin created: vibestore2027@gmail.com / VideStore2027');
 
     // Create test user
     await User.create({
@@ -200,7 +200,7 @@ const seedDB = async () => {
     console.log(`✅ ${products.length} products seeded`);
 
     console.log('\n🎉 Database seeded successfully!');
-    console.log('📌 Admin Login: videstore2027@gmail.com / VideStore2027');
+    console.log('📌 Admin Login: vibestore2027@gmail.com / VideStore2027');
     console.log('📌 User Login:  user@videstore.in / User@123');
     process.exit(0);
   } catch (error) {

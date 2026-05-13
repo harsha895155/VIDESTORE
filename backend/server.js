@@ -76,7 +76,7 @@ app.get('/api/setup-admin', async (req, res) => {
   try {
     const User = require('./models/User');
     const bcrypt = require('bcryptjs');
-    const email = 'videstore2027@gmail.com';
+    const email = 'vibestore2027@gmail.com';
     const password = 'VideStore2027';
     
     let user = await User.findOne({ email });

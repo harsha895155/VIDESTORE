@@ -192,7 +192,7 @@ export function LoginPage() {
           value={email} 
           onChange={e => { setEmail(e.target.value); setError(''); }}
           hasError={errorField === 'email'}
-          autoComplete="email"
+          autoComplete="off"
         />
         <div className="relative">
           <FloatInput 
@@ -201,7 +201,7 @@ export function LoginPage() {
             value={password} 
             onChange={e => { setPassword(e.target.value); setError(''); }}
             hasError={errorField === 'password'}
-            autoComplete="current-password"
+            autoComplete="new-password"
             rightSlot={<EyeBtn show={showPass} toggle={() => setShowPass(!showPass)} />}
           />
         </div>

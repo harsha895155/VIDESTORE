@@ -679,16 +679,19 @@ export default function SellerRegisterPage() {
                   />
                   <Field
                     label="Email Address" icon={FiMail} type="email"
+                    name="seller_email" autoComplete="off"
                     value={form.email} onChange={e => set('email', e.target.value)}
                     error={errors.email} placeholder="you@business.com"
                   />
                   <Field
                     label="Mobile Number" icon={FiPhone} type="tel"
+                    name="seller_phone" autoComplete="off"
                     value={form.phone} onChange={e => set('phone', e.target.value)}
                     error={errors.phone} placeholder="10-digit mobile number"
                   />
                   <Field
                     label="Password" type="password"
+                    name="seller_password" autoComplete="new-password"
                     value={form.password} onChange={e => set('password', e.target.value)}
                     error={errors.password}
                     placeholder="Min 8 characters"
