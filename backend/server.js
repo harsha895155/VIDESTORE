@@ -26,11 +26,10 @@ app.use(cors({
     const allowed = [
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://videstore-black.vercel.app",
-      "https://videstore.onrender.com",
-      "https://videstore-6ky79nt74-harsha895155s-projects.vercel.app"
+      "https://videstore.onrender.com"
     ];
-    if (!origin || allowed.includes(origin)) {
+    // Allow local development, specified origins, and any vercel.app subdomain
+    if (!origin || allowed.includes(origin) || origin.endsWith(".vercel.app")) {
       callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin);
